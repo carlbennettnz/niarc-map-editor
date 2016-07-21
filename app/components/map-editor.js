@@ -9,6 +9,7 @@ const {
 export default Ember.Component.extend({
   lineInProgress: null,
   gridSize: 20,
+  clickToSelectTolerance: 10, // how many pixels away can you click and still select the line?
 
   lines: [],
 
@@ -39,7 +40,8 @@ export default Ember.Component.extend({
         y2: Math.round(event.offsetY / gridSize) * gridSize
       },
       isSelected: true,
-      isInProgress: true
+      isInProgress: true,
+      isHidden: true
     });
   },
 
@@ -55,6 +57,8 @@ export default Ember.Component.extend({
       set(this, 'lineInProgress', null);
       return;
     }
+
+    set(line, 'isHidden', false);
 
     const xSize = Math.abs(get(line, 'points.x1') - event.offsetX);
     const ySize = Math.abs(get(line, 'points.y1') - event.offsetY);
@@ -72,12 +76,51 @@ export default Ember.Component.extend({
   mouseUp() {
     const line = get(this, 'lineInProgress');
 
-    if (get(line, 'points.x1') !== get(line, 'points.x2') || get(line, 'points.y1') !== get(line, 'points.y2')) {
+    if (!get(line, 'isHidden')) {
       set(line, 'isInProgress', false);
-      this.sendAction('addLine', line);
+      this.sendAction('add', line);
     }
 
     set(this, 'lineInProgress', null);
+  },
+
+  click(event) {
+    // Reverse because we want to select lines on top first and the last lines render on top
+    const lines = (get(this, 'lines') || []).reverse();
+    const tolerance = get(this, 'clickToSelectTolerance');
+    const x = event.offsetX;
+    const y = event.offsetY;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines.objectAt(i);
+
+      // Yes, line.points.x1 would work, but doing it this way ensures Ember observers are triggered
+      // and computed properties are refreshed, if we one day wanted to add some.
+      const p = {
+        x1: get(line, 'points.x1'),
+        y1: get(line, 'points.y1'),
+        x2: get(line, 'points.x2'),
+        y2: get(line, 'points.y2')
+      };
+
+      // Swap values to ensure x1 < x2 and y1 < y2. Makes the collision check simpiler.
+      if (p.x1 > p.x2) {
+        [ p.x1, p.x2 ] = [ p.x2, p.x1 ];
+      }
+
+      if (p.y1 > p.y2) {
+        [ p.y1, p.y2 ] = [ p.y2, p.y1 ];
+      }
+
+      // Logic here assumes horizontal or vertical lines
+      const xOk = (p.x1 - x < tolerance && x - p.x2 < tolerance);
+      const yOk = (p.y1 - y < tolerance && y - p.y2 < tolerance);
+
+      if (xOk && yOk) {
+        this.sendAction('select', line);
+        break;
+      }
+    }
   },
 
   actions: {

@@ -43,25 +43,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
     this.$('button.clear').click();
   });
 
-  it('adds a new line on mousedown', function() {
-    this.render(hbs`{{map-editor}}`);
-
-    const mouseDown = Ember.$.Event('mousedown');
-    mouseDown.offsetX = 20;
-    mouseDown.offsetY = 40;
-    this.$('svg').trigger(mouseDown);
-
-    return wait().then(() => {
-      const wall = this.$('g.wall line');
-      expect(wall).to.exist;
-      expect(wall.attr('x1')).to.equal('20');
-      expect(wall.attr('y1')).to.equal('40');
-      expect(wall.attr('x2')).to.equal('20');
-      expect(wall.attr('y2')).to.equal('40');
-    });
-  });
-
-  it('adjusts the line while you click and drag', function() {
+  it('adds a line when you click and drag', function() {
     this.render(hbs`{{map-editor}}`);
 
     const mouseDown = Ember.$.Event('mousedown');
@@ -85,10 +67,10 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
     });
   });
 
-  it('sends addLine action on mouseup', function(done) {
+  it('sends add action on mouseup', function(done) {
     this.set('addLine', () => done());
 
-    this.render(hbs`{{map-editor addLine=addLine}}`);
+    this.render(hbs`{{map-editor add=addLine}}`);
 
     const mouseDown = Ember.$.Event('mousedown');
     mouseDown.offsetX = 25;
@@ -162,5 +144,32 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       expect(wall.attr('x2')).to.equal('20');
       expect(wall.attr('y2')).to.equal('80');
     });
+  });
+
+  it('selects an existing line on click', function(done) {
+    this.set('lines', [
+      { points: { x1: 20, y1: 20, x2: 100, y2: 20 } },
+      { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
+    ]);
+
+    this.set('selectLine', () => done());
+
+    this.render(hbs`{{map-editor lines=lines select=selectLine}}`);
+
+    const click = Ember.$.Event('click');
+    click.offsetX = 20;
+    click.offsetY = 20;
+    this.$('svg').trigger(click);
+  });
+
+  it('shows handles on selected lines', function() {
+    this.set('lines', [
+      { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, isSelected: true },
+      { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
+    ]);
+
+    this.render(hbs`{{map-editor lines=lines}}`);
+
+    expect(this.$('circle.handle')).to.have.length(2);
   });
 });

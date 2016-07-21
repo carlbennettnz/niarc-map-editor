@@ -21,6 +21,10 @@ export default Ember.Controller.extend({
       model.pushObject(line);
     },
 
+    selectLine(line) {
+      set(line, 'isSelected', true);
+    }
+
     clearLines() {
       set(this, 'model', []);
     }

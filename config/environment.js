@@ -2,7 +2,7 @@
 
 module.exports = function(environment) {
   var ENV = {
-    modulePrefix: 'map-editor',
+    modulePrefix: 'niarc-map-editor',
     environment: environment,
     baseURL: '/',
     locationType: 'auto',

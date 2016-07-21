@@ -1,0 +1,29 @@
+body {
+  font-family: sans-serif;
+  background: #222;
+  color: white;
+  padding: 20px 40px;
+}
+
+.controls {
+  float: left;
+  padding-right: 20px;
+}
+
+svg {
+  background-color: #445;
+  background-image:
+    linear-gradient(-90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px, 20px 20px;
+}
+
+svg g.wall line {
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke: white;
+}
+
+svg g.wall .handle {
+  fill: white;
+}

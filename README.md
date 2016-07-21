@@ -1,17 +1,18 @@
-# Map-editor
+# NIARC Map Editor
 
-This README outlines the details of collaborating on this Ember application.
-A short introduction of this app could easily go here.
+* Draw walls, on a fixed grid, snapping to X or Y axis.
+* Select walls and edit them.
+* Export to a text file.
 
 ## Prerequisites
 
 You will need the following things properly installed on your computer.
 
-* [Git](http://git-scm.com/)
-* [Node.js](http://nodejs.org/) (with NPM)
-* [Bower](http://bower.io/)
+* [Git](http://git-scm.com/) for version control
+* [Node.js](http://nodejs.org/) (with NPM) to run Ember CLI and install packages
+* [Bower](http://bower.io/) to install client-side packages
 * [Ember CLI](http://ember-cli.com/)
-* [PhantomJS](http://phantomjs.org/)
+* [PhantomJS](http://phantomjs.org/) to run tests
 
 ## Installation
 
@@ -45,9 +46,9 @@ Specify what it takes to deploy your app.
 
 ## Further Reading / Useful Links
 
-* [ember.js](http://emberjs.com/)
-* [ember-cli](http://ember-cli.com/)
+* [Ember.js](http://emberjs.com/)
+* [Ember CLI](http://ember-cli.com/)
 * Development Browser Extensions
-  * [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
-  * [ember inspector for firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)
+  * [Ember Inspector for Chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
+  * [Ember Inspector for Firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)
 

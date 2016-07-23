@@ -9,7 +9,7 @@
      id="map"
      width="600"
      height="400">
-  {{#each allLines as |line|}}
+  {{#each lines as |line|}}
     {{#unless line.isHidden}}
       <g class="wall {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}}">
         <line

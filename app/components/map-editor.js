@@ -7,81 +7,102 @@ const {
 } = Ember;
 
 export default Ember.Component.extend({
-  lineInProgress: null,
+  // State
+  mouseAction: null,
+  newLine: null,
+  selectedHandle: null,
+
+  // Model
+  lines: [],
+
+  // Config
   gridSize: 20,
   clickToSelectTolerance: 10, // how many pixels away can you click and still select the line?
 
-  lines: [],
+  mouseDown(event) {
+    const point = {
+      x: event.offsetX,
+      y: event.offsetY
+    };
 
-  allLines: computed('lines.[]', 'lineInProgress', function() {
-    const allLines = [];
-    const lines = get(this, 'lines') || [];
-    const inProgress = get(this, 'lineInProgress');
-
-    allLines.push(...lines);
-
-    if (inProgress) {
-      allLines.push(inProgress);
+    // Avoids error if action fires at the same time as component is destroyed
+    if (get(this, 'isDestroying')) {
+      return;
     }
 
-    return allLines;
-  }),
+    const handle = this.getHandleAtPoint(point);
 
-  mouseDown(event) {
-    const gridSize = get(this, 'gridSize');
+    // If over a handle, start moving that handle
+    if (handle) {
+      set(this, 'mouseAction', 'moveHandle');
+      this.startMoveHandle(point, handle);
+      return;
+    }
 
-    get(this, 'lines').forEach(line => set(line, 'isSelected', false));
+    const line = this.getLineAtPoint(point);
 
-    set(this, 'lineInProgress', {
-      points: {
-        x1: Math.round(event.offsetX / gridSize) * gridSize,
-        y1: Math.round(event.offsetY / gridSize) * gridSize,
-        x2: Math.round(event.offsetX / gridSize) * gridSize,
-        y2: Math.round(event.offsetY / gridSize) * gridSize
-      },
-      isSelected: true,
-      isInProgress: true,
-      isHidden: true
-    });
+    // If over a line, start moving that line
+    if (line) {
+      set(this, 'mouseAction', 'moveLine');
+      this.startMoveLine(point, line);
+      return;
+    }
+
+    // Else start a new line
+    set(this, 'mouseAction', 'adjustNewLine');
+    this.startNewLine(point);
   },
 
   mouseMove(event) {
-    const line = get(this, 'lineInProgress');
-    const gridSize = get(this, 'gridSize');
+    const mouseAction = get(this, 'mouseAction');
 
-    if (!line || get(this, 'isDestroying')) {
+
+    if (get(this, 'isDestroying')) {
       return;
     }
 
     if (!event.buttons) {
-      set(this, 'lineInProgress', null);
+      set(this, 'newLine', null);
+      set(this, 'draggingHandle', null);
       return;
     }
 
-    set(line, 'isHidden', false);
+    const point = {
+      x: event.offsetX,
+      y: event.offsetY,
+    };
 
-    const xSize = Math.abs(get(line, 'points.x1') - event.offsetX);
-    const ySize = Math.abs(get(line, 'points.y1') - event.offsetY);
+    switch (mouseAction) {
+      case 'moveHandle':
+        this.doMoveHandle(point);
+        break;
 
-    // Snap to an axis
-    if (xSize > ySize) {
-      set(line, 'points.x2', Math.round(event.offsetX / gridSize) * gridSize);
-      set(line, 'points.y2', get(line, 'points.y1'));
-    } else {
-      set(line, 'points.x2', get(line, 'points.x1'));
-      set(line, 'points.y2', Math.round(event.offsetY / gridSize) * gridSize);
+      case 'moveLine':
+        this.doMoveLine(point);
+        break;
+
+      case 'adjustNewLine':
+        this.adjustNewLine(point);
+        break;
     }
   },
 
   mouseUp() {
-    const line = get(this, 'lineInProgress');
+    const mouseAction = get(this, 'mouseAction');
 
-    if (!get(line, 'isHidden')) {
-      set(line, 'isInProgress', false);
-      this.sendAction('add', line);
+    switch (mouseAction) {
+      case 'moveHandle':
+        this.finishMoveHandle();
+        break;
+
+      case 'moveLine':
+        this.finishMoveLine();
+        break;
+
+      case 'adjustNewLine':
+        this.finishNewLine();
+        break;
     }
-
-    set(this, 'lineInProgress', null);
   },
 
   click(event) {
@@ -90,6 +111,8 @@ export default Ember.Component.extend({
     const tolerance = get(this, 'clickToSelectTolerance');
     const x = event.offsetX;
     const y = event.offsetY;
+
+    this.sendAction('deselectAll');
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines.objectAt(i);
@@ -103,24 +126,165 @@ export default Ember.Component.extend({
         y2: get(line, 'points.y2')
       };
 
-      // Swap values to ensure x1 < x2 and y1 < y2. Makes the collision check simpiler.
-      if (p.x1 > p.x2) {
-        [ p.x1, p.x2 ] = [ p.x2, p.x1 ];
-      }
-
-      if (p.y1 > p.y2) {
-        [ p.y1, p.y2 ] = [ p.y2, p.y1 ];
-      }
-
-      // Logic here assumes horizontal or vertical lines
-      const xOk = (p.x1 - x < tolerance && x - p.x2 < tolerance);
-      const yOk = (p.y1 - y < tolerance && y - p.y2 < tolerance);
-
-      if (xOk && yOk) {
+      if (this.checkLineCollision({ x, y }, p, tolerance)) {
         this.sendAction('select', line);
         break;
       }
     }
+  },
+
+  checkPointCollision(point, target, tolerance) {
+    return Math.sqrt(Math.pow(point.x - target.x, 2) + Math.pow(point.y - target.y, 2)) < tolerance;
+  },
+
+  checkLineCollision(point, target, tolerance) {
+    // Swap values to ensure x1 < x2 and y1 < y2. Makes the collision check simpiler.
+    if (target.x1 > target.x2) {
+      [ target.x1, target.x2 ] = [ target.x2, target.x1 ];
+    }
+
+    if (target.y1 > target.y2) {
+      [ target.y1, target.y2 ] = [ target.y2, target.y1 ];
+    }
+
+    // Logic here assumes horizontal or vertical lines
+    const xOk = (target.x1 - point.x < tolerance && point.x - target.x2 < tolerance);
+    const yOk = (target.y1 - point.y < tolerance && point.y - target.y2 < tolerance);
+
+    return xOk && yOk;
+  },
+
+  getHandleAtPoint(point) {
+    const selected = (get(this, 'lines') || []).findBy('isSelected');
+    const tolerance = get(this, 'clickToSelectTolerance');
+
+    if (!selected) {
+      return null;
+    }
+
+    const handles = [
+      { x: get(selected, 'points.x1'), y: get(selected, 'points.y1') },
+      { x: get(selected, 'points.x2'), y: get(selected, 'points.y2') }
+    ];
+
+    const collisions = handles.map(handle => this.checkPointCollision(point, handle, tolerance));
+
+    if (collisions.contains(true)) {
+      return {
+        handleIndex: collisions.indexOf(true) + 1,
+        line: selected
+      };
+    }
+
+    return null;
+  },
+
+  getLineAtPoint(point) {
+    return false;
+  },
+
+  snapPointToGrid(point, gridSize) {
+    return {
+      x: Math.round(point.x / gridSize) * gridSize,
+      y: Math.round(point.y / gridSize) * gridSize
+    };
+  },
+
+  snapPointsToAxis(fixed, variable) {
+    const xSize = Math.abs(get(fixed, 'x') - get(variable, 'x'));
+    const ySize = Math.abs(get(fixed, 'y') - get(variable, 'y'));
+
+    // Snap to an axis
+    return {
+      x: xSize > ySize ? get(variable, 'x') : get(fixed, 'x'),
+      y: xSize > ySize ? get(fixed, 'y') : get(variable, 'y')
+    };
+  },
+
+  startMoveHandle(point, handle) {
+    set(this, 'handleBeingMoved', handle);
+  },
+
+  doMoveHandle(point) {
+    const handleBeingMoved = get(this, 'handleBeingMoved');
+
+    if (!handleBeingMoved) {
+      return;
+    }
+
+    const { handleIndex, line } = handleBeingMoved;
+    const gridSize = get(this, 'gridSize');
+
+    const fixedPoint = {
+      x: get(line, `points.x${handleIndex % 2 + 1}`),
+      y: get(line, `points.y${handleIndex % 2 + 1}`)
+    };
+
+    const snappedToAxis = this.snapPointsToAxis(fixedPoint, point);
+    const snappedToGrid = this.snapPointToGrid(snappedToAxis, gridSize);
+
+    console.log(fixedPoint, point, snappedToGrid);
+    this.sendAction('moveHandle', handleIndex, line, snappedToGrid);
+  },
+
+  finishMoveHandle() {
+
+  },
+
+  startMoveLine(point, line) {
+
+  },
+
+  doMoveLine(point) {
+
+  },
+
+  finishMoveLine() {
+
+  },
+
+  startNewLine(point) {
+    const gridSize = get(this, 'gridSize');
+    const snapped = this.snapPointToGrid(point, gridSize);
+
+    this.sendAction('deselectAll');
+
+    set(this, 'newLine', {
+      points: {
+        x1: snapped.x,
+        y1: snapped.y,
+        x2: snapped.x,
+        y2: snapped.y
+      }
+    });
+  },
+
+  adjustNewLine(point) {
+    const newLine = get(this, 'newLine');
+
+    this.sendAction('add', newLine);
+    this.sendAction('select', newLine);
+
+    set(this, 'handleBeingMoved', {
+      handleIndex: 2,
+      line: newLine
+    });
+
+    set(this, 'newLine', null);
+    set(this, 'mouseAction', 'moveHandle');
+
+    this.doMoveHandle(point);
+  },
+
+  finishNewLine() {
+    // const line = get(this, 'newLine');
+
+    // if (!get(line, 'isHidden')) {
+    //   set(line, 'isInProgress', false);
+    //   this.sendAction('add', line);
+    // }
+
+    set(this, 'newLine', null);
   },
 
   actions: {

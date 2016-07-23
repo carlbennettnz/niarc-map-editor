@@ -2,31 +2,15 @@
   <button class="clear" {{action 'clear'}}>Clear</button>
 </div>
 
-<svg version="1.1"
-     baseProfile="full"
-     width="300" height="200"
-     xmlns="http://www.w3.org/2000/svg"
-     id="map"
-     width="600"
-     height="400">
+<svg id="map" width="600" height="400" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
   {{#each lines as |line|}}
     {{#unless line.isHidden}}
       <g class="wall {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}}">
-        <line
-          x1={{line.points.x1}}
-          y1={{line.points.y1}}
-          x2={{line.points.x2}}
-          y2={{line.points.y2}}></line>
+        <line x1={{line.points.x1}} y1={{line.points.y1}} x2={{line.points.x2}} y2={{line.points.y2}}></line>
 
         {{#if line.isSelected}}
-          <circle class="handle"
-            cx={{line.points.x1}}
-            cy={{line.points.y1}}
-            r="4"></circle>
-          <circle class="handle"
-            cx={{line.points.x2}}
-            cy={{line.points.y2}}
-            r="4"></circle>
+          <circle class="handle" cx={{line.points.x1}} cy={{line.points.y1}} r="4"></circle>
+          <circle class="handle" cx={{line.points.x2}} cy={{line.points.y2}} r="4"></circle>
         {{/if}}
       </g>
     {{/unless}}

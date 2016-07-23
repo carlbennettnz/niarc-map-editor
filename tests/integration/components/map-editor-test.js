@@ -264,7 +264,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       });
     });
 
-    it('moves the selected line left when the left arrow key is pressed', function() {
+    it('moves the selected line when an arrow key is pressed', function() {
       this.set('lines', [ { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, isSelected: true } ]);
       this.render(componentWithAllArgs);
 

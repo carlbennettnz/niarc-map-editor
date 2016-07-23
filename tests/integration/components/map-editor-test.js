@@ -15,6 +15,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
     this.set('lines', []);
     this.set('addLine', line => this.get('lines').pushObject(line));
     this.set('selectLine', line => set(line, 'isSelected', true));
+    this.set('moveLine', (line, points) => set(line, 'points', points));
     this.set('moveHandle', (handleIndex, line, point) => {
       set(line, `points.x${handleIndex}`, get(point, 'x'));
       set(line, `points.y${handleIndex}`, get(point, 'y'));
@@ -204,14 +205,23 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
   });
 
   it('moves lines when clicked and dragged', function() {
-    this.set('lines', [
-      { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, isSelected: true },
-      { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
-    ]);
+    this.set('lines', [ { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, isSelected: true } ]);
+    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle moveLine=moveLine}}`);
 
-    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle}}`);
+    this.$('svg')
+      .trigger(mouseDownAt(80, 20))
+      .trigger(mouseMoveAt(80, 40));
 
-
+    return wait().then(() => {
+      const walls = this.$('g.wall');
+      expect(walls.length).to.equal(1, 'still only one wall');
+      const wall = walls.children('line:first');
+      expect(wall).to.exist;
+      expect(wall.attr('x1')).to.equal('20', 'x1');
+      expect(wall.attr('y1')).to.equal('40', 'y1');
+      expect(wall.attr('x2')).to.equal('100', 'x2');
+      expect(wall.attr('y2')).to.equal('40', 'y2');
+    });
   });
 });
 

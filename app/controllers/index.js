@@ -34,6 +34,10 @@ export default Ember.Controller.extend({
       (get(this, 'model') || []).forEach(line => set(line, 'isSelected', false));
     },
 
+    moveLine(line, points) {
+      set(line, 'points', points);
+    },
+
     moveHandle(handleIndex, line, point) {
       set(line, `points.x${handleIndex}`, point.x);
       set(line, `points.y${handleIndex}`, point.y);

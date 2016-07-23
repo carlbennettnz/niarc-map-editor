@@ -3,7 +3,8 @@ import Ember from 'ember';
 const {
   get,
   set,
-  computed
+  computed,
+  assert
 } = Ember;
 
 export default Ember.Component.extend({
@@ -88,21 +89,7 @@ export default Ember.Component.extend({
   },
 
   mouseUp() {
-    const mouseAction = get(this, 'mouseAction');
-
-    switch (mouseAction) {
-      case 'moveHandle':
-        this.finishMoveHandle();
-        break;
-
-      case 'moveLine':
-        this.finishMoveLine();
-        break;
-
-      case 'adjustNewLine':
-        this.finishNewLine();
-        break;
-    }
+    set(this, 'mouseAction', null);
   },
 
   click(event) {
@@ -180,10 +167,30 @@ export default Ember.Component.extend({
   },
 
   getLineAtPoint(point) {
-    return false;
+    // Reverse because we want to select lines on top first and the last lines render on top
+    const lines = get(this, 'lines').reverse();
+    const tolerance = get(this, 'clickToSelectTolerance');
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines.objectAt(i);
+
+      // Yes, line.points.x1 would work, but doing it this way ensures Ember observers are triggered
+      // and computed properties are refreshed, if we one day wanted to add some.
+      const linePoints = {
+        x1: get(line, 'points.x1'),
+        y1: get(line, 'points.y1'),
+        x2: get(line, 'points.x2'),
+        y2: get(line, 'points.y2')
+      };
+
+      if (this.checkLineCollision(point, linePoints, tolerance)) {
+        return line;
+      }
+    }
   },
 
   snapPointToGrid(point, gridSize) {
+    assert('Grid size is required', gridSize);
     return {
       x: Math.round(point.x / gridSize) * gridSize,
       y: Math.round(point.y / gridSize) * gridSize
@@ -226,20 +233,39 @@ export default Ember.Component.extend({
     this.sendAction('moveHandle', handleIndex, line, snappedToGrid);
   },
 
-  finishMoveHandle() {
-
-  },
-
   startMoveLine(point, line) {
-
+    set(this, 'lineBeingMoved', {
+      line,
+      initialMousePos: point,
+      initialLinePos: Ember.assign({}, get(line, 'points'))
+    });
   },
 
   doMoveLine(point) {
+    const lineBeingMoved = get(this, 'lineBeingMoved');
 
-  },
+    if (!lineBeingMoved) {
+      return;
+    }
 
-  finishMoveLine() {
+    const { line, initialMousePos, initialLinePos } = lineBeingMoved;
+    const gridSize = get(this, 'gridSize');
 
+    const delta = {
+      x: point.x - initialMousePos.x,
+      y: point.y - initialMousePos.y
+    };
+
+    const snappedDelta = this.snapPointToGrid(delta, gridSize);
+
+    const newPos = {
+      x1: get(initialLinePos, 'x1') + snappedDelta.x,
+      y1: get(initialLinePos, 'y1') + snappedDelta.y,
+      x2: get(initialLinePos, 'x2') + snappedDelta.x,
+      y2: get(initialLinePos, 'y2') + snappedDelta.y
+    };
+
+    this.sendAction('moveLine', line, newPos);
   },
 
   startNewLine(point) {
@@ -273,17 +299,6 @@ export default Ember.Component.extend({
     set(this, 'mouseAction', 'moveHandle');
 
     this.doMoveHandle(point);
-  },
-
-  finishNewLine() {
-    // const line = get(this, 'newLine');
-
-    // if (!get(line, 'isHidden')) {
-    //   set(line, 'isInProgress', false);
-    //   this.sendAction('add', line);
-    // }
-
-    set(this, 'newLine', null);
   },
 
   actions: {

@@ -7,23 +7,31 @@ import wait from 'ember-test-helpers/wait';
 
 const {
   get,
-  set
+  set,
+  isArray
 } = Ember;
+
+const componentWithAllArgs = hbs`{{map-editor
+  lines=lines
+  add=addLine
+  select=selectLine
+  deselectAll=deselectAllLines
+  resize=resizeLine
+  remove=removeLines
+}}`;
 
 describeComponent('map-editor', 'Integration: MapEditorComponent', { integration: true }, function() {
   beforeEach(function() {
     this.set('lines', []);
     this.set('addLine', line => this.get('lines').pushObject(line));
     this.set('selectLine', line => set(line, 'isSelected', true));
-    this.set('moveLine', (line, points) => set(line, 'points', points));
-    this.set('moveHandle', (handleIndex, line, point) => {
-      set(line, `points.x${handleIndex}`, get(point, 'x'));
-      set(line, `points.y${handleIndex}`, get(point, 'y'));
-    });
+    this.set('deselectAllLines', () => (get(this, 'lines') || []).forEach(line => set(line, 'isSelected', true)));
+    this.set('resizeLine', (line, points) => set(line, 'points', points));
+    this.set('removeLines', lines => lines.removeObjects(isArray(lines) ? lines : [ lines ]));
   });
 
   it('renders the correct UI', function() {
-    this.render(hbs`{{map-editor}}`);
+    this.render(componentWithAllArgs);
     expect(this.$('button')).to.have.length(1);
     expect(this.$('svg')).to.have.length(1);
   });
@@ -34,7 +42,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
     ]);
 
-    this.render(hbs`{{map-editor lines=lines}}`);
+    this.render(componentWithAllArgs);
 
     expect(this.$('g.wall')).to.have.length(2);
 
@@ -54,14 +62,21 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
     expect(lines[1].attr('y2')).to.equal('100');
   });
 
-  it('fires the clear action when the clear button is pressed', function(done) {
-    this.set('clear', () => done());
-    this.render(hbs`{{map-editor clear=clear}}`);
+  it('fires the removeLines action when the clear button is pressed', function(done) {
+    this.set('removeLines', () => done());
+    this.render(componentWithAllArgs);
     this.$('button.clear').click();
   });
 
   it('adds a line when you click and drag', function() {
-    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle}}`);
+    this.render(hbs`{{map-editor
+      lines=lines
+      add=addLine
+      select=selectLine
+      deselectAll=deselectAllLines
+      resize=resizeLine
+      remove=removeLines
+    }}`);
 
     this.$('svg')
       .trigger(mouseDownAt(20, 40))
@@ -78,7 +93,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
   });
 
   it('sends a select action for the new line when it is created', function() {
-    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle}}`);
+    this.render(componentWithAllArgs);
 
     this.$('svg')
       .trigger(mouseDownAt(20, 40))
@@ -90,7 +105,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
   });
 
   it('sends add action on mouseup', function() {
-    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle}}`);
+    this.render(componentWithAllArgs);
 
     this.$('svg')
       .trigger(mouseDownAt(20, 40))
@@ -107,7 +122,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
   });
 
   it('snaps to a 20px grid', function() {
-    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle}}`);
+    this.render(componentWithAllArgs);
 
     this.$('svg')
       .trigger(mouseDownAt(25, 35))
@@ -124,7 +139,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
   });
 
   it('snaps to an axis', function() {
-    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle}}`);
+    this.render(componentWithAllArgs);
 
     this.$('svg')
       .trigger(mouseDownAt(20, 20))
@@ -163,7 +178,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
 
     this.set('selectLine', () => done());
 
-    this.render(hbs`{{map-editor lines=lines select=selectLine}}`);
+    this.render(componentWithAllArgs);
 
     const click = Ember.$.Event('click');
     click.offsetX = 20;
@@ -177,7 +192,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
     ]);
 
-    this.render(hbs`{{map-editor lines=lines}}`);
+    this.render(componentWithAllArgs);
 
     expect(this.$('circle.handle')).to.have.length(2);
   });
@@ -188,7 +203,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
     ]);
 
-    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle}}`);
+    this.render(componentWithAllArgs);
 
     this.$('svg')
       .trigger(mouseDownAt(20, 20))
@@ -206,7 +221,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
 
   it('moves lines when clicked and dragged', function() {
     this.set('lines', [ { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, isSelected: true } ]);
-    this.render(hbs`{{map-editor lines=lines add=addLine select=selectLine moveHandle=moveHandle moveLine=moveLine}}`);
+    this.render(componentWithAllArgs);
 
     this.$('svg')
       .trigger(mouseDownAt(80, 20))

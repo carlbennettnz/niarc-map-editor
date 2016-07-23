@@ -16,8 +16,8 @@ describeModule('controller:index', 'IndexController', {}, function() {
 
   it('can clear lines', function() {
     let controller = this.subject();
-    controller.set('lines', lines);
-    controller.send('clearLines');
+    controller.set('model', lines);
+    controller.send('removeLines', lines);
     expect(controller.get('model')).to.have.length(0);
   });
 

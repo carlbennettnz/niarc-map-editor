@@ -4,7 +4,8 @@ const {
   get,
   set,
   computed,
-  assert
+  assert,
+  assign
 } = Ember;
 
 export default Ember.Component.extend({
@@ -230,7 +231,12 @@ export default Ember.Component.extend({
     const snappedToAxis = this.snapPointsToAxis(fixedPoint, point);
     const snappedToGrid = this.snapPointToGrid(snappedToAxis, gridSize);
 
-    this.sendAction('moveHandle', handleIndex, line, snappedToGrid);
+    const newPoints = assign({}, get(line, 'points'), {
+      [`x${handleIndex}`]: snappedToGrid.x,
+      [`y${handleIndex}`]: snappedToGrid.y
+    });
+
+    this.sendAction('resize', line, newPoints);
   },
 
   startMoveLine(point, line) {
@@ -265,7 +271,7 @@ export default Ember.Component.extend({
       y2: get(initialLinePos, 'y2') + snappedDelta.y
     };
 
-    this.sendAction('moveLine', line, newPos);
+    this.sendAction('resize', line, newPos);
   },
 
   startNewLine(point) {
@@ -303,7 +309,7 @@ export default Ember.Component.extend({
 
   actions: {
     clear() {
-      this.sendAction('clear');
+      this.sendAction('remove', get(this, 'lines'));
     }
   }
 });

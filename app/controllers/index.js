@@ -3,14 +3,19 @@ import Ember from 'ember';
 const {
   get,
   set,
-  assign
+  assign,
+  isArray
 } = Ember;
 
 export default Ember.Controller.extend({
   saveModel() {
-    localStorage.map = JSON.stringify(get(this, 'model').map(line => {
+    const model = get(this, 'model') || [];
+
+    const modelWithNothingSelected = model.map(line => {
       return assign({}, line, { isSelected: false });
-    }));
+    });
+
+    localStorage.map = JSON.stringify(modelWithNothingSelected);
   },
 
   actions: {
@@ -31,21 +36,19 @@ export default Ember.Controller.extend({
     },
 
     deselectAll(line) {
-      (get(this, 'model') || []).forEach(line => set(line, 'isSelected', false));
+      const model = get(this, 'model') || [];
+      model.forEach(line => set(line, 'isSelected', false));
     },
 
-    moveLine(line, points) {
+    resizeLine(line, points) {
       set(line, 'points', points);
-    },
-
-    moveHandle(handleIndex, line, point) {
-      set(line, `points.x${handleIndex}`, point.x);
-      set(line, `points.y${handleIndex}`, point.y);
       this.saveModel();
     },
 
-    clearLines() {
-      set(this, 'model', []);
+    removeLines(lines) {
+      const model = get(this, 'model') || [];
+      lines = isArray(lines) ? lines : [ lines ];
+      model.removeObjects(lines);
       this.saveModel();
     }
   }

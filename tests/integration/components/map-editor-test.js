@@ -175,7 +175,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
   });
 
   describe('Selections', function() {
-    it('selects an existing line on click', function(done) {
+    it('selects an existing line on mousedown', function(done) {
       this.set('lines', [
         { points: { x1: 20, y1: 20, x2: 100, y2: 20 } },
         { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
@@ -185,10 +185,25 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
 
       this.render(componentWithAllArgs);
 
-      const click = Ember.$.Event('click');
+      const click = Ember.$.Event('mousedown');
       click.offsetX = 20;
       click.offsetY = 20;
       this.$('svg').trigger(click);
+    });
+
+    it('deselects everything on mousedown in empty area', function() {
+      this.set('lines', [
+        { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, isSelected: true },
+        { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
+      ]);
+
+      this.render(componentWithAllArgs);
+
+      this.$('svg').trigger(mouseEventAt('mouseup', 200, 200));
+
+      wait().then(() => {
+        expect(this.$('g.wall.selected')).to.have.length(0);
+      });
     });
 
     it('shows handles on selected lines', function() {
@@ -249,10 +264,6 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
     });
   });
 });
-
-function mouseClickAt(x, y) {
-  return mouseEventAt('click', x, y);
-}
 
 function mouseDownAt(x, y) {
   return mouseEventAt('mousedown', x, y);

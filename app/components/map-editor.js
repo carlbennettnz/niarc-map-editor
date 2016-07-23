@@ -58,7 +58,6 @@ export default Ember.Component.extend({
   mouseMove(event) {
     const mouseAction = get(this, 'mouseAction');
 
-
     if (get(this, 'isDestroying')) {
       return;
     }
@@ -91,34 +90,6 @@ export default Ember.Component.extend({
 
   mouseUp() {
     set(this, 'mouseAction', null);
-  },
-
-  click(event) {
-    // Reverse because we want to select lines on top first and the last lines render on top
-    const lines = (get(this, 'lines') || []).reverse();
-    const tolerance = get(this, 'clickToSelectTolerance');
-    const x = event.offsetX;
-    const y = event.offsetY;
-
-    this.sendAction('deselectAll');
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines.objectAt(i);
-
-      // Yes, line.points.x1 would work, but doing it this way ensures Ember observers are triggered
-      // and computed properties are refreshed, if we one day wanted to add some.
-      const p = {
-        x1: get(line, 'points.x1'),
-        y1: get(line, 'points.y1'),
-        x2: get(line, 'points.x2'),
-        y2: get(line, 'points.y2')
-      };
-
-      if (this.checkLineCollision({ x, y }, p, tolerance)) {
-        this.sendAction('select', line);
-        break;
-      }
-    }
   },
 
   checkPointCollision(point, target, tolerance) {
@@ -245,6 +216,8 @@ export default Ember.Component.extend({
       initialMousePos: point,
       initialLinePos: Ember.assign({}, get(line, 'points'))
     });
+
+    this.sendAction('select', line);
   },
 
   doMoveLine(point) {

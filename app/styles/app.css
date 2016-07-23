@@ -27,3 +27,7 @@ svg g.wall line {
 svg g.wall .handle {
   fill: white;
 }
+
+#ember-testing-container {
+  display: none;
+}

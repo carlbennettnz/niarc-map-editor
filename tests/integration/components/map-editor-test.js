@@ -4,6 +4,7 @@ import { describeComponent, it } from 'ember-mocha';
 import { beforeEach } from 'mocha';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
+import { getKeyCode } from 'ember-keyboard';
 
 const {
   get,
@@ -25,7 +26,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
     this.set('lines', []);
     this.set('addLine', line => this.get('lines').pushObject(line));
     this.set('selectLine', line => set(line, 'isSelected', true));
-    this.set('deselectAllLines', () => (get(this, 'lines') || []).forEach(line => set(line, 'isSelected', true)));
+    this.set('deselectAllLines', () => (this.get('lines') || []).forEach(line => set(line, 'isSelected', false)));
     this.set('resizeLine', (line, points) => set(line, 'points', points));
     this.set('removeLines', lines => lines.removeObjects(isArray(lines) ? lines : [ lines ]));
   });
@@ -199,10 +200,10 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
 
       this.render(componentWithAllArgs);
 
-      this.$('svg').trigger(mouseEventAt('mouseup', 200, 200));
+      this.$('svg').trigger(mouseDownAt(200, 200));
 
-      wait().then(() => {
-        expect(this.$('g.wall.selected')).to.have.length(0);
+      return wait().then(() => {
+        expect(this.$('g.wall.selected').toArray()).to.have.length(0);
       });
     });
 
@@ -262,6 +263,40 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
         expect(wall.attr('y2')).to.equal('40', 'y2');
       });
     });
+
+    it('moves the selected line left when the left arrow key is pressed', function() {
+      this.set('lines', [ { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, isSelected: true } ]);
+      this.render(componentWithAllArgs);
+
+      const codes = [ 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown' ];
+      const expected = [
+        [ 0, 20, 80, 20 ],
+        [ 0, 0, 80, 0 ],
+        [ 20, 0, 100, 0 ],
+        [ 20, 20, 100, 20 ],
+      ];
+
+      const moveAndCheck = (code) => {
+        this.$('svg').trigger(keyDownWith(code));
+
+        return wait().then(() => {
+          const wall = this.$('g.wall line');
+          const e = expected.shift();
+
+          expect(wall).to.exist;
+          expect(wall.attr('x1')).to.equal(e[0].toString(), 'x1');
+          expect(wall.attr('y1')).to.equal(e[1].toString(), 'y1');
+          expect(wall.attr('x2')).to.equal(e[2].toString(), 'x2');
+          expect(wall.attr('y2')).to.equal(e[3].toString(), 'y2');
+
+          if (codes.length) {
+            return moveAndCheck(codes.shift());
+          }
+        });
+      };
+
+      return moveAndCheck(codes.shift());
+    });
   });
 });
 
@@ -277,6 +312,10 @@ function mouseMoveAt(x, y) {
   return mouseMove;
 }
 
+function mouseUpAt(x, y) {
+  return mouseEventAt('mouseup', x, y);
+}
+
 function mouseEventAt(eventName, x, y) {
   const event = Ember.$.Event(eventName);
 
@@ -284,4 +323,12 @@ function mouseEventAt(eventName, x, y) {
   event.offsetY = y;
 
   return event;
+}
+
+function keyDownWith(code) {
+  const keyDown = Ember.$.Event('keydown');
+
+  keyDown.keyCode = getKeyCode(code);
+
+  return keyDown;
 }

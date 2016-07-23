@@ -1,14 +1,16 @@
 import Ember from 'ember';
+import { EKMixin, keyDown } from 'ember-keyboard';
 
 const {
   get,
   set,
   computed,
   assert,
-  assign
+  assign,
+  on
 } = Ember;
 
-export default Ember.Component.extend({
+export default Ember.Component.extend(EKMixin, {
   // State
   mouseAction: null,
   newLine: null,
@@ -18,6 +20,7 @@ export default Ember.Component.extend({
   lines: [],
 
   // Config
+  keyboardActivated: true,
   gridSize: 20,
   clickToSelectTolerance: 10, // how many pixels away can you click and still select the line?
 
@@ -91,6 +94,40 @@ export default Ember.Component.extend({
   mouseUp() {
     set(this, 'mouseAction', null);
   },
+
+  deleteLine: on(keyDown('Backspace'), function(event) {
+    event.preventDefault();
+
+    const selected = get(this, 'lines').findBy('isSelected');
+
+    if (selected) {
+      this.sendAction('remove', selected);
+    }
+  }),
+
+  moveLineLeft: on(keyDown('ArrowLeft'), function(event) {
+    event.preventDefault();
+    const selected = get(this, 'lines').findBy('isSelected');
+    this.moveLineOnGrid(selected, -1, 0);
+  }),
+
+  moveLineUp: on(keyDown('ArrowUp'), function(event) {
+    event.preventDefault();
+    const selected = get(this, 'lines').findBy('isSelected');
+    this.moveLineOnGrid(selected, 0, -1);
+  }),
+
+  moveLineRight: on(keyDown('ArrowRight'), function(event) {
+    event.preventDefault();
+    const selected = get(this, 'lines').findBy('isSelected');
+    this.moveLineOnGrid(selected, 1, 0);
+  }),
+
+  moveLineDown: on(keyDown('ArrowDown'), function(event) {
+    event.preventDefault();
+    const selected = get(this, 'lines').findBy('isSelected');
+    this.moveLineOnGrid(selected, 0, 1);
+  }),
 
   checkPointCollision(point, target, tolerance) {
     return Math.sqrt(Math.pow(point.x - target.x, 2) + Math.pow(point.y - target.y, 2)) < tolerance;
@@ -278,6 +315,19 @@ export default Ember.Component.extend({
     set(this, 'mouseAction', 'moveHandle');
 
     this.doMoveHandle(point);
+  },
+
+  moveLineOnGrid(line, dx, dy) {
+    const gridSize = get(this, 'gridSize');
+
+    if (line) {
+      this.sendAction('resize', line, {
+        x1: get(line, 'points.x1') + dx * gridSize,
+        y1: get(line, 'points.y1') + dy * gridSize,
+        x2: get(line, 'points.x2') + dx * gridSize,
+        y2: get(line, 'points.y2') + dy * gridSize,
+      });
+    }
   },
 
   actions: {

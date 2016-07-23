@@ -223,7 +223,6 @@ export default Ember.Component.extend({
     const snappedToAxis = this.snapPointsToAxis(fixedPoint, point);
     const snappedToGrid = this.snapPointToGrid(snappedToAxis, gridSize);
 
-    console.log(fixedPoint, point, snappedToGrid);
     this.sendAction('moveHandle', handleIndex, line, snappedToGrid);
   },
 

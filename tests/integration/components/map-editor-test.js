@@ -14,6 +14,7 @@ const {
 
 const componentWithAllArgs = hbs`{{map-editor
   lines=lines
+  viewport=viewport
   add=addLine
   select=selectLine
   deselectAll=deselectAllLines
@@ -24,6 +25,7 @@ const componentWithAllArgs = hbs`{{map-editor
 describeComponent('map-editor', 'Integration: MapEditorComponent', { integration: true }, function() {
   beforeEach(function() {
     this.set('lines', []);
+    this.set('viewport', { scrollX: 0, scrollY: 0, zoom: 1 });
     this.set('addLine', line => this.get('lines').pushObject(line));
     this.set('selectLine', line => set(line, 'isSelected', true));
     this.set('deselectAllLines', () => (this.get('lines') || []).forEach(line => set(line, 'isSelected', false)));
@@ -34,7 +36,6 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
   describe('UI', function() {
     it('renders the correct UI', function() {
       this.render(componentWithAllArgs);
-      expect(this.$('button')).to.have.length(1);
       expect(this.$('svg')).to.have.length(1);
     });
 
@@ -64,10 +65,44 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       expect(lines[1].attr('y2')).to.equal('100');
     });
 
-    it('fires the removeLines action when the clear button is pressed', function(done) {
-      this.set('removeLines', () => done());
+    it('scales and zooms lines, axes, and grid', function() {
+      this.set('viewport.scrollX', 20);
+      this.set('viewport.scrollY', 40);
+      this.set('viewport.zoom', 0.5);
+
+      this.set('lines', [
+        { points: { x1: 20, y1: 20, x2: 100, y2: 20 } },
+        { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
+      ]);
+
       this.render(componentWithAllArgs);
-      this.$('button.clear').click();
+
+      // Lines
+
+      const lines = [
+        this.$('g.wall:first line'),
+        this.$('g.wall:last line')
+      ];
+
+      expect(lines[0].attr('x1')).to.equal('10');
+      expect(lines[0].attr('y1')).to.equal('10');
+      expect(lines[0].attr('x2')).to.equal('50');
+      expect(lines[0].attr('y2')).to.equal('10');
+
+      expect(lines[1].attr('x1')).to.equal('30');
+      expect(lines[1].attr('y1')).to.equal('20');
+      expect(lines[1].attr('x2')).to.equal('30');
+      expect(lines[1].attr('y2')).to.equal('50');
+
+      // Axes
+
+      expect(this.$('.axes.x').attr('y1')).to.equal('40', 'x axis');
+      expect(this.$('.axes.y').attr('x1')).to.equal('20', 'y axis');
+
+      // Grid
+
+      expect(this.$('#grid-pattern').attr('x')).to.equal('20');
+      expect(this.$('#grid-pattern').attr('y')).to.equal('40');
     });
   });
 
@@ -157,10 +192,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
         expect(wall.attr('x2')).to.equal('100');
         expect(wall.attr('y2')).to.equal('20');
 
-        const mouseMove2 = Ember.$.Event('mousemove');
-        mouseMove2.offsetX = 60;
-        mouseMove2.offsetY = 80;
-        mouseMove2.buttons = 1;
+        const mouseMove2 = mouseMoveAt(60, 80);
         this.$('svg').trigger(mouseMove2);
 
         return wait();
@@ -186,10 +218,8 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
 
       this.render(componentWithAllArgs);
 
-      const click = Ember.$.Event('mousedown');
-      click.offsetX = 20;
-      click.offsetY = 20;
-      this.$('svg').trigger(click);
+      const mouseDown = mouseDownAt(20, 20);
+      this.$('svg').trigger(mouseDown);
     });
 
     it('deselects everything on mousedown in empty area', function() {
@@ -319,8 +349,8 @@ function mouseUpAt(x, y) {
 function mouseEventAt(eventName, x, y) {
   const event = Ember.$.Event(eventName);
 
-  event.offsetX = x;
-  event.offsetY = y;
+  event.clientX = x;
+  event.clientY = y;
 
   return event;
 }

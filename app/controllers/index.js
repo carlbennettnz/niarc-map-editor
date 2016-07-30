@@ -8,6 +8,12 @@ const {
 } = Ember;
 
 export default Ember.Controller.extend({
+  mapViewport: {
+    scrollX: 30,
+    scrollY: 30,
+    zoom: 1
+  },
+
   saveModel() {
     const model = get(this, 'model') || [];
 

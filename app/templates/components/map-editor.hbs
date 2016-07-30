@@ -1,18 +1,33 @@
-<div class="controls">
-  <button class="clear" {{action 'clear'}}>Clear</button>
-</div>
+<svg class="map" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid-pattern" x={{viewport.scrollX}} y={{viewport.scrollY}} width="20" height="20" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="20" stroke="rgba(255, 255, 255, 0.1)"/>
+      <line x1="0" y1="0" x2="20" y2="0" stroke="rgba(255, 255, 255, 0.1)"/>
+    </pattern>
+  </defs>
 
-<svg id="map" width="600" height="400" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
-  {{#each lines as |line|}}
-    {{#unless line.isHidden}}
-      <g class="wall {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}}">
-        <line x1={{line.points.x1}} y1={{line.points.y1}} x2={{line.points.x2}} y2={{line.points.y2}}></line>
+  <rect fill="url(#grid-pattern)" stroke="black" x="0" y="0" width="100%" height="100%"/>
 
-        {{#if line.isSelected}}
-          <circle class="handle" cx={{line.points.x1}} cy={{line.points.y1}} r="4"></circle>
-          <circle class="handle" cx={{line.points.x2}} cy={{line.points.y2}} r="4"></circle>
-        {{/if}}
-      </g>
-    {{/unless}}
-  {{/each}}
+  {{! x and y axes }}
+  <line class="axes x" x1="0" y1={{viewport.scrollY}} x2="100%" y2={{viewport.scrollY}}></line>
+  <line class="axes y" y1="0" x1={{viewport.scrollX}} y2="100%" x2={{viewport.scrollX}}></line>
+
+  <g class="scroll-offset" transform={{scrollTransform}}>
+    {{#each lines as |line|}}
+      {{#unless line.isHidden}}
+        <g class="wall {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}}">
+          <line
+            x1={{scale line.points.x1 viewport.zoom}}
+            y1={{scale line.points.y1 viewport.zoom}}
+            x2={{scale line.points.x2 viewport.zoom}}
+            y2={{scale line.points.y2 viewport.zoom}}></line>
+
+          {{#if line.isSelected}}
+            <circle class="handle" cx={{scale line.points.x1 viewport.zoom}} cy={{scale line.points.y1 viewport.zoom}} r="4"></circle>
+            <circle class="handle" cx={{scale line.points.x2 viewport.zoom}} cy={{scale line.points.y2 viewport.zoom}} r="4"></circle>
+          {{/if}}
+        </g>
+      {{/unless}}
+    {{/each}}
+  </g>
 </svg>

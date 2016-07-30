@@ -23,12 +23,21 @@ export default Ember.Component.extend(EKMixin, {
   keyboardActivated: true,
   gridSize: 20,
   clickToSelectTolerance: 10, // how many pixels away can you click and still select the line?
+  viewport: {
+    scrollX: 0,
+    scrollY: 0,
+    zoom: 1
+  },
+
+  scrollTransform: computed('viewport.scrollX', '', function() {
+    const x = get(this, 'viewport.scrollX');
+    const y = get(this, 'viewport.scrollY');
+
+    return `translate(${x}, ${y})`;
+  }),
 
   mouseDown(event) {
-    const point = {
-      x: event.offsetX,
-      y: event.offsetY
-    };
+    const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
 
     // Avoids error if action fires at the same time as component is destroyed
     if (get(this, 'isDestroying')) {
@@ -71,10 +80,7 @@ export default Ember.Component.extend(EKMixin, {
       return;
     }
 
-    const point = {
-      x: event.offsetX,
-      y: event.offsetY,
-    };
+    const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
 
     switch (mouseAction) {
       case 'moveHandle':
@@ -93,6 +99,17 @@ export default Ember.Component.extend(EKMixin, {
 
   mouseUp() {
     set(this, 'mouseAction', null);
+  },
+
+  getScaledAndOffsetPoint(x, y) {
+    const scrollX = get(this, 'viewport.scrollX');
+    const scrollY = get(this, 'viewport.scrollY');
+    const zoom = get(this, 'viewport.zoom');
+
+    return {
+      x: (x - scrollX) / zoom,
+      y: (y - scrollY) / zoom
+    };
   },
 
   deleteLine: on(keyDown('Backspace'), function(event) {

@@ -44,6 +44,8 @@ export default Ember.Component.extend(EKMixin, {
       return;
     }
 
+    set(this, 'mouseDidDrag', false);
+
     const handle = this.getHandleAtPoint(point);
 
     // If over a handle, start moving that handle
@@ -55,8 +57,8 @@ export default Ember.Component.extend(EKMixin, {
 
     const line = this.getLineAtPoint(point);
 
-    // If over a line, start moving that line
-    if (line) {
+    // If over a selected line, start moving that line
+    if (line && get(line, 'isSelected')) {
       set(this, 'mouseAction', 'moveLine');
       this.startMoveLine(point, line);
       return;
@@ -74,11 +76,13 @@ export default Ember.Component.extend(EKMixin, {
       return;
     }
 
-    if (!event.buttons) {
+    if (!event.buttons || !mouseAction) {
       set(this, 'newLine', null);
       set(this, 'draggingHandle', null);
       return;
     }
+
+    set(this, 'mouseDidDrag', true);
 
     const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
 
@@ -97,7 +101,20 @@ export default Ember.Component.extend(EKMixin, {
     }
   },
 
-  mouseUp() {
+  mouseUp(event) {
+    const action = get(this, 'mouseAction');
+    const didDrag = get(this, 'mouseDidDrag');
+
+    // Select clicked lines if they're not already clicked and the pointer has not moved since mousedown
+    if (action !== 'moveHandle' && action !== 'moveLine' && didDrag === false) {
+      const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
+      const line = this.getLineAtPoint(point);
+
+      if (line) {
+        this.sendAction('select', line);
+      }
+    }
+
     set(this, 'mouseAction', null);
   },
 

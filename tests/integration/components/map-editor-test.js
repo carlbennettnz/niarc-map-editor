@@ -208,7 +208,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
   });
 
   describe('Selections', function() {
-    it('selects an existing line on mousedown', function(done) {
+    it('selects an existing line on mouseup', function(done) {
       this.set('lines', [
         { points: { x1: 20, y1: 20, x2: 100, y2: 20 } },
         { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
@@ -220,6 +220,9 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
 
       const mouseDown = mouseDownAt(20, 20);
       this.$('svg').trigger(mouseDown);
+
+      const mouseUp = mouseUpAt(20, 20);
+      this.$('svg').trigger(mouseUp);
     });
 
     it('deselects everything on mousedown in empty area', function() {

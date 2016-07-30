@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import { EKMixin, keyDown } from 'ember-keyboard';
+import { EKMixin, keyDown, getCode } from 'ember-keyboard';
 
 const {
   get,
@@ -139,28 +139,24 @@ export default Ember.Component.extend(EKMixin, {
     }
   }),
 
-  moveLineLeft: on(keyDown('ArrowLeft'), function(event) {
-    event.preventDefault();
-    const selected = get(this, 'lines').findBy('isSelected');
-    this.moveLineOnGrid(selected, -1, 0);
-  }),
+  moveLineWithKeyboard: on(keyDown(), function(event) {
+    // If the user is focused on an input, don't hijack their key events
+    if (event.target.tagName.toLowerCase() === 'input') {
+      return;
+    }
 
-  moveLineUp: on(keyDown('ArrowUp'), function(event) {
-    event.preventDefault();
-    const selected = get(this, 'lines').findBy('isSelected');
-    this.moveLineOnGrid(selected, 0, -1);
-  }),
+    const code = getCode(event);
+    const map = {
+      'ArrowLeft':  [ -1, 0 ],
+      'ArrowUp':    [ 0, -1 ],
+      'ArrowRight': [ 1, 0 ],
+      'ArrowDown':  [ 0, 1 ]
+    };
 
-  moveLineRight: on(keyDown('ArrowRight'), function(event) {
-    event.preventDefault();
-    const selected = get(this, 'lines').findBy('isSelected');
-    this.moveLineOnGrid(selected, 1, 0);
-  }),
-
-  moveLineDown: on(keyDown('ArrowDown'), function(event) {
-    event.preventDefault();
-    const selected = get(this, 'lines').findBy('isSelected');
-    this.moveLineOnGrid(selected, 0, 1);
+    if (map[code]) {
+      this.moveSelectedLineOnGrid(...map[code])
+      event.preventDefault();
+    }
   }),
 
   checkPointCollision(point, target, tolerance) {
@@ -349,6 +345,11 @@ export default Ember.Component.extend(EKMixin, {
     set(this, 'mouseAction', 'moveHandle');
 
     this.doMoveHandle(point);
+  },
+
+  moveSelectedLineOnGrid(dx, dy) {
+    const selected = get(this, 'lines').findBy('isSelected');
+    return this.moveLineOnGrid(selected, dx, dy);
   },
 
   moveLineOnGrid(line, dx, dy) {

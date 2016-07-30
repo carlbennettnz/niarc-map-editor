@@ -362,6 +362,7 @@ function keyDownWith(code) {
   const keyDown = Ember.$.Event('keydown');
 
   keyDown.keyCode = getKeyCode(code);
+  keyDown.target = document.body;
 
   return keyDown;
 }

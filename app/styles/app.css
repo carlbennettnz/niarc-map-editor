@@ -31,8 +31,12 @@ body {
   fill: white;
 }
 
+.map #grid-pattern line {
+  stroke: #565666;
+}
+
 .map line.axes {
-  stroke: #666;
+  stroke: #70707c;
 }
 
 #ember-testing-container {

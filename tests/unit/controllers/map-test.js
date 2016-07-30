@@ -13,7 +13,7 @@ const lines = [
   { points: { x1: 10, y1: 20, x2: 100, y2: 20 }, isSelected: false }
 ];
 
-describeModule('controller:index', 'IndexController', {}, function() {
+describeModule('controller:map', 'MapController', {}, function() {
   describe('Adding lines', function() {
     it('can add lines to array model', function() {
       const controller = this.subject();

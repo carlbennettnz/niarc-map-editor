@@ -1,7 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
-  beforeModel() {
-    this.transitionTo('map');
+  model() {
+    return this.modelFor('map');
   }
 });

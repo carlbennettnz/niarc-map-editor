@@ -37,6 +37,11 @@ export default Ember.Component.extend(EKMixin, {
     return `translate(${x}, ${y})`;
   }),
 
+  selectedLayerName: computed('layers.@each.isSelected', function() {
+    const layer = (get(this, 'layers') || []).findBy('isSelected');
+    return get(layer || {}, 'name');
+  }),
+
   mouseDown(event) {
     const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
 
@@ -56,7 +61,8 @@ export default Ember.Component.extend(EKMixin, {
       return;
     }
 
-    const line = this.getLineAtPoint(point);
+    const layerName = get(this, 'selectedLayerName');
+    const line = this.getLineAtPoint(point, { selectedOnly: true, layerName });
 
     // If over a selected line, start moving that line
     if (line && get(line, 'isSelected')) {
@@ -109,7 +115,8 @@ export default Ember.Component.extend(EKMixin, {
     // Select clicked lines if they're not already clicked and the pointer has not moved since mousedown
     if (action !== 'moveHandle' && action !== 'moveLine' && didDrag === false) {
       const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
-      const line = this.getLineAtPoint(point);
+      const layerName = get(this, 'selectedLayerName');
+      const line = this.getLineAtPoint(point, { layerName });
 
       if (line) {
         this.sendAction('select', line);
@@ -185,13 +192,23 @@ export default Ember.Component.extend(EKMixin, {
     return null;
   },
 
-  getLineAtPoint(point) {
+  getLineAtPoint(point, options = {}) {
     // Reverse because we want to select lines on top first and the last lines render on top
     const lines = get(this, 'lines').reverse();
     const tolerance = get(this, 'clickToSelectTolerance');
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines.objectAt(i);
+      const selectedOnly = get(options, 'selectedOnly');
+      const layerName = get(options, 'layerName');
+
+      if (selectedOnly && !get(line, 'isSelected')) {
+        continue;
+      }
+
+      if (layerName && layerName !== get(line, 'layer')) {
+        continue;
+      }
 
       // Yes, line.points.x1 would work, but doing it this way ensures Ember observers are triggered
       // and computed properties are refreshed, if we one day wanted to add some.
@@ -302,6 +319,7 @@ export default Ember.Component.extend(EKMixin, {
   startNewLine(point) {
     const gridSize = get(this, 'gridSize');
     const snapped = this.snapPointToGrid(point, gridSize);
+    const layer = get(this, 'selectedLayerName');
 
     this.sendAction('deselectAll');
 
@@ -311,7 +329,9 @@ export default Ember.Component.extend(EKMixin, {
         y1: snapped.y,
         x2: snapped.x,
         y2: snapped.y
-      }
+      },
+      isSelected: false,
+      layer
     });
   },
 

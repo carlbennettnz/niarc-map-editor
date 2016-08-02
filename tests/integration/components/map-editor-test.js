@@ -285,6 +285,17 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
         .trigger(mouseUpAt(50, 50));
     });
 
+    it('selects an existing diagonal reversed line on mouseup', function(done) {
+      this.set('lines', [ { points: { x1: 100, y1: 0, x2: 0, y2: 100 }, layer: 'map' } ]);
+      this.set('selectLine', () => done());
+
+      this.render(componentWithAllArgs);
+
+      this.$('svg')
+        .trigger(mouseDownAt(50, 50))
+        .trigger(mouseUpAt(50, 50));
+    });
+
     it('deselects everything on mousedown in empty area', function() {
       this.set('lines', [
         { points: { x1: 20, y1: 20, x2: 100, y2: 100 }, layer: 'map', isSelected: true },

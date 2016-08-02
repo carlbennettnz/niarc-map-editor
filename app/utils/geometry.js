@@ -9,18 +9,6 @@ export function checkPointCollision(point, target, tolerance) {
 }
 
 export function checkLineCollision(point, line, tolerance) {
-  // Avoid side effects
-  line = assign({}, line);
-
-  // Swap values to ensure x1 < x2 and y1 < y2. Makes the collision check simpiler.
-  if (line.x1 > line.x2) {
-    [ line.x1, line.x2 ] = [ line.x2, line.x1 ];
-  }
-
-  if (line.y1 > line.y2) {
-    [ line.y1, line.y2 ] = [ line.y2, line.y1 ];
-  }
-
   const lineLength = pythagoras(line);
   const lineEnd1ToPoint = pythagoras(assign({}, line, { x2: point.x, y2: point.y }));
   const lineEnd2ToPoint = pythagoras(assign({}, line, { x1: point.x, y1: point.y }));
@@ -34,7 +22,7 @@ export function checkLineCollision(point, line, tolerance) {
   }
 
   // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
-  const areaOfTriangleX2 = Math.abs((line.y2 - line.y1) * point.x - (line.x2 - line.x1) * point.y + line.x2 * line.y1 - line.y2 * line.x1);
+  const areaOfTriangleX2 = Math.abs((line.x1 - point.x) * (line.y2 - line.y1) - (line.x1 - line.x2) * (point.y - line.y1));
 
   return areaOfTriangleX2 / lineLength < tolerance;
 }

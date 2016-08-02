@@ -19,11 +19,23 @@ describe('GeometryUtil', function() {
   });
 
   describe('checkLineCollision', function() {
-    it('correctly identifies collisions', function() {
+    it('correctly identifies collisions with normal lines', function() {
       const pointOnLine = { x: 50, y: 50 };
       const pointNearLine = { x: 60, y: 50 };
       const pointOffLine = { x: 70, y: 50 };
       const line = { x1: 0, y1: 0, x2: 100, y2: 100 };
+      const tolerance = 10;
+
+      expect(geometry.checkLineCollision(pointOnLine, line, tolerance)).to.equal(true);
+      expect(geometry.checkLineCollision(pointNearLine, line, tolerance)).to.equal(true);
+      expect(geometry.checkLineCollision(pointOffLine, line, tolerance)).to.equal(false);
+    });
+
+    it('correctly identifies collisions with lines going from top-right to bottom-left', function() {
+      const pointOnLine = { x: 420, y: 100 };
+      const pointNearLine = { x: 412, y: 100 };
+      const pointOffLine = { x: 390, y: 100 };
+      const line = { x1: 420, y1: 100, x2: 160, y2: 220 };
       const tolerance = 10;
 
       expect(geometry.checkLineCollision(pointOnLine, line, tolerance)).to.equal(true);

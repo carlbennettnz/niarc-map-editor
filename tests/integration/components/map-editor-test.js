@@ -65,7 +65,7 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       expect(lines[1].attr('y2')).to.equal('100');
     });
 
-    it('scales and zooms lines, axes, and grid', function() {
+    it('scales and zooms lines, axes, and the grid', function() {
       this.set('viewport.scrollX', 20);
       this.set('viewport.scrollY', 40);
       this.set('viewport.zoom', 0.5);
@@ -176,35 +176,6 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
         expect(wall.attr('y2')).to.equal('40');
       });
     });
-
-    it('snaps to an axis', function() {
-      this.render(componentWithAllArgs);
-
-      this.$('svg')
-        .trigger(mouseDownAt(20, 20))
-        .trigger(mouseMoveAt(100, 80));
-
-      return wait().then(() => {
-        const wall = this.$('g.wall line');
-        expect(wall).to.exist;
-        expect(wall.attr('x1')).to.equal('20');
-        expect(wall.attr('y1')).to.equal('20');
-        expect(wall.attr('x2')).to.equal('100');
-        expect(wall.attr('y2')).to.equal('20');
-
-        const mouseMove2 = mouseMoveAt(60, 80);
-        this.$('svg').trigger(mouseMove2);
-
-        return wait();
-      }).then(() => {
-        const wall = this.$('g.wall line');
-        expect(wall).to.exist;
-        expect(wall.attr('x1')).to.equal('20');
-        expect(wall.attr('y1')).to.equal('20');
-        expect(wall.attr('x2')).to.equal('20');
-        expect(wall.attr('y2')).to.equal('80');
-      });
-    });
   });
 
   describe('Selections', function() {
@@ -225,15 +196,32 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       this.$('svg').trigger(mouseUp);
     });
 
+    it('selects an existing diagonal line on mouseup', function(done) {
+      this.set('lines', [
+        { points: { x1: 20, y1: 20, x2: 100, y2: 100 } },
+        { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
+      ]);
+
+      this.set('selectLine', () => done());
+
+      this.render(componentWithAllArgs);
+
+      const mouseDown = mouseDownAt(50, 50);
+      this.$('svg').trigger(mouseDown);
+
+      const mouseUp = mouseUpAt(50, 50);
+      this.$('svg').trigger(mouseUp);
+    });
+
     it('deselects everything on mousedown in empty area', function() {
       this.set('lines', [
-        { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, isSelected: true },
+        { points: { x1: 20, y1: 20, x2: 100, y2: 100 }, isSelected: true },
         { points: { x1: 60, y1: 40, x2: 60, y2: 100 } }
       ]);
 
       this.render(componentWithAllArgs);
 
-      this.$('svg').trigger(mouseDownAt(200, 200));
+      this.$('svg').trigger(mouseDownAt(70, 40));
 
       return wait().then(() => {
         expect(this.$('g.wall.selected').toArray()).to.have.length(0);

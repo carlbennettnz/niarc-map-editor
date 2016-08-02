@@ -29,7 +29,7 @@ export default Ember.Component.extend(EKMixin, {
     zoom: 1
   },
 
-  scrollTransform: computed('viewport.scrollX', '', function() {
+  scrollTransform: computed('viewport.scrollX', 'viewport.scrollY', function() {
     const x = get(this, 'viewport.scrollX');
     const y = get(this, 'viewport.scrollY');
 
@@ -154,7 +154,7 @@ export default Ember.Component.extend(EKMixin, {
     };
 
     if (map[code]) {
-      this.moveSelectedLineOnGrid(...map[code])
+      this.moveSelectedLineOnGrid(...map[code]);
       event.preventDefault();
     }
   }),
@@ -163,21 +163,39 @@ export default Ember.Component.extend(EKMixin, {
     return Math.sqrt(Math.pow(point.x - target.x, 2) + Math.pow(point.y - target.y, 2)) < tolerance;
   },
 
-  checkLineCollision(point, target, tolerance) {
+  checkLineCollision(point, line, tolerance) {
+    // Avoid side effects
+    line = assign({}, line);
+
     // Swap values to ensure x1 < x2 and y1 < y2. Makes the collision check simpiler.
-    if (target.x1 > target.x2) {
-      [ target.x1, target.x2 ] = [ target.x2, target.x1 ];
+    if (line.x1 > line.x2) {
+      [ line.x1, line.x2 ] = [ line.x2, line.x1 ];
     }
 
-    if (target.y1 > target.y2) {
-      [ target.y1, target.y2 ] = [ target.y2, target.y1 ];
+    if (line.y1 > line.y2) {
+      [ line.y1, line.y2 ] = [ line.y2, line.y1 ];
     }
 
-    // Logic here assumes horizontal or vertical lines
-    const xOk = (target.x1 - point.x < tolerance && point.x - target.x2 < tolerance);
-    const yOk = (target.y1 - point.y < tolerance && point.y - target.y2 < tolerance);
+    const lineLength = this.pythagoras(line);
+    const lineEnd1ToPoint = this.pythagoras(assign({}, line, { x2: point.x, y2: point.y }));
+    const lineEnd2ToPoint = this.pythagoras(assign({}, line, { x1: point.x, y1: point.y }));
 
-    return xOk && yOk;
+    if (lineEnd1ToPoint > lineLength) {
+      return lineEnd2ToPoint < tolerance;
+    }
+
+    if (lineEnd2ToPoint > lineLength) {
+      return lineEnd1ToPoint < tolerance;
+    }
+
+    // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
+    const areaOfTriangleX2 = Math.abs((line.y2 - line.y1) * point.x - (line.x2 - line.x1) * point.y + line.x2 * line.y1 - line.y2 * line.x1);
+
+    return areaOfTriangleX2 / lineLength < tolerance;
+  },
+
+  pythagoras({ x1, y1, x2, y2 }) {
+    return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
   },
 
   getHandleAtPoint(point) {
@@ -261,13 +279,13 @@ export default Ember.Component.extend(EKMixin, {
     const { handleIndex, line } = handleBeingMoved;
     const gridSize = get(this, 'gridSize');
 
+    // The point at the end of the line we're not moving
     const fixedPoint = {
       x: get(line, `points.x${handleIndex % 2 + 1}`),
       y: get(line, `points.y${handleIndex % 2 + 1}`)
     };
 
-    const snappedToAxis = this.snapPointsToAxis(fixedPoint, point);
-    const snappedToGrid = this.snapPointToGrid(snappedToAxis, gridSize);
+    const snappedToGrid = this.snapPointToGrid(point, gridSize);
 
     const newPoints = assign({}, get(line, 'points'), {
       [`x${handleIndex}`]: snappedToGrid.x,

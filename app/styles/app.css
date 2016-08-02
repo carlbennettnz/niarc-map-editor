@@ -42,3 +42,11 @@ body {
 #ember-testing-container {
   display: none;
 }
+
+#mocha #mocha-stats {
+  color: #999;
+}
+
+#mocha #mocha-stats em {
+  color: #ccc;
+}

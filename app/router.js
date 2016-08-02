@@ -9,6 +9,7 @@ Router.map(function() {
   this.route('index', { path: '/' });
   this.route('map', function() {
     this.route('edit');
+    this.route('path');
   });
 });
 

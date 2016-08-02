@@ -9,11 +9,8 @@ const {
 } = Ember;
 
 export default Ember.Controller.extend({
-  layers: [{
-    name: 'map',
-    isVisible: true,
-    isSelected: true
-  }],
+  // Override this
+  layers: [],
 
   mapViewport: {
     scrollX: 30,

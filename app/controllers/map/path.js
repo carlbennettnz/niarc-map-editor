@@ -4,6 +4,10 @@ export default MapController.extend({
   layers: [{
     name: 'map',
     isVisible: true,
+    isSelected: false
+  }, {
+    name: 'path',
+    isVisible: true,
     isSelected: true
   }]
 });

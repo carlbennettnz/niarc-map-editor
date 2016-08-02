@@ -86,6 +86,16 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
       expect(this.$('g.wall')).to.have.length(1, 'one line rendered');
     });
 
+    it('adds layer name class to lines', function() {
+      this.set('lines', [
+        { points: { x1: 20, y1: 20, x2: 100, y2: 20 }, layer: 'map' }
+      ]);
+
+      this.render(componentWithAllArgs);
+
+      expect(this.$('g.wall').hasClass('map-layer')).to.equal(true, 'has map-layer class');
+    });
+
     it('scales and zooms lines, axes, and the grid', function() {
       this.set('viewport.scrollX', 20);
       this.set('viewport.scrollY', 40);

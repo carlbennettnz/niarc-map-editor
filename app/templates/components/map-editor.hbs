@@ -17,7 +17,7 @@
       {{#if layer.isVisible}}
         {{#each lines as |line|}}
           {{#unless (or line.isHidden (not-eq line.layer layer.name))}}
-            <g class="wall {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}}">
+            <g class="wall {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}} {{line.layer}}-layer">
               <line
                 x1={{scale line.points.x1 viewport.zoom}}
                 y1={{scale line.points.y1 viewport.zoom}}

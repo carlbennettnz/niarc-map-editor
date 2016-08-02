@@ -1,18 +1,28 @@
 import Ember from 'ember';
 
 const {
-  set
+  get,
+  set,
+  RSVP
 } = Ember;
 
 export default Ember.Route.extend({
   model() {
-    return this.modelFor('map');
+    return RSVP.hash({
+      lines: this.modelFor('map'),
+      events: [
+        { type: 'move', name: 'Move' },
+        { type: 'move', name: 'Move' },
+        { type: 'move', name: 'Move' },
+        { type: 'move', name: 'Move' }
+      ]
+    });
   },
 
   afterModel(model) {
     this._super(...arguments);
 
-    (model || []).forEach(line => {
+    (get(model, 'lines') || []).forEach(line => {
       set(line, 'isSelected', false);
     });
   }

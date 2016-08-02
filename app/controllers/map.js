@@ -6,7 +6,8 @@ const {
   set,
   assign,
   assert,
-  isArray
+  isArray,
+  computed
 } = Ember;
 
 export default Ember.Controller.extend({
@@ -19,6 +20,8 @@ export default Ember.Controller.extend({
     zoom: 1
   },
 
+  lines: computed.alias('model'),
+
   actions: {
     addLine(line) {
       assert('Line must be provided', line != null);
@@ -26,13 +29,13 @@ export default Ember.Controller.extend({
       assert('Line must have a layer', typeof get(line, 'layer') === 'string');
       assert('Line must have an isSelected flag', typeof get(line, 'isSelected') === 'boolean');
 
-      let model = get(this, 'model');
+      let lines = get(this, 'lines');
 
-      if (!model) {
-        model = set(this, 'model', []);
+      if (!lines) {
+        lines = set(this, 'lines', []);
       }
 
-      model.pushObject(line);
+      lines.pushObject(line);
       this.send('saveModel');
     },
 
@@ -42,8 +45,8 @@ export default Ember.Controller.extend({
     },
 
     deselectAll(line) {
-      const model = get(this, 'model') || [];
-      model.forEach(line => set(line, 'isSelected', false));
+      const lines = get(this, 'lines') || [];
+      lines.forEach(line => set(line, 'isSelected', false));
     },
 
     resizeLine(line, points) {
@@ -52,7 +55,7 @@ export default Ember.Controller.extend({
     },
 
     removeLines(lines) {
-      const model = get(this, 'model') || [];
+      const model = get(this, 'lines') || [];
       lines = isArray(lines) ? lines : [ lines ];
       model.removeObjects(lines);
       this.send('saveModel');

@@ -1,7 +1,7 @@
 {{map-editor
   viewport=mapViewport
   layers=layers
-  lines=model
+  lines=model.lines
   add=(action 'addLine')
   select=(action 'selectLine')
   deselectAll=(action 'deselectAll')
@@ -10,4 +10,6 @@
 
 <aside class="ui-modules">
   {{map-mode-navigator}}
+  {{path-item}}
+  {{path-timeline events=model.events}}
 </aside>

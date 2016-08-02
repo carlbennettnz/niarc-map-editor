@@ -1,4 +1,9 @@
+import Ember from 'ember';
 import MapController from 'niarc-map-editor/controllers/map';
+
+const {
+  computed
+} = Ember;
 
 export default MapController.extend({
   layers: [{
@@ -9,5 +14,7 @@ export default MapController.extend({
     name: 'path',
     isVisible: true,
     isSelected: true
-  }]
+  }],
+
+  lines: computed.alias('model.lines')
 });

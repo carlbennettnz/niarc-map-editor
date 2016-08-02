@@ -12,7 +12,7 @@
   <line class="axes x" x1="0" y1={{viewport.scrollY}} x2="100%" y2={{viewport.scrollY}}></line>
   <line class="axes y" y1="0" x1={{viewport.scrollX}} y2="100%" x2={{viewport.scrollX}}></line>
 
-  <g class="scroll-offset" transform={{scrollTransform}}>
+  <g class="scroll-offset {{selectedLayerName}}-layer-selected" transform={{scrollTransform}}>
     {{#each layers as |layer|}}
       {{#if layer.isVisible}}
         {{#each lines as |line|}}

@@ -176,6 +176,56 @@ describeComponent('map-editor', 'Integration: MapEditorComponent', { integration
         expect(wall.attr('y2')).to.equal('40');
       });
     });
+
+    it('never adds zero-length lines', function() {
+      this.render(componentWithAllArgs);
+
+      this.$('svg')
+        .trigger(mouseDownAt(20, 20))
+        .trigger(mouseMoveAt(22, 22));
+
+      return wait().then(() => {
+        const wall = this.$('g.wall line');
+        expect(wall).to.have.length(0, 'zero-length line was not created');
+
+        this.$('svg').trigger(mouseMoveAt(35, 22));
+
+        return wait();
+      }).then(() => {
+        const wall = this.$('g.wall line');
+        expect(wall).to.have.length(1, 'line was created once it was long enough');
+      });
+    });
+
+    it('never edits lines to make them zero-length', function() {
+      this.render(componentWithAllArgs);
+
+      this.$('svg')
+        .trigger(mouseDownAt(20, 20))
+        .trigger(mouseMoveAt(40, 20));
+
+      return wait().then(() => {
+        const wall = this.$('g.wall line');
+        expect(wall).to.have.length(1, 'created the wall');
+
+        expect(wall.attr('x1')).to.equal('20', 'post-creation x1');
+        expect(wall.attr('y1')).to.equal('20', 'post-creation y1');
+        expect(wall.attr('x2')).to.equal('40', 'post-creation x2');
+        expect(wall.attr('y2')).to.equal('20', 'post-creation y2');
+
+        this.$('svg').trigger(mouseMoveAt(20, 20));
+
+        return wait();
+      }).then(() => {
+        const wall = this.$('g.wall line');
+        expect(wall).to.have.length(1, 'wall still exists');
+
+        expect(wall.attr('x1')).to.equal('20', 'post-edit x1');
+        expect(wall.attr('y1')).to.equal('20', 'post-edit y1');
+        expect(wall.attr('x2')).to.equal('40', 'post-edit x2');
+        expect(wall.attr('y2')).to.equal('20', 'post-edit y2');
+      });
+    });
   });
 
   describe('Selections', function() {

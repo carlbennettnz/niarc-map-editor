@@ -292,6 +292,11 @@ export default Ember.Component.extend(EKMixin, {
       [`y${handleIndex}`]: snappedToGrid.y
     });
 
+    // Avoid giving the line zero length
+    if (newPoints.x1 === newPoints.x2 && newPoints.y1 === newPoints.y2) {
+      return;
+    }
+
     this.sendAction('resize', line, newPoints);
   },
 
@@ -350,6 +355,19 @@ export default Ember.Component.extend(EKMixin, {
 
   adjustNewLine(point) {
     const newLine = get(this, 'newLine');
+    const gridSize = get(this, 'gridSize');
+
+    const point1 = {
+      x: get(newLine, 'points.x1'),
+      y: get(newLine, 'points.y1')
+    };
+
+    const point2 = this.snapPointToGrid(point, gridSize);
+
+    // The line would still have zero length, don't do anything yet
+    if (point1.x === point2.x && point1.y === point2.y) {
+      return;
+    }
 
     this.sendAction('add', newLine);
     this.sendAction('select', newLine);

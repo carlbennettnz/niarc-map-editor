@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import config from 'niarc-map-editor/config/environment';
 
 const {
   get,
@@ -18,16 +19,6 @@ export default Ember.Controller.extend({
     zoom: 1
   },
 
-  saveModel() {
-    const model = get(this, 'model') || [];
-
-    const modelWithNothingSelected = model.map(line => {
-      return assign({}, line, { isSelected: false });
-    });
-
-    localStorage.map = JSON.stringify(modelWithNothingSelected);
-  },
-
   actions: {
     addLine(line) {
       assert('Line must be provided', line != null);
@@ -42,7 +33,7 @@ export default Ember.Controller.extend({
       }
 
       model.pushObject(line);
-      this.saveModel();
+      this.send('saveModel');
     },
 
     selectLine(line) {
@@ -57,14 +48,14 @@ export default Ember.Controller.extend({
 
     resizeLine(line, points) {
       set(line, 'points', points);
-      this.saveModel();
+      this.send('saveModel');
     },
 
     removeLines(lines) {
       const model = get(this, 'model') || [];
       lines = isArray(lines) ? lines : [ lines ];
       model.removeObjects(lines);
-      this.saveModel();
+      this.send('saveModel');
     }
   }
 });

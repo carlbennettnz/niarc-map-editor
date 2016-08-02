@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import { expect } from 'chai';
-import { describeModule, it } from 'ember-mocha';
+import { describeModule, it, beforeAll } from 'ember-mocha';
 
 const {
   get,
@@ -15,6 +15,11 @@ const lines = [
 
 describeModule('controller:map', 'MapController', {}, function() {
   describe('Adding lines', function() {
+    // Should be `before`. See https://github.com/switchfly/ember-mocha/issues/81
+    it('disables saveModel action', function() {
+      this.subject().set('actions.saveModel', () => null);
+    });
+
     it('can add lines to array model', function() {
       const controller = this.subject();
 
@@ -125,5 +130,20 @@ describeModule('controller:map', 'MapController', {}, function() {
     });
   });
 
-  it.skip('saves the model when new lines are added (needs localstorage mock)');
+  it.skip('calls the saveModel action appropriately', function(done) {
+    const controller = this.subject();
+    let callCount = 0;
+
+    controller.set('actions.saveModel', function() {
+      callCount++;
+
+      if (callCount === 3) {
+        done();
+      }
+    });
+
+    controller.send('addLine', lines[0]);
+    controller.send('resizeLine', lines[0], lines[1].points);
+    controller.send('removeLine', lines[0]);
+  });
 });

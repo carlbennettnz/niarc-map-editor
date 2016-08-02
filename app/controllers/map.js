@@ -4,10 +4,17 @@ const {
   get,
   set,
   assign,
+  assert,
   isArray
 } = Ember;
 
 export default Ember.Controller.extend({
+  layers: [{
+    name: 'map',
+    isVisible: true,
+    isSelected: true
+  }],
+
   mapViewport: {
     scrollX: 30,
     scrollY: 30,
@@ -26,6 +33,11 @@ export default Ember.Controller.extend({
 
   actions: {
     addLine(line) {
+      assert('Line must be provided', line != null);
+      assert('Line must have points', typeof get(line, 'points') === 'object');
+      assert('Line must have a layer', typeof get(line, 'layer') === 'string');
+      assert('Line must have an isSelected flag', typeof get(line, 'isSelected') === 'boolean');
+
       let model = get(this, 'model');
 
       if (!model) {

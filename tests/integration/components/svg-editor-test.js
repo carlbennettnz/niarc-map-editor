@@ -12,7 +12,7 @@ const {
   isArray
 } = Ember;
 
-const componentWithAllArgs = hbs`{{map-editor
+const componentWithAllArgs = hbs`{{svg-editor
   layers=layers
   lines=lines
   viewport=viewport
@@ -23,7 +23,7 @@ const componentWithAllArgs = hbs`{{map-editor
   remove=removeLines
 }}`;
 
-describeComponent('map-editor', 'Integration: MapEditorComponent', { integration: true }, function() {
+describeComponent('svg-editor', 'Integration: SvgEditorComponent', { integration: true }, function() {
   beforeEach(function() {
     this.set('layers', [{ name: 'map', isVisible: true, isSelected: true }]);
     this.set('lines', []);

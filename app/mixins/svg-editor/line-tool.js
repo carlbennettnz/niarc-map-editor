@@ -32,18 +32,18 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const { handleIndex, line } = handleBeingMoved;
+    const { handleIndex, shape } = handleBeingMoved;
     const gridSize = get(this, 'gridSize');
 
     // The point at the end of the line we're not moving
     const fixedPoint = {
-      x: get(line, `points.x${handleIndex % 2 + 1}`),
-      y: get(line, `points.y${handleIndex % 2 + 1}`)
+      x: get(shape, `points.x${handleIndex % 2 + 1}`),
+      y: get(shape, `points.y${handleIndex % 2 + 1}`)
     };
 
     const snappedToGrid = this.snapPointToGrid(point, gridSize);
 
-    const newPoints = assign({}, get(line, 'points'), {
+    const newPoints = assign({}, get(shape, 'points'), {
       [`x${handleIndex}`]: snappedToGrid.x,
       [`y${handleIndex}`]: snappedToGrid.y
     });
@@ -53,7 +53,7 @@ export default Ember.Mixin.create({
       return;
     }
 
-    this.sendAction('resize', line, newPoints);
+    this.sendAction('resize', shape, newPoints);
   }),
 
   startMoveLine: on('startMoveShape', function(point, line) {
@@ -149,13 +149,13 @@ export default Ember.Mixin.create({
 
     set(this, 'handleBeingMoved', {
       handleIndex: 2,
-      line: newLine
+      shape: newLine
     });
 
     set(this, 'newLine', null);
     set(this, 'mouseAction', 'moveHandle');
 
-    this.doMoveHandle(point);
+    this.trigger('doMoveHandle', point);
   }),
 
   moveSelectedLineOnGrid: on('moveSelectedShapeOnGrid', function(dx, dy) {

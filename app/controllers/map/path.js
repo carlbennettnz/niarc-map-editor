@@ -16,5 +16,5 @@ export default MapController.extend({
     isSelected: true
   }],
 
-  lines: computed.alias('model.lines')
+  shapes: computed.alias('model.lines')
 });

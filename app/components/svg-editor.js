@@ -14,17 +14,17 @@ const {
 export default Ember.Component.extend(EKMixin, {
   // State
   mouseAction: null,
-  newLine: null,
+  newShape: null,
   selectedHandle: null,
   tool: null,
 
   // Model
-  lines: [],
+  shapes: [],
 
   // Config
   keyboardActivated: true,
   gridSize: 20,
-  clickToSelectTolerance: 10, // how many pixels away can you click and still select the line?
+  clickToSelectTolerance: 10, // how many pixels away can you click and still select the shape?
   viewport: {
     scrollX: 0,
     scrollY: 0,
@@ -64,18 +64,18 @@ export default Ember.Component.extend(EKMixin, {
     }
 
     const layerName = get(this, 'selectedLayerName');
-    const line = this.getLineAtPoint(point, { selectedOnly: true, layerName });
+    const shape = this.getLineAtPoint(point, { selectedOnly: true, layerName });
 
     // If over a selected line, start moving that line
-    if (line && get(line, 'isSelected')) {
-      set(this, 'mouseAction', 'moveLine');
-      this.trigger('startMoveShape', point, line);
+    if (shape && get(shape, 'isSelected')) {
+      set(this, 'mouseAction', 'moveShape');
+      this.trigger('startMoveShape', point, shape);
       return;
     }
 
     // Else start a new line
-    set(this, 'mouseAction', 'adjustNewLine');
-    this.trigger('startNewLine', point);
+    set(this, 'mouseAction', 'adjustNewShape');
+    this.trigger('startNewShape', point);
   },
 
   mouseMove(event) {
@@ -100,11 +100,11 @@ export default Ember.Component.extend(EKMixin, {
         this.trigger('doMoveHandle', point);
         break;
 
-      case 'moveLine':
+      case 'moveShape':
         this.trigger('doMoveShape', point);
         break;
 
-      case 'adjustNewLine':
+      case 'adjustNewShape':
         this.trigger('adjustNewShape', point);
         break;
     }
@@ -115,13 +115,13 @@ export default Ember.Component.extend(EKMixin, {
     const didDrag = get(this, 'mouseDidDrag');
 
     // Select clicked lines if they're not already clicked and the pointer has not moved since mousedown
-    if (action !== 'moveHandle' && action !== 'moveLine' && didDrag === false) {
+    if (action !== 'moveHandle' && action !== 'moveShape' && didDrag === false) {
       const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
       const layerName = get(this, 'selectedLayerName');
-      const line = this.getLineAtPoint(point, { layerName });
+      const shape = this.getLineAtPoint(point, { layerName });
 
-      if (line) {
-        this.sendAction('select', line);
+      if (shape) {
+        this.sendAction('select', shape);
       }
     }
 
@@ -142,7 +142,7 @@ export default Ember.Component.extend(EKMixin, {
   deleteShape: on(keyDown('Backspace'), function(event) {
     event.preventDefault();
 
-    const selected = get(this, 'lines').findBy('isSelected');
+    const selected = get(this, 'shapes').findBy('isSelected');
 
     if (selected) {
       this.sendAction('remove', selected);
@@ -170,7 +170,7 @@ export default Ember.Component.extend(EKMixin, {
   }),
 
   getHandleAtPoint(point) {
-    const selected = (get(this, 'lines') || []).findBy('isSelected');
+    const selected = (get(this, 'shapes') || []).findBy('isSelected');
     const tolerance = get(this, 'clickToSelectTolerance');
 
     if (!selected) {
@@ -187,7 +187,7 @@ export default Ember.Component.extend(EKMixin, {
     if (collisions.contains(true)) {
       return {
         handleIndex: collisions.indexOf(true) + 1,
-        line: selected
+        shape: selected
       };
     }
 
@@ -195,34 +195,34 @@ export default Ember.Component.extend(EKMixin, {
   },
 
   getLineAtPoint(point, options = {}) {
-    // Reverse because we want to select lines on top first and the last lines render on top
-    const lines = get(this, 'lines').reverse();
+    // Reverse because we want to select shape on top first and the last shapes render on top
+    const shapes = (get(this, 'shapes') || []).reverse();
     const tolerance = get(this, 'clickToSelectTolerance');
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines.objectAt(i);
+    for (let i = 0; i < shapes.length; i++) {
+      const shape = shapes.objectAt(i);
       const selectedOnly = get(options, 'selectedOnly');
       const layerName = get(options, 'layerName');
 
-      if (selectedOnly && !get(line, 'isSelected')) {
+      if (selectedOnly && !get(shape, 'isSelected')) {
         continue;
       }
 
-      if (layerName && layerName !== get(line, 'layer')) {
+      if (layerName && layerName !== get(shape, 'layer')) {
         continue;
       }
 
-      // Yes, line.points.x1 would work, but doing it this way ensures Ember observers are triggered
+      // Yes, shape.points.x1 would work, but doing it this way ensures Ember observers are triggered
       // and computed properties are refreshed, if we one day wanted to add some.
-      const linePoints = {
-        x1: get(line, 'points.x1'),
-        y1: get(line, 'points.y1'),
-        x2: get(line, 'points.x2'),
-        y2: get(line, 'points.y2')
+      const shapePoints = {
+        x1: get(shape, 'points.x1'),
+        y1: get(shape, 'points.y1'),
+        x2: get(shape, 'points.x2'),
+        y2: get(shape, 'points.y2')
       };
 
-      if (geometry.checkLineCollision(point, linePoints, tolerance)) {
-        return line;
+      if (geometry.checkLineCollision(point, shapePoints, tolerance)) {
+        return shape;
       }
     }
   },
@@ -244,11 +244,5 @@ export default Ember.Component.extend(EKMixin, {
       x: xSize > ySize ? get(variable, 'x') : get(fixed, 'x'),
       y: xSize > ySize ? get(fixed, 'y') : get(variable, 'y')
     };
-  },
-
-  actions: {
-    clear() {
-      this.sendAction('remove', get(this, 'lines'));
-    }
   }
 });

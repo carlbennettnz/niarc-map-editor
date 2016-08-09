@@ -20,44 +20,44 @@ export default Ember.Controller.extend({
     zoom: 1
   },
 
-  lines: computed.alias('model'),
+  shapes: computed.alias('model'),
 
   actions: {
-    addLine(line) {
-      assert('Line must be provided', line != null);
-      assert('Line must have points', typeof get(line, 'points') === 'object');
-      assert('Line must have a layer', typeof get(line, 'layer') === 'string');
-      assert('Line must have an isSelected flag', typeof get(line, 'isSelected') === 'boolean');
+    addShape(shape) {
+      assert('Line must be provided', shape != null);
+      assert('Line must have points', typeof get(shape, 'points') === 'object');
+      assert('Line must have a layer', typeof get(shape, 'layer') === 'string');
+      assert('Line must have an isSelected flag', typeof get(shape, 'isSelected') === 'boolean');
 
-      let lines = get(this, 'lines');
+      let shapes = get(this, 'shapes');
 
-      if (!lines) {
-        lines = set(this, 'lines', []);
+      if (!shapes) {
+        shapes = set(this, 'shapes', []);
       }
 
-      lines.pushObject(line);
+      shapes.pushObject(shape);
       this.send('saveModel');
     },
 
-    selectLine(line) {
+    selectShape(shape) {
       this.send('deselectAll');
-      set(line, 'isSelected', true);
+      set(shape, 'isSelected', true);
     },
 
-    deselectAll(line) {
-      const lines = get(this, 'lines') || [];
-      lines.forEach(line => set(line, 'isSelected', false));
+    deselectAll(shape) {
+      const shapes = get(this, 'shapes') || [];
+      shapes.forEach(shape => set(shape, 'isSelected', false));
     },
 
-    resizeLine(line, points) {
+    resizeShape(line, points) {
       set(line, 'points', points);
       this.send('saveModel');
     },
 
-    removeLines(lines) {
-      const model = get(this, 'lines') || [];
-      lines = isArray(lines) ? lines : [ lines ];
-      model.removeObjects(lines);
+    removeShapes(shapes) {
+      const model = get(this, 'shapes') || [];
+      shapes = isArray(shapes) ? shapes : [ shapes ];
+      model.removeObjects(shapes);
       this.send('saveModel');
     }
   }

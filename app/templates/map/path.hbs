@@ -1,12 +1,13 @@
 {{path-editor
   viewport=mapViewport
   layers=layers
-  lines=model.lines
-  add=(action 'addLine')
-  select=(action 'selectLine')
+  map=model.map
+  events=model.events
+  add=(action 'addShape')
+  select=(action 'selectShape')
   deselectAll=(action 'deselectAll')
-  resize=(action 'resizeLine')
-  remove=(action 'removeLines')}}
+  resize=(action 'resizeShape')
+  remove=(action 'removeShapes')}}
 
 <aside class="ui-modules">
   {{map-mode-navigator}}

@@ -9,20 +9,23 @@ const {
 export default Ember.Route.extend({
   model() {
     return RSVP.hash({
-      lines: this.modelFor('map'),
-      events: [
-        { type: 'move', name: 'Move' },
-        { type: 'move', name: 'Move' },
-        { type: 'move', name: 'Move' },
-        { type: 'move', name: 'Move' }
-      ]
+      map: this.modelFor('map'),
+      events: [{
+        type: 'move',
+        name: 'Move',
+        points: [
+          { x: 20, y: 20 },
+          { x: 100, y: 100, radius: 10 },
+          { x: 100, y: 20 }
+        ]
+      }]
     });
   },
 
   afterModel(model) {
     this._super(...arguments);
 
-    (get(model, 'lines') || []).forEach(line => {
+    (get(model, 'map') || []).forEach(line => {
       set(line, 'isSelected', false);
     });
   }

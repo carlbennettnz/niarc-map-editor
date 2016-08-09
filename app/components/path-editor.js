@@ -3,6 +3,28 @@ import SvgEditorComponent from './svg-editor';
 import LineToolMixin from 'niarc-map-editor/mixins/svg-editor/line-tool';
 import layout from 'niarc-map-editor/templates/components/svg-editor';
 
+const {
+  get,
+  set,
+  computed
+} = Ember;
+
 export default SvgEditorComponent.extend(LineToolMixin, {
-  layout
+  layout,
+
+  shapes: computed('map.[]', 'events.[]', function() {
+    const map = get(this, 'map') || [];
+    const events = get(this, 'events') || [];
+    const shapes = [];
+
+    shapes.push(...map);
+
+    events.forEach(event => {
+      if (get(event, 'type') === 'move') {
+        shapes.push(event);
+      }
+    })
+
+    return shapes;
+  })
 });

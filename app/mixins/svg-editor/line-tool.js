@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import { keyDown, getCode } from 'ember-keyboard';
+import * as geometry from 'niarc-map-editor/utils/geometry';
 
 const {
   get,
@@ -19,16 +20,10 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
-
-    // Avoids error if action fires at the same time as component is destroyed
-    if (get(this, 'isDestroying')) {
-      return;
-    }
-
     set(this, 'toolState.mouseDidDrag', false);
 
-    const handle = this.getHandlesAtPoint(point).findBy('shape.isSelected');
+    const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
+    const handle = this.getLineHandlesAtPoint(point).findBy('shape.isSelected');
 
     // If over a selected handle, start moving that handle
     if (handle) {
@@ -138,6 +133,34 @@ export default Ember.Mixin.create({
       event.preventDefault();
     }
   }),
+
+  getLineHandlesAtPoint(point) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    const shapes = get(this, 'shapes').filterBy('type', 'line');
+    const tolerance = get(this, 'clickToSelectTolerance');
+    const found = [];
+
+    shapes.forEach(shape => {
+      const handles = [
+        { x: get(shape, 'points.x1'), y: get(shape, 'points.y1') },
+        { x: get(shape, 'points.x2'), y: get(shape, 'points.y2') }
+      ];
+
+      const collisions = handles.map(handle => geometry.checkPointCollision(point, handle, tolerance));
+
+      if (collisions.contains(true)) {
+        found.pushObject({
+          handleIndex: collisions.indexOf(true) + 1,
+          shape
+        });
+      }
+    });
+
+    return found;
+  },
 
   startMoveHandle(point, handle) {
     if (guard.apply(this, arguments)) {

@@ -52,30 +52,6 @@ export default Ember.Component.extend(EKMixin, {
     };
   },
 
-  getHandlesAtPoint(point) {
-    const shapes = get(this, 'shapes') || [];
-    const tolerance = get(this, 'clickToSelectTolerance');
-    const found = [];
-
-    shapes.forEach(shape => {
-      const handles = [
-        { x: get(shape, 'points.x1'), y: get(shape, 'points.y1') },
-        { x: get(shape, 'points.x2'), y: get(shape, 'points.y2') }
-      ];
-
-      const collisions = handles.map(handle => geometry.checkPointCollision(point, handle, tolerance));
-
-      if (collisions.contains(true)) {
-        found.pushObject({
-          handleIndex: collisions.indexOf(true) + 1,
-          shape
-        });
-      }
-    });
-
-    return found;
-  },
-
   getLineAtPoint(point, options = {}) {
     // Reverse because we want to select shape on top first and the last shapes render on top
     const shapes = (get(this, 'shapes') || []).reverse();

@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import { keyDown, getCode } from 'ember-keyboard';
+import * as geometry from 'niarc-map-editor/utils/geometry';
 
 const {
   get,
@@ -28,7 +29,7 @@ export default Ember.Mixin.create({
 
     set(this, 'toolState.mouseDidDrag', false);
 
-    const handle = this.getHandlesAtPoint(point).findBy('shape.isSelected');
+    const handle = this.getPathHandlesAtPoint(point).findBy('shape.isSelected');
 
     // If over a selected handle, start moving that handle
     if (handle) {
@@ -151,6 +152,29 @@ export default Ember.Mixin.create({
       event.preventDefault();
     }
   }),
+
+  getPathHandlesAtPoint(point) {    
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    const shapes = get(this, 'shapes').filterBy('type', 'path');
+    const tolerance = get(this, 'clickToSelectTolerance');
+    const found = [];
+
+    shapes.forEach(shape => {
+      const collisions = get(shape, 'points').map(handle => geometry.checkPointCollision(point, handle, tolerance));
+
+      if (collisions.contains(true)) {
+        found.pushObject({
+          handleIndex: collisions.indexOf(true),
+          shape
+        });
+      }
+    });
+
+    return found;
+  },
 
   startMoveHandle(point, handle) {
     if (guard.apply(this, arguments)) {

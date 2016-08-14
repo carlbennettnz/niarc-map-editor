@@ -139,7 +139,7 @@ export default Ember.Mixin.create({
     }
 
     event.preventDefault();
-    this.deleteSelectedLine();
+    this.deleteSelectedHandle();
   }),
 
   handleArrowKeys: on(keyDown(), function(event) {
@@ -368,15 +368,23 @@ export default Ember.Mixin.create({
     }
   },
 
-  deleteSelectedLine() {
+  deleteSelectedHandle() {
     if (guard.apply(this, arguments)) {
       return;
     }
 
-    const selected = get(this, 'shapes').findBy('isSelected');
+    const paths = get(this, 'shapes').filterBy('type', 'path');
+    let selected;
+
+    paths.forEach(path => {
+      if (get(path, 'points').findBy('isSelected')) {
+        selected = path;
+      }
+    });
 
     if (selected) {
-      this.sendAction('remove', selected);
+      const newPoints = get(selected, 'points').rejectBy('isSelected');
+      this.sendAction('resize', selected, newPoints);
     }
   }
 });

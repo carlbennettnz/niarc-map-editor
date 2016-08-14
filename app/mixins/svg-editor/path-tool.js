@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import { keyDown, getCode } from 'ember-keyboard';
 
 const {
   get,
@@ -10,22 +11,152 @@ const {
 export default Ember.Mixin.create({
   init() {
     this._super(...arguments);
-    set(this, 'tool', 'path');
+    set(this, 'tool', 'line');
   },
 
-  startMoveLineHandle: on('startMoveHandle', function(point, handle) {
-    if (get(this, 'tool') !== 'path') {
+  handleMouseDown: on('mouseDown', function(event) {
+    if (guard.apply(this, arguments)) {
       return;
     }
 
-    set(this, 'handleBeingMoved', handle);
+    const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
+
+    // Avoids error if action fires at the same time as component is destroyed
+    if (get(this, 'isDestroying')) {
+      return;
+    }
+
+    set(this, 'toolState.mouseDidDrag', false);
+
+    const handle = this.getHandleAtPoint(point);
+
+    // If over a handle, start moving that handle
+    if (handle) {
+      set(this, 'toolState.mouseAction', 'moveHandle');
+      this.startMoveHandle(point, handle);
+      return;
+    }
+
+    const layerName = get(this, 'selectedLayerName');
+    const shape = this.getLineAtPoint(point, { selectedOnly: true, layerName });
+
+    // If over a selected line, start moving that line
+    if (shape) {
+      set(this, 'toolState.mouseAction', 'moveLine');
+      this.startMoveLine(point, shape);
+      return;
+    }
+
+    // Else start a new line
+    set(this, 'toolState.mouseAction', 'adjustNewLine');
+    this.startNewLine(point);
   }),
 
-  doMoveLineHandle: on('doMoveHandle', function(point) {
-    const tool = get(this, 'tool');
-    const handleBeingMoved = get(this, 'handleBeingMoved');
-    
-    if (tool !== 'path' || !handleBeingMoved) {
+  handleMouseMove: on('mouseMove', function(event) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    const mouseAction = get(this, 'toolState.mouseAction');
+
+    if (!event.buttons || !mouseAction) {
+      set(this, 'toolState.newLine', null);
+      set(this, 'toolState.draggingHandle', null);
+      return;
+    }
+
+    set(this, 'toolState.mouseDidDrag', true);
+
+    const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
+
+    console.log(mouseAction);
+
+    switch (mouseAction) {
+      case 'moveHandle':
+        this.doMoveHandle(point);
+        break;
+
+      case 'moveLine':
+        this.doMoveShape(point);
+        break;
+
+      case 'adjustNewLine':
+        this.adjustNewLine(point);
+        break;
+    }
+  }),
+
+  handleMouseUp: on('mouseUp', function(event) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    const action = get(this, 'toolState.mouseAction');
+    const didDrag = get(this, 'toolState.mouseDidDrag');
+
+    // Select clicked lines if they're not already clicked and the pointer has not moved since mousedown
+    if (action !== 'moveHandle' && action !== 'moveShape' && didDrag === false) {
+      const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
+      const layerName = get(this, 'selectedLayerName');
+      const shape = this.getLineAtPoint(point, { layerName });
+
+      if (shape) {
+        this.sendAction('select', shape);
+      }
+    }
+
+    set(this, 'toolState.mouseAction', null);
+  }),
+
+  handleBackspace: on(keyDown('Backspace'), function(event) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    event.preventDefault();
+    this.deleteSelectedLine();
+  }),
+
+  handleArrowKeys: on(keyDown(), function(event) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    // If the user is focused on an input, don't hijack their key events
+    if (event.target.tagName.toLowerCase() === 'input') {
+      return;
+    }
+
+    const code = getCode(event);
+    const map = {
+      'ArrowLeft':  [ -1, 0 ],
+      'ArrowUp':    [ 0, -1 ],
+      'ArrowRight': [ 1, 0 ],
+      'ArrowDown':  [ 0, 1 ]
+    };
+
+    if (map[code]) {
+      this.moveSelectedLineOnGrid(...map[code], event);
+      event.preventDefault();
+    }
+  }),
+
+  startMoveHandle(point, handle) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    set(this, 'toolState.handleBeingMoved', handle);
+  },
+
+  doMoveHandle(point) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    const handleBeingMoved = get(this, 'toolState.handleBeingMoved');
+
+    if (!handleBeingMoved) {
       return;
     }
 
@@ -33,39 +164,42 @@ export default Ember.Mixin.create({
     const gridSize = get(this, 'gridSize');
 
     // The point at the end of the line we're not moving
-    const fixedPoint = get(shape, 'points').objectAt(1 - handleIndex);
-    const snapped = this.snapPointToGrid(point, gridSize);
+    const fixedPoint = {
+      x: get(shape, `points.x${handleIndex % 2 + 1}`),
+      y: get(shape, `points.y${handleIndex % 2 + 1}`)
+    };
 
-    const newPoints = [];
-    get(shape, 'points').forEach(p => newPoints.push(p));
-    newPoints[handleIndex] = snapped;
+    const snappedToGrid = this.snapPointToGrid(point, gridSize);
+
+    const newPoints = assign({}, get(shape, 'points'), {
+      [`x${handleIndex}`]: snappedToGrid.x,
+      [`y${handleIndex}`]: snappedToGrid.y
+    });
 
     // Avoid giving the line zero length
-    // if (newPoints[0].x === newPoints[1].x && newPoints[0].y === newPoints[1].y) {
-      // return;
-    // }
-
-    console.log(`sending ${newPoints.length} points`);
-
-    this.sendAction('resize', shape, newPoints);
-  }),
-
-  startMoveLine: on('startMoveShape', function(point, line) {
-    if (get(this, 'tool') !== 'path') {
+    if (newPoints.x1 === newPoints.x2 && newPoints.y1 === newPoints.y2) {
       return;
     }
 
-    set(this, 'lineBeingMoved', {
+    this.sendAction('resize', shape, newPoints);
+  },
+
+  startMoveLine(point, line) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    set(this, 'toolState.lineBeingMoved', {
       line,
       initialMousePos: point,
       initialLinePos: Ember.assign({}, get(line, 'points'))
     });
 
     this.sendAction('select', line);
-  }),
+  },
 
-  doMoveLine: on('doMoveShape', function(point) {
-    if (get(this, 'tool') !== 'path') {
+  doMoveLine(point) {
+    if (guard.apply(this, arguments)) {
       return;
     }
 
@@ -93,10 +227,10 @@ export default Ember.Mixin.create({
     };
 
     this.sendAction('resize', line, newPos);
-  }),
+  },
 
-  startNewLine: on('startNewShape', function(point) {
-    if (get(this, 'tool') !== 'path') {
+  startNewLine(point) {
+    if (guard.apply(this, arguments)) {
       return;
     }
 
@@ -104,34 +238,34 @@ export default Ember.Mixin.create({
     const snapped = this.snapPointToGrid(point, gridSize);
     const layer = get(this, 'selectedLayerName');
 
-    const path = get(this, 'shapes').find(path => {
-      return get(path, 'isSelected') && get(path, 'layer') === layer && get(path, 'type') === 'path';
+    this.sendAction('deselectAll');
+
+    set(this, 'toolState.newLine', {
+      points: {
+        x1: snapped.x,
+        y1: snapped.y,
+        x2: snapped.x,
+        y2: snapped.y
+      },
+      isSelected: false,
+      type: 'line',
+      layer
     });
-    
-    if (path) {
-      this.addLineSegment(path, snapped);
-    } else {
-      this.sendAction('deselectAll');
+  },
 
-      set(this, 'newLine', {
-        points: [ snapped, snapped ],
-        isSelected: false,
-        type: 'path',
-        layer
-      });
-    }
-  }),
-
-  adjustNewLine: on('adjustNewShape', function(point) {
-    const tool = get(this, 'tool');
-    const newLine = get(this, 'newLine');
-    
-    if (tool !== 'path' || !newLine) {
+  adjustNewLine(point) {
+    if (guard.apply(this, arguments)) {
       return;
     }
 
+    const newLine = get(this, 'toolState.newLine');
     const gridSize = get(this, 'gridSize');
-    const point1 = get(newLine, 'points.0');
+
+    const point1 = {
+      x: get(newLine, 'points.x1'),
+      y: get(newLine, 'points.y1')
+    };
+
     const point2 = this.snapPointToGrid(point, gridSize);
 
     // The line would still have zero length, don't do anything yet
@@ -142,58 +276,57 @@ export default Ember.Mixin.create({
     this.sendAction('add', newLine);
     this.sendAction('select', newLine);
 
-    set(this, 'handleBeingMoved', {
-      handleIndex: 1,
+    set(this, 'toolState.handleBeingMoved', {
+      handleIndex: 2,
       shape: newLine
     });
 
-    set(this, 'newLine', null);
-    set(this, 'mouseAction', 'moveHandle');
+    set(this, 'toolState.newLine', null);
+    set(this, 'toolState.mouseAction', 'moveHandle');
 
     this.trigger('doMoveHandle', point);
-  }),
+  },
 
-  moveSelectedLineOnGrid: on('moveSelectedShapeOnGrid', function(dx, dy) {
-    if (get(this, 'tool') !== 'path') {
+  moveSelectedLineOnGrid(dx, dy) {
+    if (guard.apply(this, arguments)) {
       return;
     }
 
     const selected = get(this, 'lines').findBy('isSelected');
     return this.moveLineOnGrid(selected, dx, dy);
-  }),
-
-  moveLineOnGrid(line, dx, dy) {
-    const gridSize = get(this, 'gridSize');
-
-    if (line) {
-      this.sendAction('resize', line, get(line, 'points').map(point => ({
-        x: point.x + dx * gridSize,
-        y: point.y + dy * gridSize
-      })));
-    }
   },
 
-  addLineSegment(path, point) {
-    const last = get(path, 'points.lastObject');
-
-    // Don't create zero-length line segments
-    if (last.x === point.x && last.y === point.y) {
-      console.log('refusing to create zero-length line segment');
+  moveLineOnGrid(line, dx, dy) {
+    if (guard.apply(this, arguments)) {
       return;
     }
 
-    set(this, 'handleBeingMoved', {
-      handleIndex: get(path, 'points.length'),
-      shape: path
-    });
+    const gridSize = get(this, 'gridSize');
 
-    const newPoints = assign([], get(path, 'points'), {
-       [get(path, 'points.length')]: point
-    });
+    if (line) {
+      this.sendAction('resize', line, {
+        x1: get(line, 'points.x1') + dx * gridSize,
+        y1: get(line, 'points.y1') + dy * gridSize,
+        x2: get(line, 'points.x2') + dx * gridSize,
+        y2: get(line, 'points.y2') + dy * gridSize,
+      });
+    }
+  },
 
-    console.log(newPoints);
+  deleteSelectedLine() {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
 
-    this.sendAction('resize', path, newPoints);
-    set(this, 'mouseAction', 'moveHandle');
+    const selected = get(this, 'shapes').findBy('isSelected');
+
+    if (selected) {
+      this.sendAction('remove', selected);
+    }
   }
 });
+
+function guard() {
+  this._super(...arguments);
+  return get(this, 'tool') !== 'line' || get(this, 'isDestroying');
+}

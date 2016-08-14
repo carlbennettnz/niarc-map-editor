@@ -161,10 +161,23 @@ export default Ember.Mixin.create({
     };
 
     if (map[code]) {
-      this.moveSelectedLineOnGrid(...map[code], event);
+      this.moveSelectedPointOnGrid(...map[code]);
       event.preventDefault();
     }
   }),
+
+  getPathWithSelectedHandle() {
+    const paths = get(this, 'shapes').filterBy('type', 'path');
+    let selected;
+
+    paths.forEach(path => {
+      if (get(path, 'points').findBy('isSelected')) {
+        selected = path;
+      }
+    });
+
+    return selected;
+  },
 
   getPathHandlesAtPoint(point) {    
     if (guard.apply(this, arguments)) {
@@ -342,30 +355,40 @@ export default Ember.Mixin.create({
     this.doMoveHandle(point);
   },
 
-  moveSelectedLineOnGrid(dx, dy) {
+  moveSelectedPointOnGrid(dx, dy) {
     if (guard.apply(this, arguments)) {
       return;
     }
 
-    const selected = get(this, 'lines').findBy('isSelected');
-    return this.moveLineOnGrid(selected, dx, dy);
+    const selected = this.getPathWithSelectedHandle();
+
+    if (selected) {
+      const points = get(selected, 'points');
+      const handle = points.findBy('isSelected');
+      const index = points.indexOf(handle);
+      return this.moveHandleOnGrid(selected, index, dx, dy);
+    }
   },
 
-  moveLineOnGrid(line, dx, dy) {
+  moveHandleOnGrid(path, handleIndex, dx, dy) {
     if (guard.apply(this, arguments)) {
       return;
     }
 
+    const points = get(path, 'points');
     const gridSize = get(this, 'gridSize');
+    const pointToMove = points.objectAt(handleIndex);
+    
+    const movedPoint = assign({}, pointToMove, {
+      x: get(pointToMove, 'x') + dx * gridSize,
+      y: get(pointToMove, 'y') + dy * gridSize
+    });
 
-    if (line) {
-      this.sendAction('resize', line, {
-        x1: get(line, 'points.x1') + dx * gridSize,
-        y1: get(line, 'points.y1') + dy * gridSize,
-        x2: get(line, 'points.x2') + dx * gridSize,
-        y2: get(line, 'points.y2') + dy * gridSize,
-      });
-    }
+    console.log(movedPoint);
+    
+    const newPoints = assign([], points, { [handleIndex]: movedPoint });
+
+    this.sendAction('resize', path, newPoints);
   },
 
   deleteSelectedHandle() {
@@ -373,14 +396,7 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const paths = get(this, 'shapes').filterBy('type', 'path');
-    let selected;
-
-    paths.forEach(path => {
-      if (get(path, 'points').findBy('isSelected')) {
-        selected = path;
-      }
-    });
+    const selected = this.getPathWithSelectedHandle();
 
     if (selected) {
       const newPoints = get(selected, 'points').rejectBy('isSelected');

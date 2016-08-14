@@ -1,9 +1,9 @@
 <g class="path {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}} {{line.layer}}-layer">
   <path d={{path}}></path>
 
-  {{#if line.isSelected}}
-    {{#each line.points as |point|}}
+  {{#each line.points as |point|}}
+    {{#if point.isSelected}}
       <circle class="handle {{if point.isSelected 'selected'}}" cx={{scale point.x viewport.zoom}} cy={{scale point.y viewport.zoom}} r="4"></circle>
-    {{/each}}
-  {{/if}}
+    {{/if}}
+  {{/each}}
 </g>

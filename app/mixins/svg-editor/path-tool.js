@@ -29,12 +29,25 @@ export default Ember.Mixin.create({
 
     set(this, 'toolState.mouseDidDrag', false);
 
-    const handle = this.getPathHandlesAtPoint(point).findBy('shape.isSelected');
+    const handlesAtPoint = this.getPathHandlesAtPoint(point);
+    let selectedHandle = handlesAtPoint.find(handle => {
+      const points = get(handle, 'shape.points') || [];
+      const index = get(handle, 'handleIndex');
+      const point = points.objectAt(index)
+      return point && get(point, 'isSelected');
+    });
+
+    // If over a handle, but not a selected one, select it
+    if (handlesAtPoint.length && !selectedHandle) {
+      selectedHandle = handlesAtPoint.objectAt(0);
+      const { shape, handleIndex } = selectedHandle;
+      this.sendAction('selectHandle', shape, handleIndex);
+    }
 
     // If over a selected handle, start moving that handle
-    if (handle) {
+    if (selectedHandle) {
       set(this, 'toolState.mouseAction', 'moveHandle');
-      this.startMoveHandle(point, handle);
+      this.startMoveHandle(point, selectedHandle);
       return;
     }
 
@@ -109,7 +122,7 @@ export default Ember.Mixin.create({
     if (action !== 'moveHandle' && action !== 'moveShape' && didDrag === false) {
       const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
       const layerName = get(this, 'selectedLayerName');
-      const handleData = this.getHandlesAtPoint(point, { layerName }).objectAt(0);
+      const handleData = this.getPathHandlesAtPoint(point).objectAt(0);
 
       if (handleData) {
         const { shape, handleIndex } = handleData;
@@ -198,6 +211,7 @@ export default Ember.Mixin.create({
     const { handleIndex, shape } = handleBeingMoved;
     const gridSize = get(this, 'gridSize');
     const snappedToGrid = this.snapPointToGrid(point, gridSize);
+    snappedToGrid.isSelected = true;
     const newPoints = assign([], get(shape, 'points'), { [handleIndex]: snappedToGrid });
 
     // Avoid giving the line zero length

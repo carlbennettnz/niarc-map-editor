@@ -33,7 +33,10 @@ export default MapController.extend({
     },
 
     selectHandle(path, handleIndex) {
-      const point = get(path, 'points').objectAt(handleIndex);
+      const points = get(path, 'points');
+      const point = points.objectAt(handleIndex);
+
+      points.forEach(point => set(point, 'isSelected', false));
       set(point, 'isSelected', true);
     }
   }

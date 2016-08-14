@@ -30,6 +30,11 @@ export default Ember.Route.extend({
     (get(model, 'map') || []).forEach(line => {
       set(line, 'isSelected', false);
     });
+
+    (get(model, 'events') || []).filterBy('type', 'path').forEach(path => {
+      set(path, 'isSelected', false);
+      (get(path, 'points') || []).forEach(point => set(point, 'isSelected', false));
+    });
   },
 
   actions: {

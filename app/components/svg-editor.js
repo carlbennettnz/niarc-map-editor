@@ -52,29 +52,28 @@ export default Ember.Component.extend(EKMixin, {
     };
   },
 
-  getHandleAtPoint(point) {
-    const selected = (get(this, 'shapes') || []).findBy('isSelected');
+  getHandlesAtPoint(point) {
+    const shapes = get(this, 'shapes') || [];
     const tolerance = get(this, 'clickToSelectTolerance');
+    const found = [];
 
-    if (!selected) {
-      return null;
-    }
+    shapes.forEach(shape => {
+      const handles = [
+        { x: get(shape, 'points.x1'), y: get(shape, 'points.y1') },
+        { x: get(shape, 'points.x2'), y: get(shape, 'points.y2') }
+      ];
 
-    const handles = [
-      { x: get(selected, 'points.x1'), y: get(selected, 'points.y1') },
-      { x: get(selected, 'points.x2'), y: get(selected, 'points.y2') }
-    ];
+      const collisions = handles.map(handle => geometry.checkPointCollision(point, handle, tolerance));
 
-    const collisions = handles.map(handle => geometry.checkPointCollision(point, handle, tolerance));
+      if (collisions.contains(true)) {
+        found.pushObject({
+          handleIndex: collisions.indexOf(true) + 1,
+          shape
+        });
+      }
+    });
 
-    if (collisions.contains(true)) {
-      return {
-        handleIndex: collisions.indexOf(true) + 1,
-        shape: selected
-      };
-    }
-
-    return null;
+    return found;
   },
 
   getLineAtPoint(point, options = {}) {

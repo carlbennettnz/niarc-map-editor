@@ -11,14 +11,12 @@ export default Ember.Component.extend({
     const points = get(this, 'line.points') || [];
     const zoom = get(this, 'viewport.zoom');
     const parts = [];
-    console.log(`building ${points.length} point path`);
 
     const scaledPoint = (point) => {
       const x = scale([ get(point, 'x'), zoom ]);
       const y = scale([ get(point, 'y'), zoom ]);
       return `${x},${y}`;
     }
-
 
     points.forEach(point => {
       parts.push(scaledPoint(point));

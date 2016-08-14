@@ -30,6 +30,11 @@ export default MapController.extend({
 
       events.pushObject(path);
       this.send('saveModel');
+    },
+
+    selectHandle(path, handleIndex) {
+      const point = get(path, 'points').objectAt(handleIndex);
+      set(point, 'isSelected', true);
     }
   }
 });

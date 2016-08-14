@@ -28,9 +28,9 @@ export default Ember.Mixin.create({
 
     set(this, 'toolState.mouseDidDrag', false);
 
-    const handle = this.getHandleAtPoint(point);
+    const handle = this.getHandlesAtPoint(point).findBy('shape.isSelected');
 
-    // If over a handle, start moving that handle
+    // If over a selected handle, start moving that handle
     if (handle) {
       set(this, 'toolState.mouseAction', 'moveHandle');
       this.startMoveHandle(point, handle);
@@ -68,8 +68,6 @@ export default Ember.Mixin.create({
     set(this, 'toolState.mouseDidDrag', true);
 
     const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
-
-    console.log(mouseAction);
 
     switch (mouseAction) {
       case 'moveHandle':

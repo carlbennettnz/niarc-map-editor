@@ -11,7 +11,7 @@ const {
 export default Ember.Mixin.create({
   init() {
     this._super(...arguments);
-    set(this, 'tool', 'line');
+    set(this, 'tool', 'path');
   },
 
   handleMouseDown: on('mouseDown', function(event) {
@@ -28,9 +28,9 @@ export default Ember.Mixin.create({
 
     set(this, 'toolState.mouseDidDrag', false);
 
-    const handle = this.getHandleAtPoint(point);
+    const handle = this.getHandlesAtPoint(point).findBy('shape.isSelected');
 
-    // If over a handle, start moving that handle
+    // If over a selected handle, start moving that handle
     if (handle) {
       set(this, 'toolState.mouseAction', 'moveHandle');
       this.startMoveHandle(point, handle);
@@ -44,6 +44,14 @@ export default Ember.Mixin.create({
     if (shape) {
       set(this, 'toolState.mouseAction', 'moveLine');
       this.startMoveLine(point, shape);
+      return;
+    }
+
+    const existingPath = get(this, 'shapes').findBy('type', 'path');
+
+    if (existingPath) {
+      set(this, 'toolState.mouseAction', 'moveHandle');
+      this.startNewLineSegment(existingPath, point);
       return;
     }
 
@@ -69,8 +77,6 @@ export default Ember.Mixin.create({
 
     const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
 
-    console.log(mouseAction);
-
     switch (mouseAction) {
       case 'moveHandle':
         this.doMoveHandle(point);
@@ -78,6 +84,10 @@ export default Ember.Mixin.create({
 
       case 'moveLine':
         this.doMoveShape(point);
+        break;
+
+      case 'adjustNewLineSegment':
+        this.adjustNewLineSegment(point);
         break;
 
       case 'adjustNewLine':
@@ -98,10 +108,11 @@ export default Ember.Mixin.create({
     if (action !== 'moveHandle' && action !== 'moveShape' && didDrag === false) {
       const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
       const layerName = get(this, 'selectedLayerName');
-      const shape = this.getLineAtPoint(point, { layerName });
+      const handleData = this.getHandlesAtPoint(point, { layerName }).objectAt(0);
 
-      if (shape) {
-        this.sendAction('select', shape);
+      if (handleData) {
+        const { shape, handleIndex } = handleData;
+        this.sendAction('selectHandle', shape, handleIndex);
       }
     }
 
@@ -162,24 +173,13 @@ export default Ember.Mixin.create({
 
     const { handleIndex, shape } = handleBeingMoved;
     const gridSize = get(this, 'gridSize');
-
-    // The point at the end of the line we're not moving
-    const fixedPoint = {
-      x: get(shape, `points.x${handleIndex % 2 + 1}`),
-      y: get(shape, `points.y${handleIndex % 2 + 1}`)
-    };
-
     const snappedToGrid = this.snapPointToGrid(point, gridSize);
-
-    const newPoints = assign({}, get(shape, 'points'), {
-      [`x${handleIndex}`]: snappedToGrid.x,
-      [`y${handleIndex}`]: snappedToGrid.y
-    });
+    const newPoints = assign([], get(shape, 'points'), { [handleIndex]: snappedToGrid });
 
     // Avoid giving the line zero length
-    if (newPoints.x1 === newPoints.x2 && newPoints.y1 === newPoints.y2) {
-      return;
-    }
+    // if (newPoints.x1 === newPoints.x2 && newPoints.y1 === newPoints.y2) {
+    //   return;
+    // }
 
     this.sendAction('resize', shape, newPoints);
   },
@@ -241,14 +241,9 @@ export default Ember.Mixin.create({
     this.sendAction('deselectAll');
 
     set(this, 'toolState.newLine', {
-      points: {
-        x1: snapped.x,
-        y1: snapped.y,
-        x2: snapped.x,
-        y2: snapped.y
-      },
+      points: [ snapped, snapped ],
       isSelected: false,
-      type: 'line',
+      type: 'path',
       layer
     });
   },
@@ -261,15 +256,11 @@ export default Ember.Mixin.create({
     const newLine = get(this, 'toolState.newLine');
     const gridSize = get(this, 'gridSize');
 
-    const point1 = {
-      x: get(newLine, 'points.x1'),
-      y: get(newLine, 'points.y1')
-    };
-
-    const point2 = this.snapPointToGrid(point, gridSize);
+    const point0 = get(newLine, 'points.0');
+    const point1 = this.snapPointToGrid(point, gridSize);
 
     // The line would still have zero length, don't do anything yet
-    if (point1.x === point2.x && point1.y === point2.y) {
+    if (point0.x === point1.x && point0.y === point1.y) {
       return;
     }
 
@@ -277,14 +268,32 @@ export default Ember.Mixin.create({
     this.sendAction('select', newLine);
 
     set(this, 'toolState.handleBeingMoved', {
-      handleIndex: 2,
+      handleIndex: 1,
       shape: newLine
     });
 
     set(this, 'toolState.newLine', null);
     set(this, 'toolState.mouseAction', 'moveHandle');
 
-    this.trigger('doMoveHandle', point);
+    this.doMoveHandle(point);
+  },
+
+  startNewLineSegment(path, point) {
+    if (guard.apply(this, arguments)) {
+      return;
+    }
+
+    const points = get(path, 'points');
+    const newPoints = [ ...points, get(points, 'lastObject') ];
+
+    this.sendAction('resize', path, newPoints);
+
+    set(this, 'toolState.handleBeingMoved', {
+      handleIndex: newPoints.length - 1,
+      shape: path
+    });
+
+    this.doMoveHandle(point);
   },
 
   moveSelectedLineOnGrid(dx, dy) {
@@ -328,5 +337,5 @@ export default Ember.Mixin.create({
 
 function guard() {
   this._super(...arguments);
-  return get(this, 'tool') !== 'line' || get(this, 'isDestroying');
+  return get(this, 'tool') !== 'path' || get(this, 'isDestroying');
 }

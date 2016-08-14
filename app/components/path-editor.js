@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import SvgEditorComponent from './svg-editor';
-import LineToolMixin from 'niarc-map-editor/mixins/svg-editor/line-tool';
+import PathToolMixin from 'niarc-map-editor/mixins/svg-editor/path-tool';
 import layout from 'niarc-map-editor/templates/components/svg-editor';
 
 const {
@@ -9,7 +9,7 @@ const {
   computed
 } = Ember;
 
-export default SvgEditorComponent.extend(LineToolMixin, {
+export default SvgEditorComponent.extend(PathToolMixin, {
   layout,
 
   shapes: computed('map.[]', 'events.[]', function() {
@@ -20,10 +20,10 @@ export default SvgEditorComponent.extend(LineToolMixin, {
     shapes.push(...map);
 
     events.forEach(event => {
-      if (get(event, 'type') === 'move') {
+      if (get(event, 'type') === 'path') {
         shapes.push(event);
       }
-    })
+    });
 
     return shapes;
   })

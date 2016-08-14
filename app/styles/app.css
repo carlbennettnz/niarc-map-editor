@@ -43,12 +43,18 @@ body {
   stroke: #70707c;
 }
 
-.map g.wall.path-layer line {
+.map g.path-layer line {
   stroke: #e90;
 }
 
-.map g.wall.path-layer circle.handle {
+.map g.path-layer circle.handle {
   fill: #e90;
+}
+
+.map g.path path {
+  stroke: #e90;
+  stroke-width: 2px;
+  fill: none;
 }
 
 /**********************************/

@@ -15,20 +15,9 @@
   <g class="scroll-offset {{selectedLayerName}}-layer-selected" transform={{scrollTransform}}>
     {{#each layers as |layer|}}
       {{#if layer.isVisible}}
-        {{#each lines as |line|}}
-          {{#unless (or line.isHidden (not-eq line.layer layer.name))}}
-            <g class="wall {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}} {{line.layer}}-layer">
-              <line
-                x1={{scale line.points.x1 viewport.zoom}}
-                y1={{scale line.points.y1 viewport.zoom}}
-                x2={{scale line.points.x2 viewport.zoom}}
-                y2={{scale line.points.y2 viewport.zoom}}></line>
-
-              {{#if line.isSelected}}
-                <circle class="handle" cx={{scale line.points.x1 viewport.zoom}} cy={{scale line.points.y1 viewport.zoom}} r="4"></circle>
-                <circle class="handle" cx={{scale line.points.x2 viewport.zoom}} cy={{scale line.points.y2 viewport.zoom}} r="4"></circle>
-              {{/if}}
-            </g>
+        {{#each shapes as |line|}}
+          {{#unless line.isHidden}}
+            {{component (concat 'svg-shapes/' line.type) line=line viewport=viewport tagName=''}}
           {{/unless}}
         {{/each}}
       {{/if}}

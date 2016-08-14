@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import config from 'niarc-map-editor/config/environment';
 
 const {
   get,
@@ -28,5 +29,13 @@ export default Ember.Route.extend({
     (get(model, 'map') || []).forEach(line => {
       set(line, 'isSelected', false);
     });
+  },
+
+  actions: {
+    saveModel() {
+      const envSuffix = config.environment === 'test' ? '-test' : '';
+      localStorage['map' + envSuffix] = JSON.stringify(get(this, 'controller.model.map') || []);
+      localStorage['events' + envSuffix] = JSON.stringify(get(this, 'controller.model.events') || []);
+    }
   }
 });

@@ -20,7 +20,7 @@ export default Ember.Route.extend({
   actions: {
     saveModel() {
       const key = config.environment === 'test' ? 'map-test' : 'map';
-      localStorage[key] = JSON.stringify(get(this, 'controller.lines') || []);
+      localStorage[key] = JSON.stringify(get(this, 'controller.shapes') || []);
     }
   }
 });

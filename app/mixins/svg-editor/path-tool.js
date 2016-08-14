@@ -10,11 +10,11 @@ const {
 export default Ember.Mixin.create({
   init() {
     this._super(...arguments);
-    set(this, 'tool', 'line');
+    set(this, 'tool', 'path');
   },
 
   startMoveLineHandle: on('startMoveHandle', function(point, handle) {
-    if (get(this, 'tool') !== 'line') {
+    if (get(this, 'tool') !== 'path') {
       return;
     }
 
@@ -22,13 +22,10 @@ export default Ember.Mixin.create({
   }),
 
   doMoveLineHandle: on('doMoveHandle', function(point) {
-    if (get(this, 'tool') !== 'line') {
-      return;
-    }
-
+    const tool = get(this, 'tool');
     const handleBeingMoved = get(this, 'handleBeingMoved');
-
-    if (!handleBeingMoved) {
+    
+    if (tool !== 'path' || !handleBeingMoved) {
       return;
     }
 
@@ -36,28 +33,25 @@ export default Ember.Mixin.create({
     const gridSize = get(this, 'gridSize');
 
     // The point at the end of the line we're not moving
-    const fixedPoint = {
-      x: get(shape, `points.x${handleIndex % 2 + 1}`),
-      y: get(shape, `points.y${handleIndex % 2 + 1}`)
-    };
+    const fixedPoint = get(shape, 'points').objectAt(1 - handleIndex);
+    const snapped = this.snapPointToGrid(point, gridSize);
 
-    const snappedToGrid = this.snapPointToGrid(point, gridSize);
-
-    const newPoints = assign({}, get(shape, 'points'), {
-      [`x${handleIndex}`]: snappedToGrid.x,
-      [`y${handleIndex}`]: snappedToGrid.y
-    });
+    const newPoints = [];
+    get(shape, 'points').forEach(p => newPoints.push(p));
+    newPoints[handleIndex] = snapped;
 
     // Avoid giving the line zero length
-    if (newPoints.x1 === newPoints.x2 && newPoints.y1 === newPoints.y2) {
-      return;
-    }
+    // if (newPoints[0].x === newPoints[1].x && newPoints[0].y === newPoints[1].y) {
+      // return;
+    // }
+
+    console.log(`sending ${newPoints.length} points`);
 
     this.sendAction('resize', shape, newPoints);
   }),
 
   startMoveLine: on('startMoveShape', function(point, line) {
-    if (get(this, 'tool') !== 'line') {
+    if (get(this, 'tool') !== 'path') {
       return;
     }
 
@@ -71,7 +65,7 @@ export default Ember.Mixin.create({
   }),
 
   doMoveLine: on('doMoveShape', function(point) {
-    if (get(this, 'tool') !== 'line') {
+    if (get(this, 'tool') !== 'path') {
       return;
     }
 
@@ -102,7 +96,7 @@ export default Ember.Mixin.create({
   }),
 
   startNewLine: on('startNewShape', function(point) {
-    if (get(this, 'tool') !== 'line') {
+    if (get(this, 'tool') !== 'path') {
       return;
     }
 
@@ -110,34 +104,34 @@ export default Ember.Mixin.create({
     const snapped = this.snapPointToGrid(point, gridSize);
     const layer = get(this, 'selectedLayerName');
 
-    this.sendAction('deselectAll');
-
-    set(this, 'newLine', {
-      points: {
-        x1: snapped.x,
-        y1: snapped.y,
-        x2: snapped.x,
-        y2: snapped.y
-      },
-      isSelected: false,
-      type: 'line',
-      layer
+    const path = get(this, 'shapes').find(path => {
+      return get(path, 'isSelected') && get(path, 'layer') === layer && get(path, 'type') === 'path';
     });
+    
+    if (path) {
+      this.addLineSegment(path, snapped);
+    } else {
+      this.sendAction('deselectAll');
+
+      set(this, 'newLine', {
+        points: [ snapped, snapped ],
+        isSelected: false,
+        type: 'path',
+        layer
+      });
+    }
   }),
 
   adjustNewLine: on('adjustNewShape', function(point) {
-    if (get(this, 'tool') !== 'line') {
+    const tool = get(this, 'tool');
+    const newLine = get(this, 'newLine');
+    
+    if (tool !== 'path' || !newLine) {
       return;
     }
 
-    const newLine = get(this, 'newLine');
     const gridSize = get(this, 'gridSize');
-
-    const point1 = {
-      x: get(newLine, 'points.x1'),
-      y: get(newLine, 'points.y1')
-    };
-
+    const point1 = get(newLine, 'points.0');
     const point2 = this.snapPointToGrid(point, gridSize);
 
     // The line would still have zero length, don't do anything yet
@@ -149,7 +143,7 @@ export default Ember.Mixin.create({
     this.sendAction('select', newLine);
 
     set(this, 'handleBeingMoved', {
-      handleIndex: 2,
+      handleIndex: 1,
       shape: newLine
     });
 
@@ -160,7 +154,7 @@ export default Ember.Mixin.create({
   }),
 
   moveSelectedLineOnGrid: on('moveSelectedShapeOnGrid', function(dx, dy) {
-    if (get(this, 'tool') !== 'line') {
+    if (get(this, 'tool') !== 'path') {
       return;
     }
 
@@ -172,12 +166,34 @@ export default Ember.Mixin.create({
     const gridSize = get(this, 'gridSize');
 
     if (line) {
-      this.sendAction('resize', line, {
-        x1: get(line, 'points.x1') + dx * gridSize,
-        y1: get(line, 'points.y1') + dy * gridSize,
-        x2: get(line, 'points.x2') + dx * gridSize,
-        y2: get(line, 'points.y2') + dy * gridSize,
-      });
+      this.sendAction('resize', line, get(line, 'points').map(point => ({
+        x: point.x + dx * gridSize,
+        y: point.y + dy * gridSize
+      })));
     }
+  },
+
+  addLineSegment(path, point) {
+    const last = get(path, 'points.lastObject');
+
+    // Don't create zero-length line segments
+    if (last.x === point.x && last.y === point.y) {
+      console.log('refusing to create zero-length line segment');
+      return;
+    }
+
+    set(this, 'handleBeingMoved', {
+      handleIndex: get(path, 'points.length'),
+      shape: path
+    });
+
+    const newPoints = assign([], get(path, 'points'), {
+       [get(path, 'points.length')]: point
+    });
+
+    console.log(newPoints);
+
+    this.sendAction('resize', path, newPoints);
+    set(this, 'mouseAction', 'moveHandle');
   }
 });

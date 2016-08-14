@@ -214,10 +214,18 @@ export default Ember.Mixin.create({
     snappedToGrid.isSelected = true;
     const newPoints = assign([], get(shape, 'points'), { [handleIndex]: snappedToGrid });
 
-    // Avoid giving the line zero length
-    // if (newPoints.x1 === newPoints.x2 && newPoints.y1 === newPoints.y2) {
-    //   return;
-    // }
+    // Avoid overlapping points
+    for (let i = 0; i < newPoints.length; i++) {
+      if (i === handleIndex) {
+        continue;
+      }
+
+      const otherPoint = newPoints.objectAt(i);
+
+      if (snappedToGrid.x === otherPoint.x && snappedToGrid.y === otherPoint.y) {
+        return;
+      }
+    }
 
     this.sendAction('resize', shape, newPoints);
   },

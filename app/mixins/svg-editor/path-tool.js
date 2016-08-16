@@ -353,6 +353,7 @@ export default Ember.Mixin.create({
     });
 
     this.doMoveHandle(point);
+    this.sendAction('selectHandle', path, newPoints.length - 1);
   },
 
   moveSelectedPointOnGrid(dx, dy) {

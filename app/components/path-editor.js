@@ -12,18 +12,18 @@ const {
 export default SvgEditorComponent.extend(PathToolMixin, {
   layout,
 
-  shapes: computed('map.[]', 'events.[]', function() {
-    const map = get(this, 'map') || [];
-    const events = get(this, 'events') || [];
+  shapes: computed('map.[]', 'path', function() {
+    const map = get(this, 'map');
+    const path = get(this, 'path');
     const shapes = [];
 
-    shapes.push(...map);
+    if (map) {
+      shapes.push(...map);
+    }
 
-    events.forEach(event => {
-      if (get(event, 'type') === 'path') {
-        shapes.push(event);
-      }
-    });
+    if (path) {
+      shapes.push(path);
+    }
 
     return shapes;
   })

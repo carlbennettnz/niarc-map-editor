@@ -1,5 +1,7 @@
 <ul>
-  {{#each events as |event|}}
-    <li class={{event.type}}>{{event.name}}</li>
+  {{#each path.points as |point|}}
+    <li class="path">
+      <pre>{ x: {{point.x}}, y: {{point.y}} }</pre>
+    </li>
   {{/each}}
 </ul>

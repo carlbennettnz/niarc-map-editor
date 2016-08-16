@@ -2,16 +2,14 @@
   viewport=mapViewport
   layers=layers
   map=model.map
-  events=model.events
+  path=path
   add=(action 'addPath')
-  select=(action 'selectShape')
   selectHandle=(action 'selectHandle')
   deselectAll=(action 'deselectAll')
-  resize=(action 'resizeShape')
-  remove=(action 'removeShapes')}}
+  resize=(action 'setPathPoints')}}
 
 <aside class="ui-modules">
   {{map-mode-navigator}}
-  {{path-item}}
-  {{path-timeline events=model.events}}
+  {{path-item point=selectedPoint}}
+  {{path-timeline path=path}}
 </aside>

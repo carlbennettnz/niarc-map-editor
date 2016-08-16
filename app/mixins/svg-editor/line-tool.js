@@ -213,7 +213,7 @@ export default Ember.Mixin.create({
     set(this, 'toolState.lineBeingMoved', {
       line,
       initialMousePos: point,
-      initialLinePos: Ember.assign({}, get(line, 'points'))
+      initialLinePos: assign({}, get(line, 'points'))
     });
 
     this.sendAction('select', line);

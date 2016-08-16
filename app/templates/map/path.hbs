@@ -10,6 +10,6 @@
 
 <aside class="ui-modules">
   {{map-mode-navigator}}
-  {{path-item point=selectedPoint}}
+  {{path-item point=selectedPoint setProperty=(action 'setPointProp')}}
   {{path-timeline path=path}}
 </aside>

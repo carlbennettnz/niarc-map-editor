@@ -1,2 +1,6 @@
 <pre>{ x: {{point.x}}, y: {{point.y}} }</pre>
-{{input type="number" value=point.radius}}
+
+{{one-way-input
+  point.radius
+  type="number"
+  update=(action setProperty 'radius')}}

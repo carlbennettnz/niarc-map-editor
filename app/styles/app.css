@@ -57,6 +57,11 @@ body {
   fill: none;
 }
 
+.map g.path path.contruction-path {
+  stroke-width: 1px;
+  stroke-dasharray: 3 0 2;
+}
+
 /**********************************/
 /* UI MODULES                     */
 /**********************************/

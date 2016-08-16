@@ -27,7 +27,7 @@ export default MapController.extend({
   path: computed('model.events', {
     get() {
       const events = get(this, 'model.events') || [];
-      const moveEvents = events.filterBy('type', 'path');
+      const moveEvents = events.filterBy('operation', 'GO_TO_POINT');
       const points = moveEvents.mapBy('point');
 
       if (!points || !points.length) {
@@ -42,15 +42,24 @@ export default MapController.extend({
     },
 
     set(key, path) {
-      const points = get(path, 'points') || [];
-      set(this, 'model.events', points.map(point => ({
-        type: 'path',
-        point
-      })));
-      this.send('saveModel');
+      this.updateEvents(path);
       return path;
     }
   }),
+
+  updateEvents(path) {
+    path = path || get(this, 'path') || {};
+    const points = get(path, 'points') || [];
+    
+    set(this, 'model.events', points.map(point => {
+      return {
+        operation: 'GO_TO_POINT',
+        point
+      }
+    }));
+  
+    this.send('saveModel');
+  },
 
   actions: {
     addPath(path) {
@@ -71,15 +80,25 @@ export default MapController.extend({
     },
 
     setPathPoints(path, points) {
-      const newPath = assign({}, path, { points });
-      set(this, 'path', newPath);
-      this.send('saveModel');
+      set(this, 'path.points', points);
+      this.updateEvents();
     },
 
     deselectAll() {
       const path = get(this, 'path') || {};
       const points = get(path, 'points') || [];
       points.forEach(point => set(point, 'isSelected', false));
+    },
+
+    setPointProp(prop, value) {
+      const point = get(this, 'selectedPoint');
+
+      if (!point) {
+        return;
+      }
+
+      set(point, prop, value);
+      this.updateEvents();
     }
   }
 });

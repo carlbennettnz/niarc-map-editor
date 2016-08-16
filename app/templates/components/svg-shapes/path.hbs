@@ -1,4 +1,5 @@
 <g class="path {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}} {{line.layer}}-layer">
+  <path class="contruction-path" d={{constructionPath}}></path>
   <path d={{path}}></path>
 
   {{#each line.points as |point|}}

@@ -1,4 +1,12 @@
+import Ember from 'ember';
 import MapController from 'niarc-map-editor/controllers/map';
+
+const {
+  get,
+  set,
+  assert,
+  isArray
+} = Ember;
 
 export default MapController.extend({
   layers: [{

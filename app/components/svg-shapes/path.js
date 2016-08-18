@@ -77,14 +77,11 @@ export default Ember.Component.extend({
           x: pointsInQuestion[1].x + distanceDownArms * Math.cos(getAngleOf(vectors[0])),
           y: pointsInQuestion[1].y + distanceDownArms * Math.sin(getAngleOf(vectors[0]))
         };
-        console.log(pointsInQuestion, start)
 
         const end = {
           x: pointsInQuestion[1].x + distanceDownArms * Math.cos(getAngleOf(vectors[1])),
           y: pointsInQuestion[1].y + distanceDownArms * Math.sin(getAngleOf(vectors[1]))
         }
-
-        console.log(distanceDownArms);
 
         str += ' L' + scaledPoint(start);
         str += ` A ${radius} ${radius} 0 0 ${flag} ` + scaledPoint(end);

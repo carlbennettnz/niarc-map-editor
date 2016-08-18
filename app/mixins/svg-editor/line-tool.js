@@ -70,7 +70,7 @@ export default Ember.Mixin.create({
         break;
 
       case 'moveLine':
-        this.doMoveShape(point);
+        this.doMoveLine(point);
         break;
 
       case 'adjustNewLine':

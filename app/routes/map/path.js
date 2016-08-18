@@ -4,6 +4,7 @@ import config from 'niarc-map-editor/config/environment';
 const {
   get,
   set,
+  run,
   RSVP
 } = Ember;
 
@@ -42,6 +43,7 @@ export default Ember.Route.extend({
       const envSuffix = config.environment === 'test' ? '-test' : '';
       localStorage['map' + envSuffix] = JSON.stringify(get(this, 'controller.model.map') || []);
       localStorage['events' + envSuffix] = JSON.stringify(get(this, 'controller.model.events') || []);
+      run.throttle(null, () => this.send('sendData', get(this, 'controller.model.events')), 2000);
     }
   }
 });

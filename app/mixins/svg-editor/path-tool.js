@@ -134,7 +134,7 @@ export default Ember.Mixin.create({
   }),
 
   handleBackspace: on(keyDown('Backspace'), function(event) {
-    if (guard.apply(this, arguments)) {
+    if (guard.apply(this, arguments) || event.target.tagName.toLowerCase() === 'input') {
       return;
     }
 
@@ -225,7 +225,8 @@ export default Ember.Mixin.create({
     const gridSize = get(this, 'gridSize');
     const snappedToGrid = this.snapPointToGrid(point, gridSize);
     snappedToGrid.isSelected = true;
-    const newPoints = assign([], get(shape, 'points'), { [handleIndex]: assign({}, get(shape, 'points.' + handleIndex), snappedToGrid) });
+    const modifiedPoint = assign({}, get(shape, 'points.' + handleIndex), snappedToGrid);
+    const newPoints = assign([], get(shape, 'points'), { [handleIndex]: modifiedPoint });
 
     // Avoid overlapping points
     for (let i = 0; i < newPoints.length; i++) {
@@ -240,6 +241,7 @@ export default Ember.Mixin.create({
       }
     }
 
+    console.log('resizing', point, newPoints.get('lastObject'));
     this.sendAction('resize', shape, newPoints);
   },
 
@@ -255,37 +257,6 @@ export default Ember.Mixin.create({
     });
 
     this.sendAction('select', line);
-  },
-
-  doMoveLine(point) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    const lineBeingMoved = get(this, 'lineBeingMoved');
-
-    if (!lineBeingMoved) {
-      return;
-    }
-
-    const { line, initialMousePos, initialLinePos } = lineBeingMoved;
-    const gridSize = get(this, 'gridSize');
-
-    const delta = {
-      x: point.x - initialMousePos.x,
-      y: point.y - initialMousePos.y
-    };
-
-    const snappedDelta = this.snapPointToGrid(delta, gridSize);
-
-    const newPos = {
-      x1: get(initialLinePos, 'x1') + snappedDelta.x,
-      y1: get(initialLinePos, 'y1') + snappedDelta.y,
-      x2: get(initialLinePos, 'x2') + snappedDelta.x,
-      y2: get(initialLinePos, 'y2') + snappedDelta.y
-    };
-
-    this.sendAction('resize', line, newPos);
   },
 
   startNewLine(point) {

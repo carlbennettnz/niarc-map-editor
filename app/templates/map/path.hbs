@@ -12,4 +12,8 @@
   {{map-mode-navigator}}
   {{path-item point=selectedPoint setProperty=(action 'setPointProp')}}
   {{path-timeline path=path}}
+
+  <div class="ui-module">
+    <button {{action 'send'}}>Send to robot</button>
+  </div>
 </aside>

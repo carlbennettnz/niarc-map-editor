@@ -241,7 +241,7 @@ export default Ember.Mixin.create({
       }
     }
 
-    this.sendAction('resize', shape, newPoints);
+    this.sendAction('setPoints', newPoints);
   },
 
   startMoveLine(point, line) {
@@ -315,7 +315,7 @@ export default Ember.Mixin.create({
     const points = get(path, 'points');
     const newPoints = [ ...points, get(points, 'lastObject') ];
 
-    this.sendAction('resize', path, newPoints);
+    this.sendAction('setPoints', newPoints);
 
     set(this, 'toolState.handleBeingMoved', {
       handleIndex: newPoints.length - 1,
@@ -357,7 +357,7 @@ export default Ember.Mixin.create({
     
     const newPoints = assign([], points, { [handleIndex]: movedPoint });
 
-    this.sendAction('resize', path, newPoints);
+    this.sendAction('setPoints', newPoints);
   },
 
   deleteSelectedHandle() {
@@ -369,7 +369,7 @@ export default Ember.Mixin.create({
 
     if (selected) {
       const newPoints = get(selected, 'points').rejectBy('isSelected');
-      this.sendAction('resize', selected, newPoints);
+      this.sendAction('setPoints', newPoints);
     }
   }
 });

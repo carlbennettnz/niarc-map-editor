@@ -75,12 +75,12 @@ export default MapController.extend({
       set(this, 'path', newPath);
     },
 
-    setPathPoints(path, points) {
-      path = path || get(this, 'path');
+    setPathPoints(points) {
+      const path = get(this, 'path');
       
       if (path) {
         set(path, 'points', points);
-        run.next(() => this.updateEvents());
+        this.updateEvents();
       }
     },
 

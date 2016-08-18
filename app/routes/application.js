@@ -15,6 +15,7 @@ export default Ember.Route.extend({
     sendData(payload) {
       const connection = get(this, 'connection');
       const normalised = payload.map(p => {
+        p = p.serialize();
         const event = getPayload();
 
         event.Operation = p['Curve parameters'].Radius > 0 ? 1 : 0;

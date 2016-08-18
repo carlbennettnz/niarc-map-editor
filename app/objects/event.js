@@ -17,7 +17,7 @@ export default Ember.Object.extend({
       'Go to parameters': {
         'Point to go to': {
           X: get(this, 'x') * 10,
-          Y: get(this, 'y') * 10
+          Y: get(this, 'y') * -10
         },
         'Stop at end of line': true
       },

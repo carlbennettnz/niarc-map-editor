@@ -15,9 +15,9 @@ export default Ember.Controller.extend({
   layers: [],
 
   mapViewport: {
-    scrollX: -90,
-    scrollY: -90,
-    zoom: 1
+    scrollX: 30,
+    scrollY: 30,
+    zoom: 0.1
   },
 
   shapes: computed.alias('model')

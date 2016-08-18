@@ -23,6 +23,7 @@ export default Ember.Mixin.create({
     set(this, 'toolState.mouseDidDrag', false);
 
     const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
+    console.log(point)
     const handle = this.getLineHandlesAtPoint(point).findBy('shape.isSelected');
 
     // If over a selected handle, start moving that handle

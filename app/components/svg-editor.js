@@ -8,7 +8,8 @@ const {
   computed,
   assert,
   assign,
-  on
+  on,
+  $
 } = Ember;
 
 export default Ember.Component.extend(EKMixin, {
@@ -21,19 +22,33 @@ export default Ember.Component.extend(EKMixin, {
 
   // Config
   keyboardActivated: true,
-  gridSize: 20,
-  clickToSelectTolerance: 10, // how many pixels away can you click and still select the shape?
+  gridSize: 200,
+  clickToSelectTolerance: 100, // how many pixels away can you click and still select the shape?
   viewport: {
     scrollX: 0,
     scrollY: 0,
     zoom: 1
   },
 
-  scrollTransform: computed('viewport.scrollX', 'viewport.scrollY', function() {
-    const x = get(this, 'viewport.scrollX');
-    const y = get(this, 'viewport.scrollY');
+  viewportHeight: 0,
 
-    return `translate(${x}, ${y})`;
+  updateViewportHeight: on('init', function() {
+    set(this, 'viewportHeight', $(window).height());
+
+    $(window).on('resize', function() {
+      run(() => set(this, 'viewportHeight', $(window).height()));
+    })
+  }),
+
+  totalYOffset: computed('viewport.scrollY', 'viewportHeight', function() {
+    return get(this, 'viewportHeight') - get(this, 'viewport.scrollY');
+  }),
+
+  scrollTransform: computed('viewport.scrollX', 'viewport.scrollY', 'viewportHeight', function() {
+    const x = get(this, 'viewport.scrollX');
+    const y = get(this, 'viewportHeight') - get(this, 'viewport.scrollY');
+
+    return `translate(${x}, ${y}) scale(1, -1)`;
   }),
 
   selectedLayerName: computed('layers.@each.isSelected', function() {
@@ -45,10 +60,11 @@ export default Ember.Component.extend(EKMixin, {
     const scrollX = get(this, 'viewport.scrollX');
     const scrollY = get(this, 'viewport.scrollY');
     const zoom = get(this, 'viewport.zoom');
+    const viewportHeight = get(this, 'viewportHeight');
 
     return {
       x: (x - scrollX) / zoom,
-      y: (y - scrollY) / zoom
+      y: (viewportHeight - y - scrollY) / zoom
     };
   },
 

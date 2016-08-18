@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import config from 'niarc-map-editor/config/environment';
+import Event from 'niarc-map-editor/objects/event';
 
 const {
   get,
@@ -21,7 +22,7 @@ export default Ember.Route.extend({
 
     return RSVP.hash({
       map: this.modelFor('map'),
-      events
+      events: events.map(event => Event.create(event))
     });
   },
 

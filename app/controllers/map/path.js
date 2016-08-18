@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import MapController from 'niarc-map-editor/controllers/map';
+import Event from 'niarc-map-editor/objects/event';
 
 const {
   get,
@@ -27,16 +28,7 @@ export default MapController.extend({
 
   path: computed('model.events', {
     get() {
-      const events = get(this, 'model.events') || [];
-      const moveEvents = events.filter(event => get(event, 'Operation') < 2);
-      const points = events.map(event => {
-        return {
-          x: get(event, 'Go to parameters.Point to go to.X') / 10,
-          y: get(event, 'Go to parameters.Point to go to.Y') / 10,
-          radius: get(event, 'Curve parameters.Radius') / 10,
-          isSelected: get(event, 'UI parameters.Selected')
-        };
-      });
+      const points = get(this, 'model.events') || [];
 
       if (!points || !points.length) {
         return null;
@@ -58,26 +50,7 @@ export default MapController.extend({
   updateEvents(path) {
     path = path || get(this, 'path') || {};
     const points = get(path, 'points') || [];
-
-    set(this, 'model.events', points.map(point => {
-      return {
-        Operation: 1,
-        'Go to parameters': {
-          'Point to go to': {
-            X: get(point, 'x') * 10,
-            Y: get(point, 'y') * 10
-          },
-          'Stop at end of line': true
-        },
-        'Curve parameters': {
-          Radius: Number(get(point, 'radius') || 0) * 10
-        },
-        'UI parameters': {
-          Selected: get(point, 'isSelected')
-        }
-      };
-    }));
-  
+    set(this, 'model.events', points.map(point => Event.create(point)));
     this.send('saveModel');
   },
 
@@ -100,13 +73,11 @@ export default MapController.extend({
     },
 
     setPathPoints(path, points) {
-      path = path || get(this, 'path') || {};
+      path = path || get(this, 'path');
       
       if (path) {
         set(path, 'points', points);
         run.next(() => this.updateEvents());
-      } else {
-        console.log('path does not exist :O');
       }
     },
 

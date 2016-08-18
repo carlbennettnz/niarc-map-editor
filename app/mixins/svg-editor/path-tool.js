@@ -241,7 +241,6 @@ export default Ember.Mixin.create({
       }
     }
 
-    console.log('resizing', point, newPoints.get('lastObject'));
     this.sendAction('resize', shape, newPoints);
   },
 

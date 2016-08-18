@@ -1,5 +1,5 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  classNames: [ 'path-item', 'ui-module' ]
+  classNames: [ 'event-timeline', 'ui-module' ]
 });

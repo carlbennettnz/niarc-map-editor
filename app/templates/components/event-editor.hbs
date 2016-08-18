@@ -1,0 +1,125 @@
+{{#if point}}
+  <h2>Attributes</h2>
+
+  <div class="control">
+    <label>X</label>
+    {{one-way-input
+      point.x
+      type="number"
+      update=(action setProperty 'x')}}
+  </div>
+
+  <div class="control">
+    <label>Y</label>
+    {{one-way-input
+      point.y
+      type="number"
+      update=(action setProperty 'y')}}
+  </div>
+
+  <div class="control">
+    <label>Radius</label>
+    {{one-way-input
+      point.radius
+      type="number"
+      update=(action setProperty 'radius')}}
+  </div>
+
+  <div class="control">
+    <label>Face</label>
+    {{one-way-input
+      point.face
+      type="number"
+      update=(action setProperty 'face')}}
+  </div>
+
+  <div class="control">
+    <label>Ramp min value</label>
+    {{one-way-input
+      point.rampMinValue
+      type="number"
+      update=(action setProperty 'rampMinValue')}}
+  </div>
+
+  <div class="control">
+    <label>Ramp distance</label>
+    {{one-way-input
+      point.rampDistance
+      type="number"
+      update=(action setProperty 'rampDistance')}}
+  </div>
+
+  <div class="control">
+    <label>Error corr. P</label>
+    {{one-way-input
+      point.errorCorrectionP
+      type="number"
+      update=(action setProperty 'errorCorrectionP')}}
+  </div>
+
+  <div class="control">
+    <label>P saturation</label>
+    {{one-way-input
+      point.pSaturation
+      type="number"
+      update=(action setProperty 'pSaturation')}}
+  </div>
+
+  <div class="control">
+    <label>Face point P</label>
+    {{one-way-input
+      point.facePointP
+      type="number"
+      update=(action setProperty 'facePointP')}}
+  </div>
+
+  <div class="control">
+    <label>FPP Saturation</label>
+    {{one-way-input
+      point.facePointPSaturation
+      type="number"
+      update=(action setProperty 'facePointPSaturation')}}
+  </div>
+
+  <div class="control">
+    <label>Max Speed</label>
+    {{one-way-input
+      point.maxSpeed
+      type="number"
+      update=(action setProperty 'maxSpeed')}}
+  </div>
+
+  <div class="control">
+    <label>Acceleration</label>
+    {{one-way-input
+      point.acceleration
+      type="number"
+      update=(action setProperty 'acceleration')}}
+  </div>
+
+  <div class="control">
+    <label>Tolerance</label>
+    {{one-way-input
+      point.tolerance
+      type="number"
+      update=(action setProperty 'tolerance')}}
+  </div>
+
+  <div class="control">
+    <label>Ramp Curve Exp.</label>
+    {{one-way-input
+      point.rampCurveExponent
+      type="number"
+      update=(action setProperty 'rampCurveExponent')}}
+  </div>
+
+  <div class="control">
+    <label>Stop at end</label>
+    {{one-way-input
+      point.stopAtEndOfLine
+      type="number"
+      update=(action setProperty 'stopAtEndOfLine')}}
+  </div>
+{{else}}
+  <p class="placeholder">Select a point to edit its attributes</p>
+{{/if}}

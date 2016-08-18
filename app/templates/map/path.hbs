@@ -10,11 +10,14 @@
 
 <aside class="ui-modules">
   {{map-mode-navigator}}
-  {{path-item point=selectedPoint setProperty=(action 'setPointProp')}}
-  {{path-timeline path=path}}
+  {{event-timeline path=path}}
 
   <div class="ui-module connection">
     <div class="connection-indicator {{if connection.isConnected 'connected'}} {{if connection.isConnecting 'connecting'}}"></div>
     <button {{action 'connect'}}>Connect</button>
   </div>
+</aside>
+
+<aside class="ui-modules attributes">
+  {{event-editor point=selectedPoint setProperty=(action 'setPointProp')}}  
 </aside>

@@ -15,8 +15,8 @@ export default Ember.Controller.extend({
   layers: [],
 
   mapViewport: {
-    scrollX: 30,
-    scrollY: 30,
+    scrollX: 300,
+    scrollY: 200,
     zoom: 0.1
   },
 

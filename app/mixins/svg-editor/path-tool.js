@@ -155,13 +155,13 @@ export default Ember.Mixin.create({
     const code = getCode(event);
     const map = {
       'ArrowLeft':  [ -1, 0 ],
-      'ArrowUp':    [ 0, -1 ],
+      'ArrowUp':    [ 0, 1 ],
       'ArrowRight': [ 1, 0 ],
-      'ArrowDown':  [ 0, 1 ]
+      'ArrowDown':  [ 0, -1 ]
     };
 
     if (map[code]) {
-      this.moveSelectedPointOnGrid(...map[code]);
+      this.moveSelectedHandleOnGrid(...map[code]);
       event.preventDefault();
     }
   }),
@@ -326,7 +326,7 @@ export default Ember.Mixin.create({
     this.sendAction('selectHandle', path, newPoints.length - 1);
   },
 
-  moveSelectedPointOnGrid(dx, dy) {
+  moveSelectedHandleOnGrid(dx, dy) {
     if (guard.apply(this, arguments)) {
       return;
     }
@@ -349,6 +349,8 @@ export default Ember.Mixin.create({
     const points = get(path, 'points');
     const gridSize = get(this, 'gridSize');
     const pointToMove = points.objectAt(handleIndex);
+
+    console.log(dy)
     
     const movedPoint = assign({}, pointToMove, {
       x: get(pointToMove, 'x') + dx * gridSize,

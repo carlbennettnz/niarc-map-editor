@@ -12,6 +12,10 @@ body {
   height: 100%;
 }
 
+/**********************************/
+/* FORMS                          */
+/**********************************/
+
 button {
   border: 1px solid black;
   background-color: #55556f;
@@ -19,6 +23,40 @@ button {
   padding: 0.45em 1em 0.6em;
   line-height: 1;
 }
+
+input[type=text],
+input[type=number] {
+  background: #444;
+  border: 1px solid black;
+  padding: 0.5em 0.8em;
+  color: white;
+  outline: 0;
+  width: 100px;
+}
+
+input[type=text]:focus,
+input[type=number]:focus {
+  border-color: #39c;
+}
+
+.control {
+  display: flex;
+  margin-bottom: 0.5em
+}
+
+.control label {
+  flex: 0 0 100px;
+  padding: 0.5em 0;
+}
+
+.control input {
+  flex: 1 1;
+  width: 0;
+}
+
+/**********************************/
+/* MAP                            */
+/**********************************/
 
 .map {
   background-color: #445;
@@ -77,11 +115,17 @@ button {
 .ui-modules {
   position: absolute;
   top: 20px;
-  right: 20px;
+  left: 20px;
   bottom: 20px;
   width: 220px;
   display: flex;
   flex-direction: column;
+}
+
+.ui-modules.attributes {
+  right: 20px;
+  left: auto;
+  width: 260px;
 }
 
 .ui-modules > div {
@@ -93,13 +137,22 @@ button {
   margin-bottom: 0;
 }
 
-.ui-modules .mode-switcher {
+.ui-module {
+  background-color: #2c2c2c;
+  border: 1px solid black;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+.ui-module.mode-switcher {
   display: flex;
 }
 
-.ui-modules .mode-switcher a {
+.ui-module.mode-switcher a {
   flex: 1;
-  border: 1px solid black;
+  border-right: 1px solid black;
   border-left: 0;
   text-align: center;
   color: white;
@@ -114,11 +167,11 @@ button {
   cursor: pointer;
 }
 
-.ui-modules .mode-switcher a:first-of-type {
-  border-left: 1px solid black;
+.ui-module.mode-switcher a:last-of-type {
+  border-right: none;
 }
 
-.ui-modules .mode-switcher a.active {
+.ui-module.mode-switcher a.active {
   background-color: #292929;
   background-image: linear-gradient(rgba(0, 0, 0, 0.05), transparent);;
   box-shadow:
@@ -127,32 +180,16 @@ button {
     inset -1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
-.ui-module {
-  background-color: #2c2c2c;
-  border: 1px solid black;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 1px 0 0 rgba(255, 255, 255, 0.05),
-    inset -1px 0 0 rgba(255, 255, 255, 0.05);
-}
-
-.ui-modules .path-timeline {
+.ui-module.event-timeline {
   flex-grow: 1;
 }
 
-.path-item {
-  padding: 2em;
-  text-align: center;
-  font-style: italic;
-  color: #999;
-}
-
-.path-timeline ul {
+.ui-module.event-timeline ul {
   margin: 2em 0;
   padding: 0 2em;
 }
 
-.path-timeline li {
+.ui-module.event-timeline li {
   list-style-type: none;
   margin-bottom: 1em;
   padding-left: 1.5em;
@@ -161,7 +198,7 @@ button {
   font-style: italic;
 }
 
-.path-timeline li::before {
+.ui-module.event-timeline li::before {
   content: '';
   position: absolute;
   top: 3px;
@@ -176,7 +213,7 @@ button {
   z-index: 1;
 }
 
-.path-timeline li::after {
+.ui-module.event-timeline li::after {
   content: '';
   position: absolute;
   left: 2px;
@@ -186,7 +223,7 @@ button {
   background-color: #852;
 }
 
-.path-timeline li:last-child::after {
+.ui-module.event-timeline li:last-child::after {
   content: none;
 }
 
@@ -211,6 +248,31 @@ button {
 
 .connection-indicator.connected {
   background-color: #2c2;
+}
+
+.ui-module.event-editor {
+  padding: 2em;
+  color: #999;
+  flex: 1;
+}
+
+.ui-module.event-editor h2 {
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: 1px;
+  font-weight: bold;
+  text-align: center;
+  padding: 1em 2em 0.8em;
+  font-size: inherit;
+  margin: -2em -2em 2em;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid black;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1)
+}
+
+.ui-module.event-editor .position {
+  text-align: center;
+  margin-bottom: 2em;
 }
 
 /**********************************/

@@ -2,7 +2,8 @@ import Ember from 'ember';
 
 const {
   get,
-  set
+  set,
+  isEmpty
 } = Ember;
 
 export default Ember.Object.extend({
@@ -10,10 +11,11 @@ export default Ember.Object.extend({
   y: null,
   radius: null,
   isSelected: false,
+  dropCube: false,
 
   serialize() {
-    return {
-      Operation: get(this, 'radius') > 0 ? 2 : 1,
+    const serialized = [{
+      Operation: get(this, 'radius') > 0 ? 1 : 0,
       'Go to parameters': {
         'Point to go to': {
           X: get(this, 'x') * 10,
@@ -24,6 +26,17 @@ export default Ember.Object.extend({
       'Curve parameters': {
         Radius: Number(get(this, 'radius') || 0) * 10
       }
-    };
+    }];
+
+    if (!isEmpty(get(this, 'dropCube'))) {
+      serialized.push({
+        Operation: 2,
+        'Drop cude parameters': {
+          'Servo index': Number(get(this, 'dropCube'))
+        }
+      });
+    }
+
+    return serialized;
   }
 });

@@ -14,18 +14,8 @@ export default Ember.Route.extend({
   actions: {
     sendData(payload) {
       const connection = get(this, 'connection');
-      const normalised = payload.map(p => {
-        p = p.serialize();
-        const event = getPayload();
-
-        event.Operation = p['Curve parameters'].Radius > 0 ? 1 : 0;
-        assign(event['Go to parameters'], p['Go to parameters']);
-        assign(event['Curve parameters'], p['Curve parameters']);
-
-        return event;
-      });
-
-      connection.send(normalised);
+      const serialized = payload.reduce((items, item) => items = items.concat(item.serialize()), []);
+      connection.send(serialized);
     }
   }
 });

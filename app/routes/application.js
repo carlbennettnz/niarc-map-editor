@@ -4,61 +4,27 @@ const {
   get,
   set,
   run,
-  assign
+  assign,
+  inject: { service }
 } = Ember;
 
 export default Ember.Route.extend({
-  init() {
-    this._super(...arguments);
-    this.connect();
-  },
-
-  connect() {
-    console.log('connecting...');
-    const socket = new WebSocket('ws://10.140.124.43:8080');
-
-    const self = this;
-    socket.onopen = function() {
-      console.log('connected');
-      set(self, 'socket', this);
-    }
-    socket.onmessage = ({ data }) => console.log('recevied', data);
-    socket.onclose = () => {
-      console.log('closed, reconnecting...');
-      this.connect();
-    };
-
-    // Handle connection timeouts
-    // run.later(() => {
-    //   console.log('timed out, closing...');
-    //   socket.readyState ? socket.close() : this.connect();
-    // }, 10000);
-
-    set(this, 'socket', socket);
-  },
+  connection: service(),
 
   actions: {
     sendData(payload) {
-      
-      const socket = get(this, 'socket');
-      
-      if (socket && socket.readyState) {
-        socket.send(JSON.stringify(payload.map(p => {
-          const s = getPayload();
+      const connection = get(this, 'connection');
+      const normalised = payload.map(p => {
+        const event = getPayload();
 
-          s.Operation = p['Curve parameters'].Radius > 0 ? 1 : 0;
-          assign(s['Go to parameters'], p['Go to parameters']);
-          assign(s['Curve parameters'], p['Curve parameters']);
+        event.Operation = p['Curve parameters'].Radius > 0 ? 1 : 0;
+        assign(event['Go to parameters'], p['Go to parameters']);
+        assign(event['Curve parameters'], p['Curve parameters']);
 
-          // delete p['UI parameters'];
-          // p['Go to parameters']['Face'] = Math.floor(Math.random() * 3);
-          // console.log(p['Curve parameters']['Radius']);
-          return s;
-        })));
-        console.log('sending...');
-      } else {
-        console.log('no connction', !socket || socket.readyState);
-      }
+        return event;
+      });
+
+      connection.send(normalised);
     }
   }
 });

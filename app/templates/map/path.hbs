@@ -13,7 +13,8 @@
   {{path-item point=selectedPoint setProperty=(action 'setPointProp')}}
   {{path-timeline path=path}}
 
-  <div class="ui-module">
-    <button {{action 'send'}}>Send to robot</button>
+  <div class="ui-module connection">
+    <div class="connection-indicator {{if connection.isConnected 'connected'}} {{if connection.isConnecting 'connecting'}}"></div>
+    <button {{action 'connect'}}>Connect</button>
   </div>
 </aside>

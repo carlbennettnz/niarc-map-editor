@@ -7,10 +7,13 @@ const {
   set,
   run,
   computed,
-  assign
+  assign,
+  inject: { service }
 } = Ember;
 
 export default MapController.extend({
+  connection: service(),
+
   layers: [{
     name: 'map',
     isVisible: true,
@@ -98,14 +101,9 @@ export default MapController.extend({
       this.updateEvents();
     },
 
-    send() {
-      const data = [];
-
-      for (let i = 0; i < Math.random() * 50; i++) {
-        data.push(getPayload());
-      }
-
-      this.send('sendData', data);
+    connect() {
+      const connection = get(this, 'connection');
+      connection.connect();
     }
   }
 });

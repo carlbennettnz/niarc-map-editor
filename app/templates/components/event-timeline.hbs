@@ -1,6 +1,6 @@
 <ul>
   {{#each path.points as |point|}}
-    <li class="path">
+    <li class="path {{if point.isSelected 'selected'}} {{if point.isHighlighted 'highlighted'}}">
       <pre>{ x: {{point.x}}, y: {{point.y}} }</pre>
     </li>
   {{/each}}

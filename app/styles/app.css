@@ -208,6 +208,14 @@ input[type=number]:focus {
   font-style: italic;
 }
 
+.ui-module.event-timeline li.highlighted {
+  color: #ccc;
+}
+
+.ui-module.event-timeline li.selected {
+  color: #eee;
+}
+
 .ui-module.event-timeline li::before {
   content: '';
   position: absolute;

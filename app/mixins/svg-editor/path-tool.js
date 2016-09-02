@@ -166,6 +166,10 @@ export default Ember.Mixin.create({
     }
   }),
 
+  deselect: on(keyDown('Escape'), function(event) {
+    this.sendAction('deselectAll');
+  }),
+
   getPathWithSelectedHandle() {
     const paths = get(this, 'shapes').filterBy('type', 'path');
     let selected;

@@ -96,6 +96,14 @@ input[type=number]:focus {
 }
 
 .map g.path-layer circle.handle {
+  fill: none;
+}
+
+.map g.path-layer circle.handle.highlighted {
+  fill: rgba(238, 153, 0, 0.4);
+}
+
+.map g.path-layer circle.handle.selected {
   fill: #e90;
 }
 

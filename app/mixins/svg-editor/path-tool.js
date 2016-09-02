@@ -81,7 +81,7 @@ export default Ember.Mixin.create({
 
     const mouseAction = get(this, 'toolState.mouseAction');
 
-    if (!event.buttons || !mouseAction) {
+    if (!event.buttons && mouseAction) {
       set(this, 'toolState.newLine', null);
       set(this, 'toolState.draggingHandle', null);
       return;
@@ -106,6 +106,10 @@ export default Ember.Mixin.create({
 
       case 'adjustNewLine':
         this.adjustNewLine(point);
+        break;
+
+      case null:
+        this.highlightHandle(point);
         break;
     }
   }),
@@ -377,6 +381,16 @@ export default Ember.Mixin.create({
       const newPoints = get(selected, 'points').rejectBy('isSelected');
       this.sendAction('setPoints', newPoints);
     }
+  },
+
+  highlightHandle(point) {
+    let handle = this.getPathHandlesAtPoint(point)[0];
+
+    if (handle) {
+      handle = get(handle, 'shape.points').objectAt(get(handle, 'handleIndex'));
+    }
+
+    this.sendAction('highlightPoint', handle);
   }
 });
 

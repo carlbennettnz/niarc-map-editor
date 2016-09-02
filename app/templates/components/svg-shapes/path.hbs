@@ -3,8 +3,10 @@
   <path d={{path}}></path>
 
   {{#each line.points as |point|}}
-    {{#if point.isSelected}}
-      <circle class="handle {{if point.isSelected 'selected'}}" cx={{scale point.x viewport.zoom}} cy={{scale point.y viewport.zoom}} r="4"></circle>
-    {{/if}}
+    <circle
+      class="handle {{if point.isSelected 'selected'}} {{if point.isHighlighted 'highlighted'}}"
+      cx={{scale point.x viewport.zoom}}
+      cy={{scale point.y viewport.zoom}}
+      r="4"></circle>
   {{/each}}
 </g>

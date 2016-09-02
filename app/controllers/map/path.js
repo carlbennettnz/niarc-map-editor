@@ -101,6 +101,16 @@ export default MapController.extend({
       this.updateEvents();
     },
 
+    highlightPoint(point) {
+      const points = get(this, 'path.points') || [];
+
+      points.forEach(p => set(p, 'isHighlighted', false));
+
+      if (point) {
+        set(point, 'isHighlighted', true);
+      }
+    },
+
     connect() {
       const connection = get(this, 'connection');
       connection.connect();

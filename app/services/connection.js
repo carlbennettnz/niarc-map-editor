@@ -11,9 +11,10 @@ export default Ember.Service.extend({
   isConnected: false,
   isConnecting: false,
   socket: null,
+  address: '192.168.1.4:8090',
 
   connect() {
-    const socket = new WebSocket('ws://10.140.124.43:8080');
+    const socket = new WebSocket('ws://' + get(this, 'address'));
     const self = this;
 
     set(this, 'isConnecting', true);
@@ -46,7 +47,7 @@ export default Ember.Service.extend({
     const socket = get(this, 'socket') || {};
 
     if (socket.readyState > 0) {
-      socket.send(JSON.stringify(payload));
+      socket.send(payload.toString());
     } else {
       // console.log('No connection');
     }

@@ -14,6 +14,7 @@
 
   <div class="ui-module connection">
     <div class="connection-indicator {{if connection.isConnected 'connected'}} {{if connection.isConnecting 'connecting'}}"></div>
+    {{input value=connection.address}}
     <button {{action 'connect'}}>Connect</button>
   </div>
 </aside>

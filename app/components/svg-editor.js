@@ -9,6 +9,7 @@ const {
   assert,
   assign,
   on,
+  run,
   $
 } = Ember;
 

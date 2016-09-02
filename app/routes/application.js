@@ -11,11 +11,16 @@ const {
 export default Ember.Route.extend({
   connection: service(),
 
+  init() {
+    this._super(...arguments);
+    get(this, 'connection').connect();
+  },
+
   actions: {
     sendData(payload) {
       const connection = get(this, 'connection');
-      const serialized = payload.reduce((items, item) => items = items.concat(item.serialize()), []);
-      connection.send(serialized);
+      const serialized = payload.map(p => p.serialize()).join('\n');
+      return connection.send(serialized);
     }
   }
 });

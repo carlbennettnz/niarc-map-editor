@@ -57,6 +57,23 @@ export default Ember.Component.extend(EKMixin, {
     return get(layer || {}, 'name');
   }),
 
+  handleZoom: on('init', function() {
+    $(window).on('mousewheel', event => {
+      const oldZoom = get(this, 'viewport.zoom');
+      const newZoom = Math.max(oldZoom + event.originalEvent.wheelDelta / 5000, 0.05);
+      const splitX = event.originalEvent.clientX - get(this, 'viewport.scrollX');
+      const splitY = event.originalEvent.clientY - get(this, 'totalYOffset');
+
+      run(() => {
+        set(this, 'viewport', {
+          scrollX: event.originalEvent.clientX - splitX * newZoom / oldZoom,
+          scrollY: get(this, 'viewportHeight') - (event.originalEvent.clientY - splitY * newZoom / oldZoom),
+          zoom: newZoom
+        });
+      });
+    });
+  }),
+
   getScaledAndOffsetPoint(x, y) {
     const scrollX = get(this, 'viewport.scrollX');
     const scrollY = get(this, 'viewport.scrollY');

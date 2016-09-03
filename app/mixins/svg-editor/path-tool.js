@@ -357,8 +357,6 @@ export default Ember.Mixin.create({
     const points = get(path, 'points');
     const gridSize = get(this, 'gridSize');
     const pointToMove = points.objectAt(handleIndex);
-
-    console.log(dy)
     
     const movedPoint = assign({}, pointToMove, {
       x: get(pointToMove, 'x') + dx * gridSize,

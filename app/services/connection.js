@@ -43,6 +43,17 @@ export default Ember.Service.extend({
     set(this, 'socket', socket);
   },
 
+  disconnect() {
+    const socket = get(this, 'socket');
+
+    socket.onclose = () => {};
+    socket.close();
+
+    set(this, 'socket', null);
+    set(this, 'isConnecting', false);
+    set(this, 'isConnected', false);
+  },
+
   send(payload) {
     const socket = get(this, 'socket') || {};
 

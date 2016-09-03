@@ -114,6 +114,11 @@ export default MapController.extend({
     connect() {
       const connection = get(this, 'connection');
       connection.connect();
+    },
+
+    disconnect() {
+      const connection = get(this, 'connection');
+      connection.disconnect();
     }
   }
 });

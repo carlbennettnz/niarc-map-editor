@@ -13,7 +13,7 @@ export default Ember.Route.extend({
 
   init() {
     this._super(...arguments);
-    get(this, 'connection').connect();
+    // get(this, 'connection').connect();
   },
 
   actions: {

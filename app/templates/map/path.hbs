@@ -14,9 +14,32 @@
   {{event-timeline path=path}}
 
   <div class="ui-module connection">
-    <div class="connection-indicator {{if connection.isConnected 'connected'}} {{if connection.isConnecting 'connecting'}}"></div>
+    <div class="connection-indicator {{if connection.isConnected 'connected'}} {{if connection.isConnecting 'connecting'}}">
+      {{#if connection.isConnecting}}
+        {{fa-icon 'circle-o-notch' spin=true}}
+      {{/if}}
+      
+      {{#if connection.isConnected}}
+        {{fa-icon 'check'}}
+      {{/if}}
+
+      {{#unless (or connection.isConnecting connection.isConnected)}}
+        {{fa-icon 'times'}}
+      {{/unless}}
+    </div>
     {{input value=connection.address}}
-    <button {{action 'connect'}}>Connect</button>
+    
+    {{#if connection.isConnecting}}
+      <button {{action 'disconnect'}}>Cancel</button>
+    {{/if}}
+    
+    {{#if connection.isConencted}}
+      <button {{action 'disconnect'}}>Disconnect</button>
+    {{/if}}
+    
+    {{#unless (or connection.isConnecting connection.isConnected)}}
+      <button {{action 'connect'}}>Connect</button>
+    {{/unless}}
   </div>
 </aside>
 

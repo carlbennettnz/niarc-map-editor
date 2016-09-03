@@ -11,7 +11,7 @@ export default Ember.Service.extend({
   isConnected: false,
   isConnecting: false,
   socket: null,
-  address: '192.168.1.4:8090',
+  address: 'localhost:8090',
 
   connect() {
     const socket = new WebSocket('ws://' + get(this, 'address'));
@@ -21,8 +21,8 @@ export default Ember.Service.extend({
     
     socket.onopen = function() {
       console.log('connected');
-      set(this, 'isConnected', true);
-      set(this, 'isConnecting', false);
+      set(self, 'isConnected', true);
+      set(self, 'isConnecting', false);
       set(self, 'socket', this);
     }
     
@@ -34,17 +34,15 @@ export default Ember.Service.extend({
       run.later(() => this.connect(), 10000);
     };
 
-    // Handle connection timeouts
-    // run.later(() => {
-    //   console.log('timed out, closing...');
-    //   socket.readyState ? socket.close() : this.connect();
-    // }, 10000);
-
     set(this, 'socket', socket);
   },
 
   disconnect() {
     const socket = get(this, 'socket');
+
+    if (!socket || !(socket instanceof WebSocket)) {
+      return;
+    }
 
     socket.onclose = () => {};
     socket.close();

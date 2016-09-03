@@ -24,6 +24,12 @@ button {
   color: rgba(255, 255, 255, 0.9);
   padding: 0.45em 1em 0.6em;
   line-height: 1;
+  outline: 0;
+  cursor: pointer;
+}
+
+button:active {
+  background-color: #444459;
 }
 
 input[type=text],
@@ -127,7 +133,7 @@ input[type=number]:focus {
   top: 20px;
   left: 20px;
   bottom: 20px;
-  width: 220px;
+  width: 260px;
   display: flex;
   flex-direction: column;
 }
@@ -135,7 +141,6 @@ input[type=number]:focus {
 .ui-modules.attributes {
   right: 20px;
   left: auto;
-  width: 260px;
 }
 
 .ui-modules > div {
@@ -250,7 +255,7 @@ input[type=number]:focus {
 }
 
 .connection-indicator {
-  width: 2em;
+  flex: 0 0 26px;
   /*background-color: #333;*/
   color: rgba(255, 255, 255, 0.7);
   border-right: 1px solid black;
@@ -269,7 +274,7 @@ input[type=number]:focus {
 }
 
 .ui-module.connection input {
-  flex: 1;
+  flex: 1 1 0;
   border-width: 0 1px 0 0;
 }
 

@@ -233,8 +233,9 @@ export default Ember.Mixin.create({
     const gridSize = get(this, 'gridSize');
     const snappedToGrid = this.snapPointToGrid(point, gridSize);
     snappedToGrid.isSelected = true;
+    const oldPoints = get(shape, 'points').map(point => assign({}, point, { isSelected: false }));
     const modifiedPoint = assign({}, get(shape, 'points.' + handleIndex), snappedToGrid);
-    const newPoints = assign([], get(shape, 'points'), { [handleIndex]: modifiedPoint });
+    const newPoints = assign([], oldPoints, { [handleIndex]: modifiedPoint });
 
     // Avoid overlapping points
     for (let i = 0; i < newPoints.length; i++) {

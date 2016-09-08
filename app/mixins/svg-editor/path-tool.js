@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import { keyDown, getCode } from 'ember-keyboard';
+import { keyDown, keyUp, getCode } from 'ember-keyboard';
 import * as geometry from 'niarc-map-editor/utils/geometry';
 
 import Path from 'niarc-map-editor/objects/path';
@@ -165,6 +165,10 @@ export default Ember.Mixin.create({
 
   deselect: on(keyDown('Escape'), function(event) {
     this.sendAction('deselectAll');
+  }),
+
+  selectPathTool: on(keyUp('KeyP'), function() {
+    set(this, 'tool', 'path');
   }),
 
   getPathWithSelectedHandle() {

@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import { keyUp } from 'ember-keyboard';
 import min from 'niarc-map-editor/utils/computed/min';
 import absoluteDifference from 'niarc-map-editor/utils/computed/absolute-difference';
 
@@ -10,10 +11,6 @@ const {
 } = Ember;
 
 export default Ember.Mixin.create({
-  md: on('mouseDown', function() {
-    console.log('hello world', get(this, 'tool'));
-  }),
-
   selectionMouseDown: on('mouseDown', function(event) {
     if (guard.apply(this, arguments)) {
       return;
@@ -58,6 +55,10 @@ export default Ember.Mixin.create({
       console.log('finishing selection');
       this.finishSelection();
     }
+  }),
+
+  selectSelectionTool: on(keyUp('KeyS'), function() {
+    set(this, 'tool', 'selection');
   }),
 
   startSelection(point) {

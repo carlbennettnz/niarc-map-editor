@@ -82,6 +82,16 @@ body[data-tool=selection] .map {
   cursor: crosshair;
 }
 
+body[data-tool=move] .map {
+  cursor: grab;
+  cursor: -webkit-grab;
+}
+
+body.grabbing[data-tool=move] .map {
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+}
+
 .map g.wall line {
   stroke-width: 2px;
   stroke-linecap: round;

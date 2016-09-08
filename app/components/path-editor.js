@@ -2,6 +2,7 @@ import Ember from 'ember';
 import SvgEditorComponent from './svg-editor';
 import PathToolMixin from 'niarc-map-editor/mixins/svg-editor/path-tool';
 import SelectionToolMixin from 'niarc-map-editor/mixins/svg-editor/selection-tool';
+import MoveToolMixin from 'niarc-map-editor/mixins/svg-editor/move-tool';
 import layout from 'niarc-map-editor/templates/components/svg-editor';
 
 const {
@@ -11,7 +12,7 @@ const {
   computed
 } = Ember;
 
-export default SvgEditorComponent.extend(PathToolMixin, SelectionToolMixin, {
+export default SvgEditorComponent.extend(PathToolMixin, SelectionToolMixin, MoveToolMixin, {
   layout,
 
   tool: 'path',

@@ -10,11 +10,6 @@ const {
 } = Ember;
 
 export default Ember.Mixin.create({
-  init() {
-    this._super(...arguments);
-    set(this, 'tool', 'line');
-  },
-
   handleMouseDown: on('mouseDown', function(event) {
     if (guard.apply(this, arguments)) {
       return;

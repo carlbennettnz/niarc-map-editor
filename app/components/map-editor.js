@@ -10,5 +10,7 @@ const {
 export default SvgEditorComponent.extend(LineToolMixin, {
   layout,
 
+  tool: 'line',
+
   shapes: computed.alias('lines')
 });

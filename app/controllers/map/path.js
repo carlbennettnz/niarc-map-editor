@@ -1,6 +1,8 @@
 import Ember from 'ember';
 import MapController from 'niarc-map-editor/controllers/map';
 import Event from 'niarc-map-editor/objects/event';
+import Path from 'niarc-map-editor/objects/path';
+import PathPoint from 'niarc-map-editor/objects/path-point';
 
 const {
   get,
@@ -13,6 +15,8 @@ const {
 
 export default MapController.extend({
   connection: service(),
+
+  tool: 'selection',
 
   layers: [{
     name: 'map',
@@ -37,11 +41,11 @@ export default MapController.extend({
         return null;
       }
 
-      return {
+      return Path.create({
         type: 'path',
         layer: 'path',
-        points,
-      };
+        points: points.map(point => PathPoint.create(point))
+      });
     },
 
     set(key, path) {
@@ -58,6 +62,10 @@ export default MapController.extend({
   },
 
   actions: {
+    selectTool(tool) {
+      set(this, 'tool', tool);
+    },
+
     addPath(path) {
       set(this, 'path', path);
     },

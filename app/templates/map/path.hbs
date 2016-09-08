@@ -1,4 +1,5 @@
 {{path-editor
+  tool=tool
   viewport=mapViewport
   layers=layers
   map=model.map
@@ -11,6 +12,15 @@
 
 <aside class="ui-modules">
   {{map-mode-navigator}}
+
+  <div class="ui-module tool-selector">
+    <ul>
+      <li class="{{if (eq tool 'path') 'active'}}" title="Path creation tool (P)" {{action 'selectTool' 'path'}}>{{fa-icon 'pencil'}}</li>
+      <li class="{{if (eq tool 'selection') 'active'}}" title="Selection tool (S)" {{action 'selectTool' 'selection'}}>{{fa-icon 'square-o'}}</li>
+      <li class="{{if (eq tool 'move') 'active'}}" title="Move tool (M)" {{action 'selectTool' 'move'}}>{{fa-icon 'hand-paper-o'}}</li>
+    </ul>
+  </div>
+
   {{event-timeline path=path}}
 
   <div class="ui-module connection">

@@ -6,6 +6,7 @@ const {
   get,
   set,
   computed,
+  observer,
   assert,
   assign,
   on,
@@ -57,8 +58,9 @@ export default Ember.Component.extend(EKMixin, {
     return get(layer || {}, 'name');
   }),
 
-  handleZoom: on('init', function() {
-    $(window).on('mousewheel', event => {
+  handleZoom: on('didInsertElement', function() {
+    this.$().on('mousewheel', event => {
+      console.log(event.target)
       const oldZoom = get(this, 'viewport.zoom');
       const newZoom = Math.max(oldZoom + event.originalEvent.wheelDelta / 5000, 0.05);
       const splitX = event.originalEvent.clientX - get(this, 'viewport.scrollX');
@@ -72,6 +74,10 @@ export default Ember.Component.extend(EKMixin, {
         });
       });
     });
+  }),
+
+  toolDidChange: observer('tool', function() {
+    set(this, 'toolState', {});
   }),
 
   getScaledAndOffsetPoint(x, y) {

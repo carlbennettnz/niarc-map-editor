@@ -13,6 +13,8 @@ body {
   height: 100%;
   min-width: 800px;
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /**********************************/
@@ -122,7 +124,13 @@ input[type=number]:focus {
 
 .map g.path path.contruction-path {
   stroke-width: 1px;
-  stroke-dasharray: 3 0 2;
+  stroke-dasharray: 5, 5;
+}
+
+.map .selection-marquee {
+  fill: none;
+  stroke-dasharray: 5, 5;
+  stroke: rgba(255, 255, 255, 0.6);
 }
 
 /**********************************/
@@ -196,8 +204,34 @@ input[type=number]:focus {
     inset -1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
+.ui-module.tool-selector {
+  padding: 0;
+}
+
+.ui-module.tool-selector ul {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+}
+
+.ui-module.tool-selector li {
+  flex: 0 0 20px;
+  list-style-type: none;
+  border: 1px solid black;
+  padding: 0.6em 1em;
+  text-align: center;
+  font-size: 13 0%;
+}
+
+.ui-module.tool-selector li.active {
+  background-color: #222;
+}
+
 .ui-module.event-timeline {
   flex-grow: 1;
+  flex-shrink: 1;
+  overflow-y: auto;
 }
 
 .ui-module.event-timeline ul {
@@ -290,7 +324,8 @@ input[type=number]:focus {
 .ui-module.event-editor {
   padding: 2em;
   color: #999;
-  flex: 1;
+  flex: 1 1;
+  overflow-y: auto;
 }
 
 .ui-module.event-editor h2 {

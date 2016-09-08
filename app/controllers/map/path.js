@@ -16,7 +16,7 @@ const {
 export default MapController.extend({
   connection: service(),
 
-  tool: 'selection',
+  tool: 'path',
 
   layers: [{
     name: 'map',
@@ -54,13 +54,6 @@ export default MapController.extend({
     }
   }),
 
-  updateEvents(path) {
-    path = path || get(this, 'path') || {};
-    const points = get(path, 'points') || [];
-    set(this, 'model.events', points.map(point => Event.create(point)));
-    this.send('saveModel');
-  },
-
   actions: {
     selectTool(tool) {
       set(this, 'tool', tool);
@@ -88,7 +81,7 @@ export default MapController.extend({
       
       if (path) {
         set(path, 'points', points);
-        this.updateEvents();
+        this.send('updateEvents');
       }
     },
 
@@ -106,7 +99,7 @@ export default MapController.extend({
       }
 
       set(point, prop, value);
-      this.updateEvents();
+      this.send('updateEvents');
     },
 
     highlightPoint(point) {
@@ -127,35 +120,14 @@ export default MapController.extend({
     disconnect() {
       const connection = get(this, 'connection');
       connection.disconnect();
+    },
+
+    updateEvents(path) {
+      path = path || get(this, 'path') || {};
+      const points = get(path, 'points') || [];
+      set(this, 'model.events', points.map(point => Event.create(point)));
+      console.log('saving');
+      this.send('saveModel');
     }
   }
 });
-
-function getPayload() {
-  return {
-    "Operation": Math.floor(Math.random() * 3), // go to point: 0, go to point curved: 1, drop cube: 2
-    "Go to parameters": {
-      "Point to go to": { "X": 50, "Y": 60 },
-      "Point to face": { "X": 50, "Y": 60 },
-      "Face": 0, // none: 0, face point: 1, face target: 2
-      "Ramp min value": Math.random(),
-      "Ramp distance": Math.random() * 100,
-      "Error correction P": Math.random(),
-      "P saturation": Math.random(),
-      "Face point P": Math.random(),
-      "Face point P saturation": Math.random(),
-      "Max speed": Math.random(),
-      "Acceleration": 0.5,
-      "Tolerance": 5,
-      "Ramp curve exponent": 1.5,
-      "Stop at end of line": Math.random() < 0.5
-    },
-    "Curve parameters": {
-      "Radius": 30,
-      "Error correction P": 0.01
-    },
-    "Drop cube parameters": {
-      "Servo index": 0 // 0-13
-    }
-  };
-}

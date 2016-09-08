@@ -76,9 +76,10 @@ export default Ember.Component.extend(EKMixin, {
     });
   }),
 
-  toolDidChange: observer('tool', function() {
+  toolDidChange: observer('tool', on('init', function() {
     set(this, 'toolState', {});
-  }),
+    $('body').attr('data-tool', get(this, 'tool'));
+  })),
 
   getScaledAndOffsetPoint(x, y) {
     const scrollX = get(this, 'viewport.scrollX');

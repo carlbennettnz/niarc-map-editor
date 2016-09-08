@@ -234,6 +234,8 @@ export default Ember.Mixin.create({
 
     set(pointToMove, 'isSelected', true);
     pointToMove.setPosition(snappedToGrid);
+
+    this.sendAction('pathDidChange');    
   },
 
   startMoveLine(point, line) {
@@ -319,17 +321,20 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const selected = this.getPathWithSelectedHandle();
+    const path = get(this, 'shapes').findBy('type', 'path');
 
-    if (selected) {
-      const points = get(selected, 'points');
-      const handles = points.filterBy('isSelected');
+    if (path) {
+      const handles = get(path, 'points').filterBy('isSelected');
       const gridSize = get(this, 'gridSize');
 
       handles.forEach(handle => handle.move({
         dx: gridSize * dx,
         dy: gridSize * dy
       }));
+
+      if (handles.length) {
+        this.sendAction('pathDidChange');
+      }
     }
   },
 
@@ -338,10 +343,11 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const path = get(this, 'path');
+    const path = get(this, 'shapes').findBy('type', 'path');
     const selectedPoints = get(path, 'points').filterBy('isSelected');
-    console.log(path, selectedPoints)
     path.removePoints(selectedPoints);
+
+    this.sendAction('pathDidChange');
   },
 
   highlightHandle(point) {
@@ -349,7 +355,7 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const path = get(this, 'path');
+    const path = get(this, 'shapes').findBy('type', 'path');
     const handle = this.getPathHandlesAtPoint(point)[0];
     
     path.highlightPoint(get(handle || {}, 'handleIndex'));

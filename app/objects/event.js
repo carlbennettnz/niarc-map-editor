@@ -37,15 +37,30 @@ export default Ember.Object.extend({
       Number(get(this, 'servoIndex')) || 0
     ].join();
 
-    // if (!isEmpty(get(this, 'dropCube'))) {
-    //   serialized.push({
-    //     Operation: 2,
-    //     'Drop cude parameters': {
-    //       'Servo index': Number(get(this, 'dropCube'))
-    //     }
-    //   });
-    // }
-
     return serialized;
+  },
+
+  deserialize(data) {
+    const pointsToFace = [];
+
+    set(this, 'x',                     Number(data[0]));
+    set(this, 'y',                     Number(data[1]));
+    set(this, 'pointToFace.x',         Number(data[2]));
+    set(this, 'pointToFace.y',         Number(data[3]));
+    set(this, 'rampMinValue',          Number(data[4]));
+    set(this, 'errorCorrectionP',      Number(data[5]));
+    set(this, 'pSaturation',           Number(data[6]));
+    set(this, 'facePointP',            Number(data[7]));
+    set(this, 'facePointPSaturation',  Number(data[8]));
+    set(this, 'maxSpeed',              Number(data[9]));
+    set(this, 'rampDistance',          Number(data[10]));
+    set(this, 'tolerance',             Number(data[11]));
+    set(this, 'acceleration',          Number(data[12]));
+    set(this, 'rampCurveExponent',     Number(data[13]));
+    set(this, 'stopAtEndOfLine',       Number(data[14]) === 1);
+    set(this, 'face',                  pointsToFace[Number(data[15])]);
+    set(this, 'radius',                Number(data[16]));
+    set(this, 'curveErrorCorrectionP', Number(data[17]));
+    set(this, 'servoIndex',            Number(data[18]));
   }
 });

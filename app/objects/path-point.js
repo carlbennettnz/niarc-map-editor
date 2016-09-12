@@ -2,17 +2,21 @@ import Ember from 'ember';
 
 const {
   get,
-  set
+  set,
+  computed: { alias }
 } = Ember;
 
 export default Ember.Object.extend({
-  x: 0,
-  y: 0,
-  radius: 0,
-  isSelected: false,
-  isHighlighted: false,
+  event: null,
+
+  id: alias('event.id'),
+  x: alias('event.x'),
+  y: alias('event.y'),
+  radius: alias('event.radius'),
 
   setPosition({ x, y }) {
+    get(this, 'x');
+    get(this, 'y');
     set(this, 'x', x);
     set(this, 'y', y);
   },

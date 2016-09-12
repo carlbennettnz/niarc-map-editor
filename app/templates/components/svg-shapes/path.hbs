@@ -1,10 +1,10 @@
-<g class="path {{if line.isInProgress 'in-progress'}} {{if line.isSelected 'selected'}} {{line.layer}}-layer">
+<g class="path {{if line.isInProgress 'in-progress'}} {{line.layer}}-layer">
   <path class="contruction-path" d={{constructionPath}}></path>
   <path d={{path}}></path>
 
   {{#each line.points as |point|}}
     <circle
-      class="handle {{if point.isSelected 'selected'}} {{if point.isHighlighted 'highlighted'}}"
+      class="handle {{if (contains selectedEventIds point.id) 'selected'}} {{if (eq highlightedEventId point.id) 'highlighted'}}"
       cx={{scale point.x viewport.zoom}}
       cy={{scale point.y viewport.zoom}}
       r="4"></circle>

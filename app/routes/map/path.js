@@ -22,7 +22,13 @@ export default Ember.Route.extend({
 
     return RSVP.hash({
       map: this.modelFor('map'),
-      events: events.map(event => Event.create(event))
+      events: events.map((eventSource, i) => {
+        const event = Event.create(eventSource);
+
+        set(event, 'id', i);
+
+        return event;
+      })
     });
   },
 

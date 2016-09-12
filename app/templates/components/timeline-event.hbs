@@ -1,0 +1,12 @@
+{{#if (eq event.type 'go-to-point')}}
+  <span>{ x: {{event.x}}, y: {{event.y}} }</span>
+{{/if}}
+
+{{#if (eq event.type 'drop-cube')}}
+  <span>
+    Drop Cube
+    {{~#if event.servoIndex~}}
+      : {{event.servoIndex}}
+    {{/if}}
+  </span>
+{{/if}}

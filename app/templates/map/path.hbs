@@ -4,25 +4,41 @@
   layers=layers
   map=model.map
   path=path
+  selectedEvents=selectedEvents
+  highlightedEvent=highlightedEvent
   pathDidChange=(action 'updateEvents')
-  add=(action 'addPath')
-  selectHandle=(action 'selectHandle')
-  deselectAll=(action 'deselectAll')
-  highlightPoint=(action 'highlightPoint')
-  setPoints=(action 'setPathPoints')}}
+  addPoint=(action 'addPoint')
+  selectEvent=(action 'selectEvent')
+  addEventsToSelection=(action 'addEventsToSelection')
+  highlightEvent=(action 'highlightEvent')}}
 
 <aside class="ui-modules">
   {{map-mode-navigator}}
 
   <div class="ui-module tool-selector">
     <ul>
-      <li class="{{if (eq tool 'path') 'active'}}" title="Path creation tool (P)" {{action 'selectTool' 'path'}}>{{fa-icon 'pencil'}}</li>
-      <li class="{{if (eq tool 'selection') 'active'}}" title="Selection tool (S)" {{action 'selectTool' 'selection'}}>{{fa-icon 'square-o'}}</li>
-      <li class="{{if (eq tool 'move') 'active'}}" title="Move tool (M)" {{action 'selectTool' 'move'}}>{{fa-icon 'hand-paper-o'}}</li>
+      <li class="{{if (eq tool 'path') 'active'}}" title="Path creation tool (P)" {{action 'selectTool' 'path'}}>
+        {{fa-icon 'pencil'}} Line
+      </li>
+
+      <li class="{{if (eq tool 'selection') 'active'}}" title="Selection tool (S)" {{action 'selectTool' 'selection'}}>
+        {{fa-icon 'square-o'}} Selection
+      </li>
+      
+      <li class="{{if (eq tool 'move') 'active'}}" title="Move tool (M)" {{action 'selectTool' 'move'}}>
+        {{fa-icon 'hand-paper-o'}} Move
+      </li>
     </ul>
   </div>
 
-  {{event-timeline path=path}}
+  {{event-timeline
+    events=model.events
+    selectedEvents=selectedEvents
+    highlightedEvent=highlightedEvent
+    addEvent=(action 'addEvent')
+    deleteEvent=(action 'deleteEvent')
+    selectEvent=(action 'selectEvent')
+    highlightEvent=(action 'highlightEvent')}}
 
   <div class="ui-module connection">
     <div class="connection-indicator {{if connection.isConnected 'connected'}} {{if connection.isConnecting 'connecting'}}">
@@ -55,5 +71,12 @@
 </aside>
 
 <aside class="ui-modules attributes">
-  {{event-editor point=selectedPoint setProperty=(action 'setPointProp')}}  
+  {{#if selectedEvents}}
+    {{component (concat 'event-editors/' selectedEvents.0.type)
+      event=selectedEvents.[0]
+      hasNextEvent=hasNextEvent
+      hasPreviousEvent=hasPreviousEvent
+      selectPreviousEvent=(action 'selectPreviousEvent')
+      selectNextEvent=(action 'selectNextEvent')}}
+  {{/if}}
 </aside>

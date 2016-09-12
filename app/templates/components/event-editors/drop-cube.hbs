@@ -1,0 +1,14 @@
+<header>
+  <a {{action selectPreviousEvent}} class={{unless hasPreviousEvent 'disabled'}}>{{fa-icon 'caret-left'}}</a>
+  <h2>Drop Cube Event</h2>
+  <a {{action selectNextEvent}} class={{unless hasNextEvent 'disabled'}}>{{fa-icon 'caret-right'}}</a>
+</header>
+
+<div class="controls">
+  <div class="control">
+    <label>Servo Index</label>
+    {{input
+      value=event.servoIndex
+      type="number"}}
+  </div>
+</div>

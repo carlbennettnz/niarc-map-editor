@@ -166,12 +166,12 @@ body.grabbing[data-tool=move] .map {
   left: auto;
 }
 
-.ui-modules > div {
+.ui-module {
   margin-bottom: 10px;
   flex: 0 0 auto;
 }
 
-.ui-modules > div:last-of-type {
+.ui-module:last-of-type {
   margin-bottom: 0;
 }
 
@@ -186,6 +186,7 @@ body.grabbing[data-tool=move] .map {
 
 .ui-module.mode-switcher {
   display: flex;
+  margin-bottom: 10px;
 }
 
 .ui-module.mode-switcher a {
@@ -230,53 +231,94 @@ body.grabbing[data-tool=move] .map {
 }
 
 .ui-module.tool-selector li {
-  flex: 0 0 20px;
+  flex: 1 1 auto;
   list-style-type: none;
-  border: 1px solid black;
+  border-right: 1px solid black;
   padding: 0.6em 1em;
   text-align: center;
   font-size: 13 0%;
+  cursor: pointer;
+}
+
+.ui-module.tool-selector li:last-of-type {
+  border-right: 0;
 }
 
 .ui-module.tool-selector li.active {
   background-color: #222;
 }
 
+.ui-module.tool-selector i {
+  margin-right: 0.3em;
+}
+
 .ui-module.event-timeline {
   flex-grow: 1;
   flex-shrink: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.ui-module.event-timeline .timeline {
+  margin: 0;
+  padding: 1em 0;
   overflow-y: auto;
+  flex: 1 1;
 }
 
 .ui-module.event-timeline ul {
-  margin: 2em 0;
-  padding: 0 2em;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.ui-module.event-timeline ul::before {
+  content: '';
+  position: absolute;
+  left: 2em;
+  margin: -5px 0 -5px 1px;
+  top: 1.55em;
+  bottom: 1.55em;
+  width: 3px;
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .ui-module.event-timeline li {
   list-style-type: none;
-  margin-bottom: 1em;
-  padding-left: 1.5em;
+  padding: 0.5em 2em 0.6em 3.5em;
   position: relative;
   color: #aaa;
   font-style: italic;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 95%; 
 }
 
 .ui-module.event-timeline li.highlighted {
   color: #ccc;
+  background-color: rgba(180, 170, 160, 0.075);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .ui-module.event-timeline li.selected {
   color: #eee;
+  background-color: rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .ui-module.event-timeline li::before {
   content: '';
   position: absolute;
-  top: 3px;
+  top: 50%;
   margin-left: -1.5em;
   width: 7px;
   height: 7px;
+  margin-top: -3px;
   border-radius: 50%;
   background-color: #b80;
   box-shadow:
@@ -285,18 +327,25 @@ body.grabbing[data-tool=move] .map {
   z-index: 1;
 }
 
-.ui-module.event-timeline li::after {
-  content: '';
-  position: absolute;
-  left: 2px;
-  top: 3px;
-  width: 3px;
-  height: 30px;
-  background-color: #852;
-}
-
 .ui-module.event-timeline li:last-child::after {
   content: none;
+}
+
+.ui-module.event-timeline li[data-event-type=drop-cube]::before {
+  background-color: #37c;
+}
+
+.ui-module.event-timeline .controls {
+  flex: 0 0;
+  background-color: rgba(50, 50, 50, 0.8);
+  border-top: 1px solid black;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+}
+
+.ui-module.event-timeline .controls button {
+  border-width: 0 1px 0 0;
+  flex: 0 0 auto;
 }
 
 .ui-module.connection {
@@ -336,24 +385,59 @@ body.grabbing[data-tool=move] .map {
 }
 
 .ui-module.event-editor {
-  padding: 2em;
   color: #999;
   flex: 1 1;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.ui-module.event-editor h2 {
+.ui-module.event-editor header {
+  flex: 0 0 auto;
+  display: flex;
   text-transform: uppercase;
   color: #888;
   letter-spacing: 1px;
   font-weight: bold;
   text-align: center;
-  padding: 1em 2em 0.8em;
-  font-size: inherit;
-  margin: -2em -2em 2em;
+  padding: 1em 1.2em 0.8em;
   background-color: rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid black;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1)
+}
+
+.ui-module.event-editor header h2 {
+  font-size: inherit;
+  margin: 0;
+  flex: 1 1;
+}
+
+.ui-module.event-editor header a {
+  flex: 0 0 auto;
+  font-size: 18px;
+  line-height: 0;
+  margin: -1.2em 0 -1.2em -1.2em;
+  padding: 1.1em 1.2em;
+  cursor: pointer;
+}
+
+.ui-module.event-editor header a:last-of-type {
+  margin-left: 0;
+  margin-right: -1.2em;
+}
+
+.ui-module.event-editor header a:hover {
+  color: #ccc;
+}
+
+.ui-module.event-editor header a.disabled {
+  color: #555;
+  pointer-events: none;
+}
+
+.ui-module.event-editor .controls {
+  flex: 1 1;
+  padding: 2em;
+  overflow-y: auto;
 }
 
 .ui-module.event-editor .position {

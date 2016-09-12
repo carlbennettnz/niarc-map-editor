@@ -19,8 +19,6 @@ export default Ember.Mixin.create({
     const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
 
     set(this, 'toolState.mouseDidDrag', false);
-
-    console.log('starting selection');
     this.startSelection(point);
   }),
 
@@ -92,8 +90,8 @@ export default Ember.Mixin.create({
     if (path && selection) {
       const points = path.getPointsInRect(selection);
 
-      path.deselectAllPoints();
-      points.map(point => set(point, 'isSelected', true));
+      this.sendAction('selectEvent', null);
+      this.sendAction('addEventsToSelection', points.mapBy('id'));
 
       set(this, 'tool', 'path');
     }

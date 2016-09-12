@@ -32,6 +32,8 @@ export default Ember.Component.extend(EKMixin, {
     zoom: 1
   },
 
+  selectedEventIds: computed.mapBy('selectedEvents', 'id'),
+
   viewportHeight: 0,
 
   updateViewportHeight: on('init', function() {
@@ -60,7 +62,6 @@ export default Ember.Component.extend(EKMixin, {
 
   handleZoom: on('didInsertElement', function() {
     this.$().on('mousewheel', event => {
-      console.log(event.target)
       const oldZoom = get(this, 'viewport.zoom');
       const newZoom = Math.max(oldZoom + event.originalEvent.wheelDelta / 5000, 0.05);
       const splitX = event.originalEvent.clientX - get(this, 'viewport.scrollX');

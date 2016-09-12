@@ -1,5 +1,4 @@
 import Ember from 'ember';
-import { scale } from 'niarc-map-editor/helpers/scale';
 
 const {
   get,
@@ -61,18 +60,18 @@ export default Ember.Component.extend({
         const distanceDownArms = Math.sqrt(bisectorLength * bisectorLength - radius * radius);
 
         const start = {
-          x: pointsInQuestion[1].x + distanceDownArms * Math.cos(getAngleOf(vectors[0])),
-          y: pointsInQuestion[1].y + distanceDownArms * Math.sin(getAngleOf(vectors[0]))
+          x: get(pointsInQuestion[1], 'x') + distanceDownArms * Math.cos(getAngleOf(vectors[0])),
+          y: get(pointsInQuestion[1], 'y') + distanceDownArms * Math.sin(getAngleOf(vectors[0]))
         };
 
         const mid = {
-          x: pointsInQuestion[1].x,
-          y: pointsInQuestion[1].y
+          x: get(pointsInQuestion[1], 'x'),
+          y: get(pointsInQuestion[1], 'y')
         };
 
         const end = {
-          x: pointsInQuestion[1].x + distanceDownArms * Math.cos(getAngleOf(vectors[1])),
-          y: pointsInQuestion[1].y + distanceDownArms * Math.sin(getAngleOf(vectors[1]))
+          x: get(pointsInQuestion[1], 'x') + distanceDownArms * Math.cos(getAngleOf(vectors[1])),
+          y: get(pointsInQuestion[1], 'y') + distanceDownArms * Math.sin(getAngleOf(vectors[1]))
         }
 
         const final = [ mid, end ].map(p => this.getScaledPoint(p)).map(s => s.replace(',', ' '));
@@ -90,8 +89,8 @@ export default Ember.Component.extend({
 
 function getVector(a, b) {
   return {
-    x: b.x - a.x,
-    y: b.y - a.y
+    x: get(b, 'x') - get(a, 'x'),
+    y: get(b, 'y') - get(a, 'y')
   };
 }
 

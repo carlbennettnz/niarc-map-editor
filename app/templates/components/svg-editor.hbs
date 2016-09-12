@@ -21,9 +21,14 @@
   <g class="scroll-offset {{selectedLayerName}}-layer-selected" transform={{scrollTransform}}>
     {{#each layers as |layer|}}
       {{#if layer.isVisible}}
-        {{#each shapes as |line|}}
-          {{#unless line.isHidden}}
-            {{component (concat 'svg-shapes/' line.type) line=line viewport=viewport tagName=''}}
+        {{#each shapes as |shape|}}
+          {{#unless shape.isHidden}}
+            {{component (concat 'svg-shapes/' shape.type)
+              line=shape
+              viewport=viewport
+              selectedEventIds=selectedEventIds
+              highlightedEventId=highlightedEvent.id
+              tagName=''}}
           {{/unless}}
         {{/each}}
       {{/if}}

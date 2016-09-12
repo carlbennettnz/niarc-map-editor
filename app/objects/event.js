@@ -7,6 +7,7 @@ const {
 } = Ember;
 
 export default Ember.Object.extend({
+  type: 'go-to-point',
   x: null,
   y: null,
   radius: null,

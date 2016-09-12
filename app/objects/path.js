@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import PathPoint from 'niarc-map-editor/objects/path-point';
 
 const {
   get,
@@ -52,5 +53,17 @@ export default Ember.Object.extend({
     });
 
     return pointsInRect;
+  },
+
+  fromEvents(events) {
+    const points = events
+      .filterBy('type', 'go-to-point')
+      .map(event => PathPoint.create({ event }));
+
+    set(this, 'points', points);
+
+    console.log(points);
+
+    return this;
   }
 });

@@ -10,3 +10,11 @@
     {{/if}}
   </span>
 {{/if}}
+
+{{#if (eq event.type 'go-to-wall')}}
+  <span>Go To Wall</span>
+{{/if}}
+
+{{#if unknownEventType}}
+  <span>Unknown Event Type</span>
+{{/if}}

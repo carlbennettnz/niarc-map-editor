@@ -70,6 +70,16 @@ export default MapController.extend({
     return Path.create({ layer: 'path' }).fromEvents(goToPointEvents);
   }),
 
+  eventsForTimeline: computed('connection.events.[]', function() {
+    const allowedTypes = [
+      'go-to-point',
+      'drop-cube',
+      'go-to-wall'
+    ];
+
+    return get(this, 'connection.events').filter(({ type }) => allowedTypes.includes(type));
+  }),
+
   actions: {
     selectTool(tool) {
       set(this, 'tool', tool);

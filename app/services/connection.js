@@ -45,7 +45,13 @@ export default Ember.Service.extend({
     
     socket.onmessage = ({ data }) => {
       const events = data.trim().split('\n').map(event => Event.create().deserialize(event.split(',')));
-      set(this, 'events', events);
+      const allowedTypes = [
+        'go-to-point',
+        'go-to-wall',
+        'drop-cube'
+      ];
+
+      set(this, 'events', events.filter(({ type }) => allowedTypes.includes(type)));
     };
     
     socket.onclose = () => {

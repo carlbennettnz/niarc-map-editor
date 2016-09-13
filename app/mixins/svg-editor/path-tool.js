@@ -239,6 +239,8 @@ export default Ember.Mixin.create({
     this.sendAction('addPoint', point1);
 
     run.next(() => {
+      this.sendAction('selectPoint', get(this, 'path.points.lastObject.id'));
+
       set(this, 'toolState.handleBeingMoved', get(this, 'path.points.1'));
       set(this, 'toolState.newLineStartingPoint', null);
       set(this, 'toolState.mouseAction', 'moveHandle');
@@ -260,9 +262,11 @@ export default Ember.Mixin.create({
     };
     
     this.sendAction('addPoint', newPos);
+    
     run.next(() => {
       const newPoint = get(this, 'path.points.lastObject');
 
+      this.sendAction('selectPoint', get(newPoint, 'id'));
       set(this, 'toolState.handleBeingMoved', newPoint);
 
       this.doMoveHandle(point);
@@ -303,7 +307,7 @@ export default Ember.Mixin.create({
     if (path) {
       const points = get(path, 'points').filter(point => selectedEventIds.includes(get(point, 'id')));
       path.removePoints(points);
-      this.sendAction('selectEvent', null);
+      this.sendAction('selectPoint', null);
       this.sendAction('pathDidChange');
     }
   },

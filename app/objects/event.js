@@ -14,7 +14,7 @@ export default Ember.Object.extend({
   radius: null,
 
   serialize() {
-    const types: {
+    const types = {
       'go-to-point': 1,
       'drop-cube': 2,
       'face-angle': 3,
@@ -23,7 +23,7 @@ export default Ember.Object.extend({
     };
 
     const serialized = [
-      type[get(this, 'type')],
+      types[get(this, 'type')],
       Number(get(this, 'x')) || 0,
       Number(get(this, 'y')) || 0,
       Number(get(this, 'relativePoint.x')) || 0,
@@ -45,7 +45,7 @@ export default Ember.Object.extend({
       Number(get(this, 'angleToFace')) || 0,
       Number(get(this, 'radius')) || 0,
       Number(get(this, 'curveErrorCorrectionP')) || 0,
-      Number(get(this, 'servoIndex')), || 0,
+      Number(get(this, 'servoIndex')) || 0,
       Number(get(this, 'sensorToUse')) || 0,
       Number(get(this, 'goToWallPGain')) || 0
     ].join();
@@ -65,7 +65,7 @@ export default Ember.Object.extend({
       'go-to-point-relative'
     ];
 
-    set(this, 'type',                  types[Number(data[0])])
+    set(this, 'type',                  types[Number(data[0])]);
     set(this, 'x',                     Number(data[1]));
     set(this, 'y',                     Number(data[2]));
     set(this, 'relativePoint.x',       Number(data[3]));

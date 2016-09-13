@@ -44,8 +44,10 @@ export default Ember.Object.extend({
       'go-to-point-relative': 5
     };
 
+    const getType = (index, radius) => types[index] === 1 ? Number(radius > 0) : types[index];
+
     const serialized = [
-      types[get(this, 'type')],
+      getType(get(this, 'type'), get(this, 'radius')),
       Number(get(this, 'x')) || 0,
       Number(get(this, 'y')) || 0,
       Number(get(this, 'relativePointX')) || 0,

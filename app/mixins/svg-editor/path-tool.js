@@ -44,13 +44,13 @@ export default Ember.Mixin.create({
 
     if (path) {
       set(this, 'toolState.mouseAction', 'moveHandle');
-      this.startNewLineSegment(path, point);
+      this.startNewLineSegment(path, point, event.shiftKey);
       return;
     }
 
     // Else start a new path
     set(this, 'toolState.mouseAction', 'adjustNewLine');
-    this.startNewPath(point);
+    this.startNewPath(point, event.shiftKey);
   }),
 
   handleMouseMove: on('mouseMove', function(event) {
@@ -72,7 +72,7 @@ export default Ember.Mixin.create({
 
     switch (mouseAction) {
       case 'moveHandle':
-        this.doMoveHandle(point, !event.shiftKey);
+        this.doMoveHandle(point, event.shiftKey);
         break;
 
       case 'moveLine':
@@ -80,11 +80,11 @@ export default Ember.Mixin.create({
         break;
 
       case 'adjustNewLineSegment':
-        this.adjustNewLineSegment(point);
+        this.adjustNewLineSegment(point, event.shiftKey);
         break;
 
       case 'adjustNewLine':
-        this.adjustNewPath(point);
+        this.adjustNewPath(point, event.shiftKey);
         break;
 
       case null:
@@ -175,7 +175,7 @@ export default Ember.Mixin.create({
     set(this, 'toolState.handleBeingMoved', handle);
   },
 
-  doMoveHandle(point, snapToGrid = true) {
+  doMoveHandle(point, snapToGrid = false) {
     if (guard.apply(this, arguments)) {
       return;
     }
@@ -186,8 +186,7 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const gridSize = get(this, 'gridSize');
-    const snappedToGrid = snapToGrid ? this.snapPointToGrid(point, gridSize) : point;
+    const snappedToGrid = snapToGrid ? this.snapPointToGrid(point) : point;
 
     Ember.assert('path exists', get(this, 'path'));
     const fromPath = get(this, 'path.points').findBy('id', get(handle, 'id'));
@@ -209,26 +208,23 @@ export default Ember.Mixin.create({
     });
   },
 
-  startNewPath(point) {
+  startNewPath(point, snapToGrid) {
     if (guard.apply(this, arguments)) {
       return;
     }
 
-    const gridSize = get(this, 'gridSize');
-    const snapped = this.snapPointToGrid(point, gridSize);
+    const snapped = snapToGrid ? this.snapPointToGrid(point) : point;
 
     set(this, 'toolState.newLineStartingPoint', snapped);
   },
 
-  adjustNewPath(point) {
+  adjustNewPath(point, snapToGrid) {
     if (guard.apply(this, arguments)) {
       return;
     }
 
-    const gridSize = get(this, 'gridSize');
-
     const point0 = get(this, 'toolState.newLineStartingPoint');
-    const point1 = this.snapPointToGrid(point, gridSize);
+    const point1 = snapToGrid ? this.snapPointToGrid(point) : point;
 
     // The line would still have zero length, don't do anything yet
     if (get(point0, 'x') === get(point1, 'x') && get(point0, 'y') === get(point1, 'y')) {
@@ -245,11 +241,11 @@ export default Ember.Mixin.create({
       set(this, 'toolState.newLineStartingPoint', null);
       set(this, 'toolState.mouseAction', 'moveHandle');
 
-      this.doMoveHandle(point);
+      this.doMoveHandle(point, snapToGrid);
     });
   },
 
-  startNewLineSegment(path, point) {
+  startNewLineSegment(path, point, snapToGrid) {
     if (guard.apply(this, arguments)) {
       return;
     }
@@ -269,7 +265,7 @@ export default Ember.Mixin.create({
       this.sendAction('selectPoint', get(newPoint, 'id'));
       set(this, 'toolState.handleBeingMoved', newPoint);
 
-      this.doMoveHandle(point);
+      this.doMoveHandle(point, snapToGrid);
     });
   },
 

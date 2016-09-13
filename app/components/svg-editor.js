@@ -127,8 +127,7 @@ export default Ember.Component.extend(EKMixin, {
     }
   },
 
-  snapPointToGrid(point, gridSize) {
-    assert('Grid size is required', gridSize);
+  snapPointToGrid(point, gridSize = get(this, 'gridSize') / 4) {
     return {
       x: Math.round(point.x / gridSize) * gridSize,
       y: Math.round(point.y / gridSize) * gridSize

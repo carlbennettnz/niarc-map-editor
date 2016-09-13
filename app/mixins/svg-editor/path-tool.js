@@ -175,7 +175,7 @@ export default Ember.Mixin.create({
     set(this, 'toolState.handleBeingMoved', handle);
   },
 
-  doMoveHandle(point, snapToGrid) {
+  doMoveHandle(point, snapToGrid = true) {
     if (guard.apply(this, arguments)) {
       return;
     }

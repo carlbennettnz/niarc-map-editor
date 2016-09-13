@@ -11,7 +11,7 @@ export default Ember.Service.extend({
   isConnected: false,
   isConnecting: false,
   socket: null,
-  address: 'localhost:8090',
+  address: '10.140.34.169:4000',
 
   connect() {
     const socket = new WebSocket('ws://' + get(this, 'address'));

@@ -6,15 +6,7 @@ const {
   computed: { alias }
 } = Ember;
 
-let nextId = 0;
-
 export default Ember.Object.extend({
-  init() {
-    this._super(...arguments);
-    set(this, 'id', nextId);
-    nextId++;
-  },
-
   event: null,
 
   id: alias('event.id'),

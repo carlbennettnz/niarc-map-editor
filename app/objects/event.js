@@ -6,7 +6,15 @@ const {
   isEmpty
 } = Ember;
 
+let nextId = 0;
+
 export default Ember.Object.extend({
+  init() {
+    this._super(...arguments);
+    set(this, 'id', nextId);
+    nextId++;
+  },
+
   id: null,
   type: 'go-to-point',
   x: null,

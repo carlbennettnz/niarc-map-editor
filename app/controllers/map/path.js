@@ -95,20 +95,23 @@ export default MapController.extend({
     },
 
     addEvent(type = 'drop-cube') {
-      console.log('action: addEvent');
       const newEvent = Event.create({ type });
       const events = get(this, 'model.events');
-      const selectedEvent = get(this, 'selectedEvent');
+      const selectedEvent = get(this, 'selectedEvents.lastObject');
       let index = 0;
+
 
       if (selectedEvent) {
         index = events.indexOf(selectedEvent) + 1;
       }
 
-      events.splice(index + 1, 0, newEvent);
+      console.log(events.length, get(this, 'model.events.length'));
+      events.splice(index, 0, newEvent);
+      console.log(events.length, get(this, 'model.events.length'));
+      events.arrayContentDidChange();
       set(this, 'selectedEvent', newEvent)
 
-      // this.send('saveModel');
+      this.send('saveModel');
     },
 
     deleteEvent() {

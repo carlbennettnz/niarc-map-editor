@@ -182,7 +182,7 @@ describeComponent('path-editor', 'Integration: PathEditorComponent', { integrati
         const $path = this.$('g.path .curved-path');
         
         expect($path).to.have.length(1);
-        expect($path.attr('d')).to.match(/^M 0,\d+ L 500,\d+$/);
+        expect($path.attr('d')).to.match(/^M 0,\d+ L 400,\d+$/);
       });
     });
 

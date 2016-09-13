@@ -14,10 +14,20 @@ export default Ember.Object.extend({
   radius: null,
 
   serialize() {
+    const types: {
+      'go-to-point': 1,
+      'drop-cube': 2,
+      'face-angle': 3,
+      'go-to-wall': 4,
+      'go-to-point-relative': 5
+    };
+
     const serialized = [
-      get(this, 'radius') > 0 ? 1 : 0, // go to point: 0, go to point curved: 1, drop cube: 2
+      type[get(this, 'type')],
       Number(get(this, 'x')) || 0,
       Number(get(this, 'y')) || 0,
+      Number(get(this, 'relativePoint.x')) || 0,
+      Number(get(this, 'relativePoint.y')) || 0,
       Number(get(this, 'pointToFace.x')) || 0,
       Number(get(this, 'pointToFace.y')) || 0,
       Number(get(this, 'rampMinValue')) || 0,
@@ -32,9 +42,12 @@ export default Ember.Object.extend({
       Number(get(this, 'rampCurveExponent')) || 0,
       get(this, 'stopAtEndOfLine') === true ? 1 : 0,
       Number(get(this, 'face')) || 0, // go to point: 0, go to point curved: 1, drop cube: 2
+      Number(get(this, 'angleToFace')) || 0,
       Number(get(this, 'radius')) || 0,
       Number(get(this, 'curveErrorCorrectionP')) || 0,
-      Number(get(this, 'servoIndex')) || 0
+      Number(get(this, 'servoIndex')), || 0,
+      Number(get(this, 'sensorToUse')) || 0,
+      Number(get(this, 'goToWallPGain')) || 0
     ].join();
 
     return serialized;
@@ -43,24 +56,39 @@ export default Ember.Object.extend({
   deserialize(data) {
     const pointsToFace = [];
 
-    set(this, 'x',                     Number(data[0]));
-    set(this, 'y',                     Number(data[1]));
-    set(this, 'pointToFace.x',         Number(data[2]));
-    set(this, 'pointToFace.y',         Number(data[3]));
-    set(this, 'rampMinValue',          Number(data[4]));
-    set(this, 'errorCorrectionP',      Number(data[5]));
-    set(this, 'pSaturation',           Number(data[6]));
-    set(this, 'facePointP',            Number(data[7]));
-    set(this, 'facePointPSaturation',  Number(data[8]));
-    set(this, 'maxSpeed',              Number(data[9]));
-    set(this, 'rampDistance',          Number(data[10]));
-    set(this, 'tolerance',             Number(data[11]));
-    set(this, 'acceleration',          Number(data[12]));
-    set(this, 'rampCurveExponent',     Number(data[13]));
-    set(this, 'stopAtEndOfLine',       Number(data[14]) === 1);
-    set(this, 'face',                  pointsToFace[Number(data[15])]);
-    set(this, 'radius',                Number(data[16]));
-    set(this, 'curveErrorCorrectionP', Number(data[17]));
-    set(this, 'servoIndex',            Number(data[18]));
+    const types = [
+      'go-to-point',
+      'go-to-point',
+      'drop-cube',
+      'face-angle',
+      'go-to-wall',
+      'go-to-point-relative'
+    ];
+
+    set(this, 'type',                  types[Number(data[0])])
+    set(this, 'x',                     Number(data[1]));
+    set(this, 'y',                     Number(data[2]));
+    set(this, 'relativePoint.x',       Number(data[3]));
+    set(this, 'relativePoint.y',       Number(data[4]));
+    set(this, 'pointToFace.x',         Number(data[5]));
+    set(this, 'pointToFace.y',         Number(data[6]));
+    set(this, 'rampMinValue',          Number(data[7]));
+    set(this, 'errorCorrectionP',      Number(data[8]));
+    set(this, 'pSaturation',           Number(data[9]));
+    set(this, 'facePointP',            Number(data[10]));
+    set(this, 'facePointPSaturation',  Number(data[11]));
+    set(this, 'maxSpeed',              Number(data[12]));
+    set(this, 'rampDistance',          Number(data[13]));
+    set(this, 'tolerance',             Number(data[14]));
+    set(this, 'acceleration',          Number(data[15]));
+    set(this, 'rampCurveExponent',     Number(data[16]));
+    set(this, 'stopAtEndOfLine',       Number(data[17]) === 1);
+    set(this, 'face',                  Number(data[18]));
+    set(this, 'angleToFace',           Number(data[19]));
+    set(this, 'radius',                Number(data[20]));
+    set(this, 'curveErrorCorrectionP', Number(data[21]));
+    set(this, 'servoIndex',            Number(data[22]));
+    set(this, 'sensorToUse',           Number(data[23]));
+    set(this, 'goToWallPGain',         Number(data[24]));
   }
 });

@@ -45,16 +45,12 @@ export default Ember.Route.extend({
     });
   },
 
-  sendData() {
-    this.send('sendData', get(this, 'controller.model.events'));
-  },
-
   actions: {
     saveModel() {
       const envSuffix = config.environment === 'test' ? '-test' : '';
       localStorage['map' + envSuffix] = JSON.stringify(get(this, 'controller.model.map') || []);
       localStorage['events' + envSuffix] = JSON.stringify(get(this, 'controller.model.events') || []);
-      run.throttle(this, this.sendData, 2000);
+      this.send('sendData', get(this, 'controller.model.events'));
     }
   }
 });

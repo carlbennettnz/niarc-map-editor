@@ -12,6 +12,7 @@ export default Ember.Service.extend({
   isConnecting: false,
   socket: null,
   address: '10.140.34.169:4000',
+  lastSendTime: null,
 
   connect() {
     const socket = new WebSocket('ws://' + get(this, 'address'));
@@ -54,9 +55,24 @@ export default Ember.Service.extend({
 
   send(payload) {
     const socket = get(this, 'socket') || {};
+    const lastSendTime = get(this, 'lastSendTime');
+    const pending = get(this, 'throttledMessage');
 
     if (socket.readyState > 0) {
-      socket.send(payload.toString());
+      if (!lastSendTime || lastSendTime + 1000 < Date.now()) {
+        socket.send(payload.toString());
+      } else {
+        if (pending) {
+          run.cancel(pending);
+        }
+
+        const scheduledSend = run.later(() => {
+          set(this, 'pending', null);
+          this.send(payload);
+        }, lastSendTime + 1000 - Date.now());
+
+        set(this, 'pending', scheduledSend);
+      }
     } else {
       // console.log('No connection');
     }

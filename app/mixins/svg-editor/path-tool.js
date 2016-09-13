@@ -72,7 +72,7 @@ export default Ember.Mixin.create({
 
     switch (mouseAction) {
       case 'moveHandle':
-        this.doMoveHandle(point);
+        this.doMoveHandle(point, !event.shiftKey);
         break;
 
       case 'moveLine':
@@ -175,7 +175,7 @@ export default Ember.Mixin.create({
     set(this, 'toolState.handleBeingMoved', handle);
   },
 
-  doMoveHandle(point) {
+  doMoveHandle(point, snapToGrid) {
     if (guard.apply(this, arguments)) {
       return;
     }
@@ -187,7 +187,7 @@ export default Ember.Mixin.create({
     }
 
     const gridSize = get(this, 'gridSize');
-    const snappedToGrid = this.snapPointToGrid(point, gridSize);
+    const snappedToGrid = snapToGrid ? this.snapPointToGrid(point, gridSize) : point;
 
     Ember.assert('path exists', get(this, 'path'));
     const fromPath = get(this, 'path.points').findBy('id', get(handle, 'id'));

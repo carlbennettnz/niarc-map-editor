@@ -7,106 +7,121 @@
 <div class="controls">
   <div class="control">
     <label>X</label>
-    {{input
-      value=event.x
-      type="number"}}
+    {{input value=event.x type="number"}}
   </div>
   
   <div class="control">
     <label>Y</label>
-    {{input
-      value=event.y
-      type="number"}}
+    {{input value=event.y type="number"}}
   </div>
   
   <div class="control">
     <label>Radius</label>
-    {{input
-      value=event.radius
-      type="number"}}
+    {{input value=event.radius type="number"}}
   </div>
   
   <div class="control">
-    <label>Face</label>
-    {{input
-      value=event.face
-      type="number"}}
+    <label>Relative X</label>
+    {{input value=event.relativePointX type="number"}}
   </div>
   
   <div class="control">
-    <label>Ramp min value</label>
-    {{input
-      value=event.rampMinValue
-      type="number"}}
+    <label>Relative Y</label>
+    {{input value=event.relativePointY type="number"}}
   </div>
   
   <div class="control">
-    <label>Ramp distance</label>
-    {{input
-      value=event.rampDistance
-      type="number"}}
+    <label>Point To Face X</label>
+    {{input value=event.pointToFaceX type="number"}}
   </div>
   
   <div class="control">
-    <label>Error corr. P</label>
-    {{input
-      value=event.errorCorrectionP
-      type="number"}}
+    <label>Point To Face Y</label>
+    {{input value=event.pointToFaceY type="number"}}
   </div>
   
   <div class="control">
-    <label>P saturation</label>
-    {{input
-      value=event.pSaturation
-      type="number"}}
+    <label>Ramp Min Value</label>
+    {{input value=event.rampMinValue type="number"}}
   </div>
   
   <div class="control">
-    <label>Face point P</label>
-    {{input
-      value=event.facePointP
-      type="number"}}
+    <label>Ramp Distance</label>
+    {{input value=event.rampDistance type="number"}}
+  </div>
+  
+  <div class="control">
+    <label>Error Correction P</label>
+    {{input value=event.errorCorrectionP type="number"}}
+  </div>
+  
+  <div class="control">
+    <label>P Saturation</label>
+    {{input value=event.pSaturation type="number"}}
+  </div>
+  
+  <div class="control">
+    <label>Face Point P</label>
+    {{input value=event.facePointP type="number"}}
   </div>
   
   <div class="control">
     <label>FPP Saturation</label>
-    {{input
-      value=event.facePointPSaturation
-      type="number"}}
+    {{input value=event.facePointPSaturation type="number"}}
   </div>
   
   <div class="control">
     <label>Max Speed</label>
-    {{input
-      value=event.maxSpeed
-      type="number"}}
+    {{input value=event.maxSpeed type="number"}}
   </div>
   
   <div class="control">
     <label>Acceleration</label>
-    {{input
-      value=event.acceleration
-      type="number"}}
+    {{input value=event.acceleration type="number"}}
   </div>
   
   <div class="control">
     <label>Tolerance</label>
-    {{input
-      value=event.tolerance
-      type="number"}}
+    {{input value=event.tolerance type="number"}}
   </div>
   
   <div class="control">
     <label>Ramp Curve Exp.</label>
-    {{input
-      value=event.rampCurveExponent
-      type="number"}}
+    {{input value=event.rampCurveExponent type="number"}}
   </div>
   
   <div class="control">
+    <label>Face</label>
+    {{input value=event.face type="number"}}
+  </div>
+  
+  <div class="control">
+    <label>Angle To Face</label>
+    {{input value=event.angleToFace type="number"}}
+  </div>
+  
+  <div class="control">
+    <label title="Curve Error Correction P">CECP</label>
+    {{input value=event.curveErrorCorrectionP type="number"}}
+  </div>
+  
+  <div class="control">
+    <label>Servo Index</label>
+    {{input value=event.servoIndex type="number"}}
+  </div>
+  
+  <div class="control">
+    <label>Sensor To Use</label>
+    {{input value=event.sensorToUse type="number"}}
+  </div>
+  
+  <div class="control">
+    <label>Go To Wall P Gain</label>
+    {{input value=event.goToWallPGain type="number"}}
+  </div>
+
+  <div class="control">
     <label>Stop at end</label>
-    {{input
-      value=event.stopAtEndOfLine
-      type="number"}}
+    {{input checked=event.stopAtEndOfLine type="checkbox"}}
   </div>
 </div>

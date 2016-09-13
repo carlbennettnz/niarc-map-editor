@@ -98,17 +98,15 @@ export default MapController.extend({
       const newEvent = Event.create({ type });
       const events = get(this, 'model.events');
       const selectedEvent = get(this, 'selectedEvents.lastObject');
-      let index = 0;
-
+      let index = events.length;
 
       if (selectedEvent) {
         index = events.indexOf(selectedEvent) + 1;
       }
 
-      console.log(events.length, get(this, 'model.events.length'));
       events.splice(index, 0, newEvent);
-      console.log(events.length, get(this, 'model.events.length'));
       events.arrayContentDidChange();
+
       set(this, 'selectedEvent', newEvent)
 
       this.send('saveModel');

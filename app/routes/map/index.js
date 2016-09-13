@@ -2,6 +2,6 @@ import Ember from 'ember';
 
 export default Ember.Route.extend({
   beforeModel() {
-    this.transitionTo('map.edit');
+    this.transitionTo('map.path');
   }
 });

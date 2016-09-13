@@ -52,8 +52,8 @@ export default Ember.Object.extend({
       Number(get(this, 'y')) || 0,
       Number(get(this, 'relativePointX')) || 0,
       Number(get(this, 'relativePointY')) || 0,
-      Number(get(this, 'pointToFace.x')) || 0,
-      Number(get(this, 'pointToFace.y')) || 0,
+      Number(get(this, 'pointToFaceX')) || 0,
+      Number(get(this, 'pointToFaceY')) || 0,
       Number(get(this, 'rampMinValue')) || 0,
       Number(get(this, 'errorCorrectionP')) || 0,
       Number(get(this, 'pSaturation')) || 0,
@@ -80,6 +80,8 @@ export default Ember.Object.extend({
   deserialize(data) {
     const pointsToFace = [];
 
+    data = data.map(Number);
+
     const types = [
       'go-to-point',
       'go-to-point',
@@ -89,30 +91,32 @@ export default Ember.Object.extend({
       'go-to-point-relative'
     ];
 
-    set(this, 'type',                  types[Number(data[0])]);
-    set(this, 'x',                     Number(data[1]));
-    set(this, 'y',                     Number(data[2]));
-    set(this, 'relativePoint.x',       Number(data[3]));
-    set(this, 'relativePoint.y',       Number(data[4]));
-    set(this, 'pointToFace.x',         Number(data[5]));
-    set(this, 'pointToFace.y',         Number(data[6]));
-    set(this, 'rampMinValue',          Number(data[7]));
-    set(this, 'errorCorrectionP',      Number(data[8]));
-    set(this, 'pSaturation',           Number(data[9]));
-    set(this, 'facePointP',            Number(data[10]));
-    set(this, 'facePointPSaturation',  Number(data[11]));
-    set(this, 'maxSpeed',              Number(data[12]));
-    set(this, 'rampDistance',          Number(data[13]));
-    set(this, 'tolerance',             Number(data[14]));
-    set(this, 'acceleration',          Number(data[15]));
-    set(this, 'rampCurveExponent',     Number(data[16]));
-    set(this, 'stopAtEndOfLine',       Number(data[17]) === 1);
-    set(this, 'face',                  Number(data[18]));
-    set(this, 'angleToFace',           Number(data[19]));
-    set(this, 'radius',                Number(data[20]));
-    set(this, 'curveErrorCorrectionP', Number(data[21]));
-    set(this, 'servoIndex',            Number(data[22]));
-    set(this, 'sensorToUse',           Number(data[23]));
-    set(this, 'goToWallPGain',         Number(data[24]));
+    set(this, 'type',                  types[data[0]]);
+    set(this, 'x',                     data[1]);
+    set(this, 'y',                     data[2]);
+    set(this, 'relativePointX',        data[3]);
+    set(this, 'relativePointY',        data[4]);
+    set(this, 'pointToFaceX',          data[5]);
+    set(this, 'pointToFaceY',          data[6]);
+    set(this, 'rampMinValue',          data[7]);
+    set(this, 'errorCorrectionP',      data[8]);
+    set(this, 'pSaturation',           data[9]);
+    set(this, 'facePointP',            data[10]);
+    set(this, 'facePointPSaturation',  data[11]);
+    set(this, 'maxSpeed',              data[12]);
+    set(this, 'rampDistance',          data[13]);
+    set(this, 'tolerance',             data[14]);
+    set(this, 'acceleration',          data[15]);
+    set(this, 'rampCurveExponent',     data[16]);
+    set(this, 'stopAtEndOfLine',       data[17] === 1);
+    set(this, 'face',                  data[18]);
+    set(this, 'angleToFace',           data[19]);
+    set(this, 'radius',                data[20]);
+    set(this, 'curveErrorCorrectionP', data[21]);
+    set(this, 'servoIndex',            data[22]);
+    set(this, 'sensorToUse',           data[23]);
+    set(this, 'goToWallPGain',         data[24]);
+
+    return this;
   }
 });

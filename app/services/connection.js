@@ -1,9 +1,12 @@
 import Ember from 'ember';
+import Event from 'niarc-map-editor/objects/event';
 
 const {
   get,
   set,
   run,
+  on,
+  observer,
   assign
 } = Ember;
 
@@ -11,8 +14,21 @@ export default Ember.Service.extend({
   isConnected: false,
   isConnecting: false,
   socket: null,
-  address: '10.140.34.169:4000',
+  address: '192.168.1.5:4000',
   lastSendTime: null,
+  events: [],
+
+  loadStoredAddress: on('init', function() {
+    this._super(...arguments);
+
+    if (localStorage.address) {
+      set(this, 'address', localStorage.address)
+    }
+  }),
+
+  storeAddress: observer('address', function() {
+    localStorage.address = get(this, 'address');
+  }),
 
   connect() {
     const socket = new WebSocket('ws://' + get(this, 'address'));
@@ -27,7 +43,10 @@ export default Ember.Service.extend({
       set(self, 'socket', this);
     }
     
-    socket.onmessage = ({ data }) => console.log('recevied', data);
+    socket.onmessage = ({ data }) => {
+      const events = data.trim().split('\n').map(event => Event.create().deserialize(event.split(',')));
+      set(this, 'events', events);
+    };
     
     socket.onclose = () => {
       console.log('closed, reconnecting in 10 seconds...');

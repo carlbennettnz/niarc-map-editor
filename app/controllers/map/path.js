@@ -44,23 +44,23 @@ export default MapController.extend({
 
   highlightedEvent: null,
 
-  hasPreviousEvent: computed('model.events.[]', 'selectedEvent', function() {
+  hasPreviousEvent: computed('connection.events.[]', 'selectedEvent', function() {
     const selectedEvents = get(this, 'selectedEvents');
-    const events = get(this, 'model.events') || [];
+    const events = get(this, 'connection.events') || [];
 
     return selectedEvents.length === 1 && events.indexOf(selectedEvents[0]) > 0;
   }),
 
-  hasNextEvent: computed('model.events.[]', 'selectedEvents', function() {
+  hasNextEvent: computed('connection.events.[]', 'selectedEvents', function() {
     const selectedEvents = get(this, 'selectedEvents');
-    const events = get(this, 'model.events') || [];
+    const events = get(this, 'connection.events') || [];
     const index = events.indexOf(selectedEvents[0]);
 
     return selectedEvents.length === 1 && index > -1 && index < events.length - 1;
   }),
 
-  path: computed('model.events.[]', function() {
-    const events = get(this, 'model.events') || [];
+  path: computed('connection.events.[]', function() {
+    const events = get(this, 'connection.events') || [];
     const goToPointEvents = events.filterBy('type', 'go-to-point');
 
     if (!goToPointEvents.length) {
@@ -76,7 +76,7 @@ export default MapController.extend({
     },
 
     addPoint(point) {
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events');
 
       const event = Event.create({
         type: 'go-to-point',
@@ -91,7 +91,7 @@ export default MapController.extend({
 
     addEvent(type = 'drop-cube') {
       const newEvent = Event.create({ type });
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events');
       const selectedEvent = get(this, 'selectedEvents.lastObject');
       let index = events.length;
 
@@ -109,7 +109,7 @@ export default MapController.extend({
 
     deleteEvent() {
       const selectedEvents = get(this, 'selectedEvents') || [];
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events');
       let indexToSelect = null;
 
       if (!selectedEvents.length) {
@@ -138,7 +138,7 @@ export default MapController.extend({
     },
 
     selectEvent(eventId) {
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events');
       const event = events.findBy('id', eventId);
 
       set(this, 'selectedEvents', event ? [ event ] : []);
@@ -151,7 +151,7 @@ export default MapController.extend({
         return;
       }
 
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events');
       const index = events.indexOf(selectedEvent);
 
       set(this, 'selectedEvent', events.objectAt(index - 1) || get(events, 'firstObject') || null);
@@ -164,14 +164,14 @@ export default MapController.extend({
         return;
       }
 
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events');
       const index = events.indexOf(selectedEvent);
 
       set(this, 'selectedEvent', events.objectAt(index + 1) || get(events, 'lastObject') || null);
     },
 
     addEventsToSelection(eventIds) {
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events');
       const selectedEvents = get(this, 'selectedEvents');
       const newEvents = [ ...selectedEvents ];
 
@@ -187,7 +187,7 @@ export default MapController.extend({
     },
 
     highlightEvent(eventId) {
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events') || [];
       const event = events.findBy('id', eventId);
 
       set(this, 'highlightedEvent', event);
@@ -196,7 +196,7 @@ export default MapController.extend({
     updateEvents() {
       const path = get(this, 'path') || {};
       const points = get(path, 'points') || [];
-      const events = get(this, 'model.events');
+      const events = get(this, 'connection.events');
       const eventsToRemove = [];
 
       const updatedEvents = events.map(event => {

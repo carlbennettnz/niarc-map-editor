@@ -6,29 +6,18 @@ const {
   get,
   set,
   run,
-  RSVP
+  RSVP,
+  computed,
+  Object: EmberObject,
+  inject: { service }
 } = Ember;
 
 export default Ember.Route.extend({
+  connection: service(),
+
   model() {
-    const key = config.environment === 'test' ? 'events-test' : 'events';
-    let events = [];
-
-    try {
-      events = JSON.parse(localStorage[key] || '[]');
-    } catch (err) {
-      console.error(err);
-    }
-
-    return RSVP.hash({
-      map: this.modelFor('map'),
-      events: events.map((eventSource, i) => {
-        const event = Event.create(eventSource);
-
-        set(event, 'id', i);
-
-        return event;
-      })
+    return EmberObject.create({
+      map: this.modelFor('map')
     });
   },
 
@@ -49,8 +38,8 @@ export default Ember.Route.extend({
     saveModel() {
       const envSuffix = config.environment === 'test' ? '-test' : '';
       localStorage['map' + envSuffix] = JSON.stringify(get(this, 'controller.model.map') || []);
-      localStorage['events' + envSuffix] = JSON.stringify(get(this, 'controller.model.events') || []);
-      this.send('sendData', get(this, 'controller.model.events'));
+      localStorage['events' + envSuffix] = JSON.stringify(get(this, 'controller.connection.events') || []);
+      this.send('sendData', get(this, 'controller.connection.events'));
     }
   }
 });

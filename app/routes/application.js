@@ -1,9 +1,12 @@
 import Ember from 'ember';
+import config from 'niarc-map-editor/config/environment';
+import Event from 'niarc-map-editor/objects/event';
 
 const {
   get,
   set,
   run,
+  on,
   assign,
   inject: { service }
 } = Ember;
@@ -11,10 +14,24 @@ const {
 export default Ember.Route.extend({
   connection: service(),
 
-  init() {
-    this._super(...arguments);
-    // get(this, 'connection').connect();
+  model() {
+    const key = config.environment === 'test' ? 'events-test' : 'events';
+    let events = [];
+
+    try {
+      events = JSON.parse(localStorage[key] || '[]');
+    } catch (err) {
+      console.error(err);
+    }
+
+    return events.map((eventSource, i) => Event.create(eventSource));
   },
+
+  updateModel: on('connection.message', function(message) {
+    const events = message.split('\n').map(event => Event.create().deserialize(event));
+    set(this, 'pathRoute.model', events);
+    get(this, 'pathRoute').send('saveModel');
+  }),
 
   actions: {
     sendData(payload) {

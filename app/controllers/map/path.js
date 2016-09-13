@@ -44,10 +44,6 @@ export default MapController.extend({
 
   highlightedEvent: null,
 
-  watch: observer('model.events.[]', function() {
-    console.log('ob', get(this, 'model.events.length'));
-  }),
-
   hasPreviousEvent: computed('model.events.[]', 'selectedEvent', function() {
     const selectedEvents = get(this, 'selectedEvents');
     const events = get(this, 'model.events') || [];
@@ -80,7 +76,6 @@ export default MapController.extend({
     },
 
     addPoint(point) {
-      console.log('action: addPoint');
       const events = get(this, 'model.events');
 
       const event = Event.create({
@@ -113,18 +108,31 @@ export default MapController.extend({
     },
 
     deleteEvent() {
-      console.log('action: deleteEvent');
-      const selectedEvent = get(this, 'selectedEvent');
+      const selectedEvents = get(this, 'selectedEvents') || [];
+      const events = get(this, 'model.events');
+      let indexToSelect = null;
 
-      if (!selectedEvent) {
+      if (!selectedEvents.length) {
         return;
       }
 
-      const events = get(this, 'model.events');
-      const index = events.indexOf(selectedEvent);
+      if (selectedEvents.length === 1) {
+        indexToSelect = Math.max(events.indexOf(selectedEvents[0]) - 1, 0);
+      }
 
-      events.removeObject(selectedEvent);
-      set(this, 'selectedEvent', events.objectAt(index) || get(events, 'lastObject') || null);
+      events.removeObjects(selectedEvents);
+
+      const remainingPointEvents = events.filterBy('type', 'go-to-point');
+
+      if (remainingPointEvents.length === 1) {
+        events.removeObjects(remainingPointEvents);
+      }
+
+      if (indexToSelect == null || events.length === 0) {
+        set(this, 'selectedEvents', []);
+      } else {
+        set(this, 'selectedEvents', [ events.objectAt(indexToSelect) ]);
+      }
 
       this.send('saveModel');
     },
@@ -133,7 +141,6 @@ export default MapController.extend({
       const events = get(this, 'model.events');
       const event = events.findBy('id', eventId);
 
-      console.log(events.toArray());
       set(this, 'selectedEvents', event ? [ event ] : []);
     },
 

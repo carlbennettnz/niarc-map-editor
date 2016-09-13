@@ -192,9 +192,7 @@ export default Ember.Mixin.create({
     Ember.assert('path exists', get(this, 'path'));
     const fromPath = get(this, 'path.points').findBy('id', get(handle, 'id'));
 
-    console.log(get(fromPath, 'x'));
     fromPath.setPosition(snappedToGrid);
-    console.log(get(fromPath, 'x'));
 
     this.sendAction('pathDidChange');
   },
@@ -264,7 +262,6 @@ export default Ember.Mixin.create({
     this.sendAction('addPoint', newPos);
     run.next(() => {
       const newPoint = get(this, 'path.points.lastObject');
-      console.log(get(this, 'path.points.length'));
 
       set(this, 'toolState.handleBeingMoved', newPoint);
 

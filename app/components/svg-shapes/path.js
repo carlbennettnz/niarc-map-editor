@@ -17,6 +17,10 @@ export default Ember.Component.extend({
     const points = get(this, 'line.points') || [];
     const parts = [];
 
+    if (!points.length) {
+      return '';
+    }
+
     points.forEach(point => {
       parts.push(this.getScaledPoint(point));
     });
@@ -28,6 +32,10 @@ export default Ember.Component.extend({
     const points = get(this, 'line.points') || [];
     const zoom = get(this, 'viewport.zoom');
     let str = '';
+
+    if (!points.length) {
+      return '';
+    }
 
     str += 'M ' + this.getScaledPoint(points[0]);
 
@@ -72,7 +80,8 @@ export default Ember.Component.extend({
         const end = {
           x: get(pointsInQuestion[1], 'x') + distanceDownArms * Math.cos(getAngleOf(vectors[1])),
           y: get(pointsInQuestion[1], 'y') + distanceDownArms * Math.sin(getAngleOf(vectors[1]))
-        }
+        };
+
 
         const final = [ mid, end ].map(p => this.getScaledPoint(p)).map(s => s.replace(',', ' '));
 

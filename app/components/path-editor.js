@@ -26,7 +26,7 @@ export default SvgEditorComponent.extend(PathToolMixin, SelectionToolMixin, Move
       shapes.push(...map);
     }
 
-    if (path) {
+    if (path && get(path, 'points.length')) {
       shapes.push(path);
     }
 

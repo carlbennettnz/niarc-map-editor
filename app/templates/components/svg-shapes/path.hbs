@@ -1,6 +1,6 @@
 <g class="path {{if line.isInProgress 'in-progress'}} {{line.layer}}-layer">
   <path class="contruction-path" d={{constructionPath}}></path>
-  <path d={{path}}></path>
+  <path class="curved-path" d={{path}}></path>
 
   {{#each line.points as |point|}}
     <circle

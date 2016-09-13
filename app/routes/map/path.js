@@ -27,6 +27,8 @@ export default Ember.Route.extend({
 
         set(event, 'id', i);
 
+        console.log(event)
+
         return event;
       })
     });

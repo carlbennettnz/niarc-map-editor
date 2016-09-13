@@ -62,8 +62,6 @@ export default Ember.Object.extend({
 
     set(this, 'points', points);
 
-    console.log(points);
-
     return this;
   }
 });

@@ -9,7 +9,8 @@ const {
   get,
   set,
   assign,
-  on
+  on,
+  run
 } = Ember;
 
 export default Ember.Mixin.create({
@@ -28,7 +29,7 @@ export default Ember.Mixin.create({
 
     // If over a handle, but not a selected one, select it
     if (handlesAtPoint.length && !selectedHandle) {
-      this.sendAction('selectEvent', get(handlesAtPoint[0], 'id'));
+      this.sendAction('selectPoint', get(handlesAtPoint[0], 'id'));
       selectedHandle = handlesAtPoint[0];
     }
 
@@ -188,12 +189,12 @@ export default Ember.Mixin.create({
     const gridSize = get(this, 'gridSize');
     const snappedToGrid = this.snapPointToGrid(point, gridSize);
 
-    set(handle, 'x', get(snappedToGrid, 'x'));
-    set(handle, 'y', get(snappedToGrid, 'y'));
-
+    Ember.assert('path exists', get(this, 'path'));
     const fromPath = get(this, 'path.points').findBy('id', get(handle, 'id'));
 
-    console.log(fromPath === handle);
+    console.log(get(fromPath, 'x'));
+    fromPath.setPosition(snappedToGrid);
+    console.log(get(fromPath, 'x'));
 
     this.sendAction('pathDidChange');
   },
@@ -239,11 +240,13 @@ export default Ember.Mixin.create({
     this.sendAction('addPoint', point0);
     this.sendAction('addPoint', point1);
 
-    set(this, 'toolState.handleBeingMoved', get(this, 'path.points.1'));
-    set(this, 'toolState.newLineStartingPoint', null);
-    set(this, 'toolState.mouseAction', 'moveHandle');
+    run.next(() => {
+      set(this, 'toolState.handleBeingMoved', get(this, 'path.points.1'));
+      set(this, 'toolState.newLineStartingPoint', null);
+      set(this, 'toolState.mouseAction', 'moveHandle');
 
-    this.doMoveHandle(point);
+      this.doMoveHandle(point);
+    });
   },
 
   startNewLineSegment(path, point) {
@@ -253,13 +256,20 @@ export default Ember.Mixin.create({
 
     const points = get(path, 'points');
     const lastPoint = get(points, 'lastObject');
-    const newPoint = assign({}, lastPoint)
+    const newPos = {
+      x: get(lastPoint, 'x'),
+      y: get(lastPoint, 'y')
+    };
     
-    points.pushObject(newPoint);
+    this.sendAction('addPoint', newPos);
+    run.next(() => {
+      const newPoint = get(this, 'path.points.lastObject');
+      console.log(get(this, 'path.points.length'));
 
-    set(this, 'toolState.handleBeingMoved', newPoint);
+      set(this, 'toolState.handleBeingMoved', newPoint);
 
-    this.doMoveHandle(point);
+      this.doMoveHandle(point);
+    });
   },
 
   moveSelectedHandlesOnGrid(dx, dy) {

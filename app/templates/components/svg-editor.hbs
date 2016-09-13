@@ -22,14 +22,15 @@
     {{#each layers as |layer|}}
       {{#if layer.isVisible}}
         {{#each shapes as |shape|}}
-          {{#unless shape.isHidden}}
+          {{#if (and (eq shape.layer layer.name) (not shape.isHidden))}}
             {{component (concat 'svg-shapes/' shape.type)
               line=shape
               viewport=viewport
               selectedEventIds=selectedEventIds
               highlightedEventId=highlightedEvent.id
-              tagName=''}}
-          {{/unless}}
+              tagName=''
+            }}
+          {{/if}}
         {{/each}}
       {{/if}}
     {{/each}}

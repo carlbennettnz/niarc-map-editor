@@ -44,6 +44,10 @@ export default MapController.extend({
 
   highlightedEvent: null,
 
+  watch: observer('model.events.[]', function() {
+    console.log('ob', get(this, 'model.events.length'));
+  }),
+
   hasPreviousEvent: computed('model.events.[]', 'selectedEvent', function() {
     const selectedEvents = get(this, 'selectedEvents');
     const events = get(this, 'model.events') || [];
@@ -59,7 +63,7 @@ export default MapController.extend({
     return selectedEvents.length === 1 && index > -1 && index < events.length - 1;
   }),
 
-  path: computed('model.events', function() {
+  path: computed('model.events.[]', function() {
     const events = get(this, 'model.events') || [];
     const goToPointEvents = events.filterBy('type', 'go-to-point');
 
@@ -76,11 +80,10 @@ export default MapController.extend({
     },
 
     addPoint(point) {
+      console.log('action: addPoint');
       const events = get(this, 'model.events');
-      const lastId = events.mapBy('id').reduce((maxId, id) => id > maxId ? id : maxId, -1);
 
       const event = Event.create({
-        id: lastId + 1,
         type: 'go-to-point',
         x: get(point, 'x'),
         y: get(point, 'y')
@@ -88,10 +91,11 @@ export default MapController.extend({
 
       events.pushObject(event);
 
-      this.send('saveModel');
+      // run.next(() => this.send('saveModel'));
     },
 
     addEvent(type = 'drop-cube') {
+      console.log('action: addEvent');
       const newEvent = Event.create({ type });
       const events = get(this, 'model.events');
       const selectedEvent = get(this, 'selectedEvent');
@@ -104,10 +108,11 @@ export default MapController.extend({
       events.splice(index + 1, 0, newEvent);
       set(this, 'selectedEvent', newEvent)
 
-      this.send('saveModel');
+      // this.send('saveModel');
     },
 
     deleteEvent() {
+      console.log('action: deleteEvent');
       const selectedEvent = get(this, 'selectedEvent');
 
       if (!selectedEvent) {
@@ -127,6 +132,7 @@ export default MapController.extend({
       const events = get(this, 'model.events');
       const event = events.findBy('id', eventId);
 
+      console.log(events.toArray());
       set(this, 'selectedEvents', event ? [ event ] : []);
     },
 
@@ -211,7 +217,7 @@ export default MapController.extend({
         set(event, 'y', get(correspondingPoint, 'y'));
       });
 
-      events.removeObjects(events);
+      events.removeObjects(eventsToRemove);
 
       this.send('saveModel');
     }

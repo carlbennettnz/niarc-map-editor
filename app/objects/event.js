@@ -7,12 +7,11 @@ const {
 } = Ember;
 
 export default Ember.Object.extend({
+  id: null,
   type: 'go-to-point',
   x: null,
   y: null,
   radius: null,
-  isSelected: false,
-  dropCube: false,
 
   serialize() {
     const serialized = [

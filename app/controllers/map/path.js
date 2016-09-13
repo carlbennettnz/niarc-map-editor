@@ -86,7 +86,7 @@ export default MapController.extend({
 
       events.pushObject(event);
 
-      // run.next(() => this.send('saveModel'));
+      this.send('saveModel')
     },
 
     addEvent(type = 'drop-cube') {
@@ -193,16 +193,6 @@ export default MapController.extend({
       set(this, 'highlightedEvent', event);
     },
 
-    connect() {
-      const connection = get(this, 'connection');
-      connection.connect();
-    },
-
-    disconnect() {
-      const connection = get(this, 'connection');
-      connection.disconnect();
-    },
-
     updateEvents() {
       const path = get(this, 'path') || {};
       const points = get(path, 'points') || [];
@@ -228,6 +218,16 @@ export default MapController.extend({
       events.removeObjects(eventsToRemove);
 
       this.send('saveModel');
+    },
+
+    connect() {
+      const connection = get(this, 'connection');
+      connection.connect();
+    },
+
+    disconnect() {
+      const connection = get(this, 'connection');
+      connection.disconnect();
     }
   }
 });

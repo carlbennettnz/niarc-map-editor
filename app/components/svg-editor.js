@@ -89,8 +89,8 @@ export default Ember.Component.extend(EKMixin, {
     const viewportHeight = get(this, 'viewportHeight');
 
     return {
-      x: (x - scrollX) / zoom,
-      y: (viewportHeight - y - scrollY) / zoom
+      x: Math.round((x - scrollX) / zoom),
+      y: Math.round((viewportHeight - y - scrollY) / zoom)
     };
   },
 

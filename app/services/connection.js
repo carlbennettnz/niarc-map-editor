@@ -26,6 +26,17 @@ export default Ember.Service.extend({
     }
   }),
 
+  enableSaveAndLoad: on('init', function() {
+    window.save = () => JSON.stringify(get(this, 'events'));
+    window.load = events => {
+      if (typeof events === 'string') {
+        events = JSON.parse(events);
+      }
+
+      set(this, 'events', events.map(event => Event.create(event)));
+    };
+  }),
+
   storeAddress: observer('address', function() {
     localStorage.address = get(this, 'address');
   }),

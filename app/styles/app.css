@@ -16,6 +16,34 @@ body {
   user-select: none;
   -webkit-user-select: none;
 }
+::-webkit-scrollbar {
+    width: 13px;
+    height: 18px;
+}
+
+::-webkit-scrollbar-thumb {
+    height: 6px;
+    border: 3px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    -webkit-border-radius: 7px;
+    transition: background-color 2s;
+    background-color: #444; /*scroll bar colour*/
+}
+
+.ui-modules :hover ::-webkit-scrollbar-thumb {
+  background-color: #616161;
+}
+
+::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: transparent;
+    transition: background-color .8s;
+}
 
 /**********************************/
 /* FORMS                          */

@@ -50,7 +50,6 @@ export default Ember.Mixin.create({
     const didDrag = get(this, 'toolState.mouseDidDrag');
 
     if (didDrag) {
-      console.log('finishing selection');
       this.finishSelection();
     }
   }),
@@ -91,7 +90,7 @@ export default Ember.Mixin.create({
       const points = path.getPointsInRect(selection);
 
       this.sendAction('selectEvent', null);
-      this.sendAction('addEventsToSelection', points.mapBy('id'));
+      this.sendAction('addPointsToSelection', points.mapBy('id'));
 
       set(this, 'tool', 'path');
     }

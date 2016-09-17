@@ -20,8 +20,14 @@ export default Ember.Component.extend({
     return !knownEventTypes.includes(get(this, 'event.type'));
   }),
 
-  click() {
-    this.sendAction('selectEvent', get(this, 'event.id'));
+  click({ metaKey, ctrlKey }) {
+    const selectedEvents = get(this, 'selectedEvents');
+
+    if (metaKey || ctrlKey) {
+      this.sendAction('addEventsToSelection', [ get(this, 'event.id') ]);
+    } else {
+      this.sendAction('selectEvent', get(this, 'event.id'));
+    }
   },
 
   mouseEnter() {

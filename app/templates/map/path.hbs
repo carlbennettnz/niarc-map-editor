@@ -9,8 +9,9 @@
   pathDidChange=(action 'updateEvents')
   addPoint=(action 'addPoint')
   selectPoint=(action 'selectEvent')
-  addEventsToSelection=(action 'addEventsToSelection')
-  highlightEvent=(action 'highlightEvent')}}
+  addPointsToSelection=(action 'addEventsToSelection')
+  highlightEvent=(action 'highlightEvent')
+}}
 
 <aside class="ui-modules">
   {{map-mode-navigator}}
@@ -38,7 +39,9 @@
     addEvent=(action 'addEvent')
     deleteEvent=(action 'deleteEvent')
     selectEvent=(action 'selectEvent')
-    highlightEvent=(action 'highlightEvent')}}
+    addEventsToSelection=(action 'addEventsToSelection')
+    highlightEvent=(action 'highlightEvent')
+  }}
 
   <div class="ui-module connection">
     <div class="connection-indicator {{if connection.isConnected 'connected'}} {{if connection.isConnecting 'connecting'}}">
@@ -54,6 +57,7 @@
         {{fa-icon 'times'}}
       {{/unless}}
     </div>
+    
     {{input value=connection.address}}
     
     {{#if connection.isConnecting}}

@@ -26,11 +26,21 @@ export default Ember.Mixin.create({
     const selectedEventIds = get(this, 'selectedEventIds');
     const handlesAtPoint = this.getPathHandlesAtPoint(point);
     let selectedHandle = handlesAtPoint.find(handle => selectedEventIds.includes(get(handle, 'id')));
+    let didAddPointToSelection;
 
     // If over a handle, but not a selected one, select it
-    if (handlesAtPoint.length && !selectedHandle) {
-      this.sendAction('selectPoint', get(handlesAtPoint[0], 'id'));
-      selectedHandle = handlesAtPoint[0];
+    if (handlesAtPoint.length) {
+      console.log('handles at point');
+      if (event.metaKey || event.crtlKey) {
+        console.log('crtl');
+        this.sendAction('addPointsToSelection', [ get(handlesAtPoint[0], 'id') ]);
+        console.log('added ' + get(handlesAtPoint[0], 'id'));
+        selectedHandle = null;
+        didAddPointToSelection = true;
+      } else if (!selectedHandle) {
+        this.sendAction('selectPoint', get(handlesAtPoint[0], 'id'));
+        selectedHandle = handlesAtPoint[0];
+      }
     }
 
     // If over a selected handle, start moving that handle
@@ -40,17 +50,19 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const path = get(this, 'path');
+    if (!didAddPointToSelection) {
+      const path = get(this, 'path');
 
-    if (path) {
-      set(this, 'toolState.mouseAction', 'moveHandle');
-      this.startNewLineSegment(path, point, event.shiftKey);
-      return;
+      if (path) {
+        set(this, 'toolState.mouseAction', 'moveHandle');
+        this.startNewLineSegment(path, point, event.shiftKey);
+        return;
+      }
+
+      // Else start a new path
+      set(this, 'toolState.mouseAction', 'adjustNewLine');
+      this.startNewPath(point, event.shiftKey);
     }
-
-    // Else start a new path
-    set(this, 'toolState.mouseAction', 'adjustNewLine');
-    this.startNewPath(point, event.shiftKey);
   }),
 
   handleMouseMove: on('mouseMove', function(event) {
@@ -96,20 +108,6 @@ export default Ember.Mixin.create({
   handleMouseUp: on('mouseUp', function(event) {
     if (guard.apply(this, arguments)) {
       return;
-    }
-
-    const action = get(this, 'toolState.mouseAction');
-    const didDrag = get(this, 'toolState.mouseDidDrag');
-
-    // Select clicked lines if they're not already clicked and the pointer has not moved since mousedown
-    if (action !== 'moveHandle' && action !== 'moveShape' && didDrag === false) {
-      const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
-      const layerName = get(this, 'selectedLayerName');
-      const handle = this.getPathHandlesAtPoint(point).objectAt(0);
-
-      if (handle) {
-        set(handle, 'isSelected', true);
-      }
     }
 
     set(this, 'toolState.mouseAction', null);

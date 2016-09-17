@@ -96,7 +96,7 @@ export default MapController.extend({
 
       events.pushObject(event);
 
-      this.send('saveModel')
+      this.send('saveModel');
     },
 
     addEvent(type = 'drop-cube') {
@@ -147,11 +147,19 @@ export default MapController.extend({
       this.send('saveModel');
     },
 
-    selectEvent(eventId) {
+    selectEvent(eventId, { metaKey, ctrlKey } = {}) {
       const events = get(this, 'connection.events');
       const event = events.findBy('id', eventId);
 
-      set(this, 'selectedEvents', event ? [ event ] : []);
+      if (metaKey || ctrlKey) {
+        const selectedEvents = get(this, 'selectedEvents');
+
+        if (!selectedEvents.includes(event)) {
+          selectedEvents.pushObject(event);
+        }
+      } else {
+        set(this, 'selectedEvents', event ? [ event ] : []);
+      }
     },
 
     selectPreviousEvent() {

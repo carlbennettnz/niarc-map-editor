@@ -74,13 +74,14 @@
   </div>
 </aside>
 
-<aside class="ui-modules attributes">
-  {{#if selectedEvents}}
-    {{component (concat 'event-editors/' selectedEvents.0.type)
-      event=selectedEvents.[0]
+{{#if compiledEvent}}
+  <aside class="ui-modules attributes">
+    {{component (concat 'event-editors/' compiledEvent.type)
+      event=compiledEvent
       hasNextEvent=hasNextEvent
       hasPreviousEvent=hasPreviousEvent
       selectPreviousEvent=(action 'selectPreviousEvent')
-      selectNextEvent=(action 'selectNextEvent')}}
-  {{/if}}
-</aside>
+      selectNextEvent=(action 'selectNextEvent')
+    }}
+  </aside>
+{{/if}}

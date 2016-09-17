@@ -15,6 +15,9 @@ export default Ember.Object.extend({
     nextId++;
   },
 
+  // ATTENTION: Don't add params without also adding them to the exported
+  // parameters array at the end of this file.
+
   id: null,
   type: 'go-to-point',
   x: null,
@@ -35,7 +38,7 @@ export default Ember.Object.extend({
   tolerance: 50,
   acceleration: 0.1,
   rampCurveExponent: 2,
-  stopAtEndOfLine: false,
+  stopAtEndOfLine: false, 
   face: 0,
   angleToFace: 0,
   curveErrorCorrectionP: 0.003,
@@ -128,3 +131,30 @@ export default Ember.Object.extend({
     return this;
   }
 });
+
+export const parameters = [
+  'x',
+  'y',
+  'radius',
+  'relativePointX',
+  'relativePointY',
+  'pointToFaceX',
+  'pointToFaceY',
+  'rampMinValue',
+  'errorCorrectionP',
+  'pSaturation',
+  'facePointP',
+  'facePointPSaturation',
+  'maxSpeed',
+  'rampDistance',
+  'tolerance',
+  'acceleration',
+  'rampCurveExponent',
+  'stopAtEndOfLine',
+  'face',
+  'angleToFace',
+  'curveErrorCorrectionP',
+  'servoIndex',
+  'sensorToUse',
+  'goToWallPGain'
+];

@@ -1,6 +1,6 @@
 import Ember from 'ember';
 import MapController from 'niarc-map-editor/controllers/map';
-import Event from 'niarc-map-editor/objects/event';
+import Event, { parameters as eventParams } from 'niarc-map-editor/objects/event';
 import Path from 'niarc-map-editor/objects/path';
 import PathPoint from 'niarc-map-editor/objects/path-point';
 
@@ -11,6 +11,7 @@ const {
   computed,
   observer,
   assign,
+  Object: EmberObject,
   inject: { service }
 } = Ember;
 
@@ -79,6 +80,51 @@ export default MapController.extend({
 
     return get(this, 'connection.events').filter(({ type }) => allowedTypes.includes(type));
   }),
+
+  compiledEvent: computed(...eventParams.map(param => `selectedEvents.@each.${param}`), function() {
+    const selectedEvents = get(this, 'selectedEvents');
+
+    if (!selectedEvents.length)  {
+      return null;
+    }
+
+    const type = get(selectedEvents[0], 'type');
+    const compiledEvent = EmberObject.create({ type });
+
+    if (selectedEvents.rejectBy('type', type).length) {
+      return null;
+    }
+
+    eventParams.forEach(key => {
+      const firstValue = get(selectedEvents[0], key);
+      console.log(key, firstValue);
+      const matchesFirst = selectedEvents.slice(1).map(event => get(event, key) !== firstValue);
+
+      // If they're all the same, show the value in the compiled event
+      if (!matchesFirst.includes(true)) {
+        set(compiledEvent, key, firstValue);
+      }
+
+      compiledEvent.addObserver(key, this, this.handleEventParamChange);
+    });
+
+    return compiledEvent;
+  }),
+
+  handleEventParamChange(sender, key) {
+    let newValue = get(sender, key);
+    const selectedEvents = get(this, 'selectedEvents');
+
+    if (typeof newValue === 'string' && !isNaN(newValue)) {
+      newValue = Number(newValue);
+    }
+
+    selectedEvents.forEach(event => {
+      set(event, key, newValue);
+    });
+
+    this.send('saveModel');
+  },
 
   actions: {
     selectTool(tool) {

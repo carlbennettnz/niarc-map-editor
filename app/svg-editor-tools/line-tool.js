@@ -143,7 +143,7 @@ export default EmberObject.extend({
     editor.sendAction('select', line);
   },
 
-  moveLine(point) {
+  moveLine(point, snapToGrid) {
     const editor = get(this, 'editor');
     const lineBeingMoved = get(this, 'lineBeingMoved');
 
@@ -152,20 +152,21 @@ export default EmberObject.extend({
     }
 
     const { line, initialMousePos, initialLinePos } = lineBeingMoved;
-    const gridSize = get(this, 'gridSize');
 
-    const delta = {
+    let delta = {
       x: point.x - initialMousePos.x,
       y: point.y - initialMousePos.y
     };
 
-    const snappedDelta = editor.snapPointToGrid(delta, gridSize);
+    if (snapToGrid) {
+      delta = editor.snapPointToGrid(delta);
+    }
 
     const newPos = {
-      x1: get(initialLinePos, 'x1') + get(snappedDelta, 'x'),
-      y1: get(initialLinePos, 'y1') + get(snappedDelta, 'y'),
-      x2: get(initialLinePos, 'x2') + get(snappedDelta, 'x'),
-      y2: get(initialLinePos, 'y2') + get(snappedDelta, 'y')
+      x1: get(initialLinePos, 'x1') + get(delta, 'x'),
+      y1: get(initialLinePos, 'y1') + get(delta, 'y'),
+      x2: get(initialLinePos, 'x2') + get(delta, 'x'),
+      y2: get(initialLinePos, 'y2') + get(delta, 'y')
     };
 
     editor.sendAction('resize', line, newPos);

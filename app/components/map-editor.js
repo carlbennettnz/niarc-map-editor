@@ -23,17 +23,29 @@ export default SvgEditorComponent.extend({
 
   layout,
 
-  mouseDown({ clientX, clientY, crtlKey, metaKey, altKey, shiftKey }) {
+  mouseDown({ clientX, clientY, crtlKey, metaKey, altKey, shiftKey, which }) {
     this._super(...arguments);
 
     const lineTool = get(this, 'tools.line');
     const moveTool = get(this, 'tools.move');
     const selectionTool = get(this, 'tools.selection');
     
+    const action = get(this, 'action');
     const layerName = get(this, 'selectedLayerName');
     const point = this.getScaledAndOffsetPoint(clientX, clientY);
     const handles = lineTool.getLineHandlesAtPoint(point, { layerName });
     const lines = lineTool.getLinesAtPoint(point, { layerName });
+
+    if (action) {
+      return;
+    }
+
+    // Pan
+    if ((which === 1 && (crtlKey || metaKey)) || which === 2) {
+      moveTool.startMove({ x: clientX, y: clientY });
+      set(this, 'action', 'pan');
+      return;
+    }
 
     // New lines
     if (altKey) {
@@ -53,13 +65,6 @@ export default SvgEditorComponent.extend({
     if (lines.length) {
       lineTool.startMoveLine(point, lines.findBy('isSelected') || lines[0]);
       set(this, 'action', 'moveLine');
-      return;
-    }
-
-    // Pan
-    if (crtlKey || metaKey) {
-      moveTool.startMove({ x: clientX, y: clientY });
-      set(this, 'action', 'pan');
       return;
     }
 

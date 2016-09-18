@@ -23,7 +23,7 @@ export default SvgEditorComponent.extend({
     set(this, 'tools.selection', SelectionTool.create({ editor: this }));
   },
 
-  mouseDown({ clientX, clientY, crtlKey, metaKey, altKey, shiftKey, which }) {
+  mouseDown({ clientX, clientY, ctrlKey, metaKey, altKey, shiftKey, which }) {
     this._super(...arguments);
 
     const lineTool = get(this, 'tools.line');
@@ -41,7 +41,7 @@ export default SvgEditorComponent.extend({
     }
 
     // Pan
-    if ((which === 1 && (crtlKey || metaKey)) || which === 2) {
+    if ((which === 1 && (ctrlKey || metaKey)) || which === 2) {
       moveTool.startMove({ x: clientX, y: clientY });
       set(this, 'action', 'pan');
       return;

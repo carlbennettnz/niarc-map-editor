@@ -82,7 +82,7 @@ export default Ember.Object.extend({
       Number(get(this, 'rampCurveExponent')) || 0,
       get(this, 'stopAtEndOfLine') === true ? 1 : 0,
       Number(get(this, 'face')) || 0, // go to point: 0, go to point curved: 1, drop cube: 2
-      Number(get(this, 'angleToFace')) || 0,
+      Number(get(this, 'angleToFace')) / 180 * Math.PI || 0,
       Number(get(this, 'radius')) || 0,
       Number(get(this, 'curveErrorCorrectionP')) || 0,
       Number(get(this, 'servoIndex')) || 0,
@@ -119,7 +119,7 @@ export default Ember.Object.extend({
     set(this, 'rampCurveExponent',     data[16]);
     set(this, 'stopAtEndOfLine',       data[17] === 1);
     set(this, 'face',                  data[18]);
-    set(this, 'angleToFace',           data[19]);
+    set(this, 'angleToFace',           data[19] / Math.PI * 180);
     set(this, 'radius',                data[20]);
     set(this, 'curveErrorCorrectionP', data[21]);
     set(this, 'servoIndex',            data[22]);

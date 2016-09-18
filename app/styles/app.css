@@ -59,6 +59,11 @@ button {
   cursor: pointer;
 }
 
+button i.fa {
+  font-size: 125%;
+  margin-top: 1px;
+}
+
 button:active {
   background-color: #444459;
 }

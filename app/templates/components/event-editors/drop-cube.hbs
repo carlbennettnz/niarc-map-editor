@@ -7,8 +7,13 @@
 <div class="controls">
   <div class="control">
     <label>Servo Index</label>
-    {{input
-      value=event.servoIndex
-      type="number"}}
+    {{#x-select value=event.servoIndex as |xs|}}
+      {{#xs.option value=2}}Left 1{{/xs.option}}
+      {{#xs.option value=1}}Left 2{{/xs.option}}
+      {{#xs.option value=5}}Right 1{{/xs.option}}
+      {{#xs.option value=0}}Right 2{{/xs.option}}
+      {{#xs.option value=3}}Front 1{{/xs.option}}
+      {{#xs.option value=4}}Front 2{{/xs.option}}
+    {{/x-select}}
   </div>
 </div>

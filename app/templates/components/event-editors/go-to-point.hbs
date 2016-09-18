@@ -26,16 +26,6 @@
   </div>
   
   <div class="control">
-    <label>Relative X</label>
-    {{input value=event.relativePointX type="number"}}
-  </div>
-  
-  <div class="control">
-    <label>Relative Y</label>
-    {{input value=event.relativePointY type="number"}}
-  </div>
-  
-  <div class="control">
     <label>Point To Face X</label>
     {{input value=event.pointToFaceX type="number"}}
   </div>
@@ -56,22 +46,22 @@
   </div>
   
   <div class="control">
-    <label>Error Correction P</label>
+    <label title="Line error correction proportional gain">Line Correction P</label>
     {{input value=event.errorCorrectionP step="0.0005" type="number"}}
   </div>
   
   <div class="control">
-    <label>P Saturation</label>
+    <label title="Maximum line error correction">Line P Saturation</label>
     {{input value=event.pSaturation step="0.05" type="number"}}
   </div>
   
   <div class="control">
-    <label>Face Point P</label>
+    <label title="Face point error correction proportional gain">Face Point P</label>
     {{input value=event.facePointP step="0.005" type="number"}}
   </div>
   
   <div class="control">
-    <label>FPP Saturation</label>
+    <label title="Maximum face point error correction">FPP Saturation</label>
     {{input value=event.facePointPSaturation step="0.05" type="number"}}
   </div>
   
@@ -92,7 +82,12 @@
   
   <div class="control">
     <label>Face</label>
-    {{input value=event.face type="number"}}
+    {{#x-select value=event.face as |xs|}}
+      {{#xs.option value=0}}None{{/xs.option}}
+      {{#xs.option value=1}}Face Point{{/xs.option}}
+      {{#xs.option value=2}}Face Target{{/xs.option}}
+      {{#xs.option value=3}}Face Angle{{/xs.option}}
+    {{/x-select}}
   </div>
   
   <div class="control">
@@ -104,12 +99,7 @@
     <label title="Curve Error Correction P">CECP</label>
     {{input value=event.curveErrorCorrectionP step="0.0005" type="number"}}
   </div>
-  
-  <div class="control">
-    <label>Servo Index</label>
-    {{input value=event.servoIndex type="number"}}
-  </div>
-  
+
   <div class="control">
     <label>Sensor To Use</label>
     {{input value=event.sensorToUse type="number"}}

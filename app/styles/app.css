@@ -51,6 +51,7 @@ body {
 button {
   border: 1px solid black;
   background-color: #55556f;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.9);
   padding: 0.45em 1em 0.6em;
   line-height: 1;
@@ -75,6 +76,11 @@ input[type=number] {
 input[type=text]:focus,
 input[type=number]:focus {
   border-color: #39c;
+}
+
+select {
+  margin-top: 3px;
+  width: 100px;
 }
 
 .control {

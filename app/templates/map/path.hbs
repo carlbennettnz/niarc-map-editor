@@ -16,22 +16,6 @@
 <aside class="ui-modules">
   {{map-mode-navigator}}
 
-  <div class="ui-module tool-selector">
-    <ul>
-      <li class="{{if (eq tool 'path') 'active'}}" title="Path creation tool (P)" {{action 'selectTool' 'path'}}>
-        {{fa-icon 'pencil'}} Line
-      </li>
-
-      <li class="{{if (eq tool 'selection') 'active'}}" title="Selection tool (S)" {{action 'selectTool' 'selection'}}>
-        {{fa-icon 'square-o'}} Selection
-      </li>
-      
-      <li class="{{if (eq tool 'move') 'active'}}" title="Move tool (M)" {{action 'selectTool' 'move'}}>
-        {{fa-icon 'hand-paper-o'}} Move
-      </li>
-    </ul>
-  </div>
-
   {{event-timeline
     events=eventsForTimeline
     selectedEvents=selectedEvents

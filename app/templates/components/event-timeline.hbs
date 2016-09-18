@@ -1,16 +1,22 @@
 <div class="timeline">
-  <ul>
-    {{#each events as |event|}}
-      {{timeline-event
-        event=event
-        isSelected=(contains selectedEvents event)
-        isHighlighted=(eq highlightedEvent event)
-        selectEvent=(action selectEvent)
-        toggleEventSelection=(action toggleEventSelection)
-        highlightEvent=(action highlightEvent)
-      }}
-    {{/each}}
-  </ul>
+  {{#if events}}
+    <ul>
+      {{#each events as |event|}}
+        {{timeline-event
+          event=event
+          isSelected=(contains selectedEvents event)
+          isHighlighted=(eq highlightedEvent event)
+          selectEvent=(action selectEvent)
+          toggleEventSelection=(action toggleEventSelection)
+          highlightEvent=(action highlightEvent)
+        }}
+      {{/each}}
+    </ul>
+  {{else}}
+    <p class="placeholder">
+      No events
+    </p>
+  {{/if}}
 </div>
 
 <div class="controls">

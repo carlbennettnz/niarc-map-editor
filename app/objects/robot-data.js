@@ -25,7 +25,7 @@ export default Ember.Object.extend({
   lidarPoints: [],
 
   deserialize(castData) {
-    const lidarPoints = get(this, 'lidarPoints');
+    const lidarPoints = [];
 
     const robotX = this.readI32(castData);
     const robotY = this.readI32(castData);
@@ -34,7 +34,6 @@ export default Ember.Object.extend({
     set(this, 'robotPose.x', robotX / 1000);
     set(this, 'robotPose.y', robotY / 1000);
     set(this, 'robotPose.rotation', robotRotation / 1000);
-    set(this, 'lidarPoints', []);
 
     while (castData.length > 0)  {
       lidarPoints.pushObject({
@@ -42,6 +41,8 @@ export default Ember.Object.extend({
         y: this.readI16(castData)
       });
     }
+
+    set(this, 'lidarPoints', lidarPoints);
 
     return this;
   },

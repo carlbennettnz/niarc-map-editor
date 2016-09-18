@@ -14,14 +14,14 @@ const {
 } = Ember;
 
 export default SvgEditorComponent.extend({
+  layout,
+  
   init() {
     this._super(...arguments);
     set(this, 'tools.line', LineTool.create({ editor: this }));
     set(this, 'tools.move', MoveTool.create({ editor: this }));
     set(this, 'tools.selection', SelectionTool.create({ editor: this }));
   },
-
-  layout,
 
   mouseDown({ clientX, clientY, crtlKey, metaKey, altKey, shiftKey, which }) {
     this._super(...arguments);

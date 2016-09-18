@@ -97,7 +97,6 @@ export default MapController.extend({
 
     eventParams.forEach(key => {
       const firstValue = get(selectedEvents[0], key);
-      console.log(key, firstValue);
       const matchesFirst = selectedEvents.slice(1).map(event => get(event, key) !== firstValue);
 
       // If they're all the same, show the value in the compiled event

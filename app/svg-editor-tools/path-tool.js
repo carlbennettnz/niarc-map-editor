@@ -10,10 +10,11 @@ const {
   set,
   assign,
   on,
-  run
+  run,
+  Object: EmberObject
 } = Ember;
 
-export default Ember.Mixin.create({
+export default EmberObject.extend({
   handleMouseDown: on('mouseDown', function(event) {
     if (guard.apply(this, arguments)) {
       return;
@@ -21,7 +22,7 @@ export default Ember.Mixin.create({
 
     const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
 
-    set(this, 'toolState.mouseDidDrag', false);
+    set(this, 'mouseDidDrag', false);
 
     const selectedEventIds = get(this, 'selectedEventIds');
     const handlesAtPoint = this.getPathHandlesAtPoint(point);
@@ -30,22 +31,19 @@ export default Ember.Mixin.create({
 
     // If over a handle, but not a selected one, select it
     if (handlesAtPoint.length) {
-      console.log('handles at point');
       if (event.metaKey || event.crtlKey) {
-        console.log('crtl');
-        this.sendAction('addPointsToSelection', [ get(handlesAtPoint[0], 'id') ]);
-        console.log('added ' + get(handlesAtPoint[0], 'id'));
+        editor.sendAction('addPointsToSelection', [ get(handlesAtPoint[0], 'id') ]);
         selectedHandle = null;
         didAddPointToSelection = true;
       } else if (!selectedHandle) {
-        this.sendAction('selectPoint', get(handlesAtPoint[0], 'id'));
+        editor.sendAction('selectPoint', get(handlesAtPoint[0], 'id'));
         selectedHandle = handlesAtPoint[0];
       }
     }
 
     // If over a selected handle, start moving that handle
     if (selectedHandle) {
-      set(this, 'toolState.mouseAction', 'moveHandle');
+      set(this, 'mouseAction', 'moveHandle');
       this.startMoveHandle(point, selectedHandle);
       return;
     }
@@ -54,13 +52,13 @@ export default Ember.Mixin.create({
       const path = get(this, 'path');
 
       if (path) {
-        set(this, 'toolState.mouseAction', 'moveHandle');
+        set(this, 'mouseAction', 'moveHandle');
         this.startNewLineSegment(path, point, event.shiftKey);
         return;
       }
 
       // Else start a new path
-      set(this, 'toolState.mouseAction', 'adjustNewLine');
+      set(this, 'mouseAction', 'adjustNewLine');
       this.startNewPath(point, event.shiftKey);
     }
   }),
@@ -70,21 +68,21 @@ export default Ember.Mixin.create({
       return;
     }
 
-    const mouseAction = get(this, 'toolState.mouseAction') || null;
+    const mouseAction = get(this, 'mouseAction') || null;
 
     if (!event.buttons && mouseAction) {
-      set(this, 'toolState.newLine', null);
-      set(this, 'toolState.draggingHandle', null);
+      set(this, 'newLine', null);
+      set(this, 'draggingHandle', null);
       return;
     }
 
-    set(this, 'toolState.mouseDidDrag', true);
+    set(this, 'mouseDidDrag', true);
 
     const point = this.getScaledAndOffsetPoint(event.clientX, event.clientY);
 
     switch (mouseAction) {
       case 'moveHandle':
-        this.doMoveHandle(point, event.shiftKey);
+        this.moveHandle(point, event.shiftKey);
         break;
 
       case 'moveLine':
@@ -110,7 +108,7 @@ export default Ember.Mixin.create({
       return;
     }
 
-    set(this, 'toolState.mouseAction', null);
+    set(this, 'mouseAction', null);
   }),
 
   handleBackspace: on(keyDown('Backspace'), function(event) {
@@ -147,105 +145,75 @@ export default Ember.Mixin.create({
   }),
 
   deselect: on(keyDown('Escape'), function(event) {
-    this.sendAction('deselectAll');
+    editor
   }),
 
   selectPathTool: on(keyUp('KeyP'), function() {
     set(this, 'tool', 'path');
   }),
 
-  getPathHandlesAtPoint(point) {    
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    const handles = get(this, 'path.points') || [];
-    const tolerance = get(this, 'clickToSelectTolerance');
+  getPathHandlesAtPoint(point) {
+    const editor = get(this, 'editor');
+    const handles = get(editor, 'path.points') || [];
+    const tolerance = get(editor, 'clickToSelectTolerance');
 
     return handles.filter(handle => geometry.checkPointCollision(point, handle, tolerance));
   },
 
   startMoveHandle(point, handle) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
+    const editor = get(this, 'editor');
 
-    set(this, 'toolState.handleBeingMoved', handle);
+    editor.sendAction('selectPoint', get(handle, 'id'));
+    set(this, 'handleBeingMoved', handle);
   },
 
-  doMoveHandle(point, snapToGrid = false) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
+  moveHandle(point, snapToGrid) {
+    const editor = get(this, 'editor');
+    const newLineStartingPoint = get(this, 'newLineStartingPoint');
+    const handle = get(this, 'handleBeingMoved');
 
-    const handle = get(this, 'toolState.handleBeingMoved');
+    if (newLineStartingPoint) {
+      return this.adjustNewSegment(point, snapToGrid);
+    }
 
     if (!handle) {
       return;
     }
 
-    const snappedToGrid = snapToGrid ? this.snapPointToGrid(point) : point;
+    if (snapToGrid) {
+      point = editor.snapPointToGrid(point);
+    }
 
-    Ember.assert('path exists', get(this, 'path'));
-    const fromPath = get(this, 'path.points').findBy('id', get(handle, 'id'));
+    const fromPath = get(editor, 'path.points').findBy('id', get(handle, 'id'));
 
-    fromPath.setPosition(snappedToGrid);
-
-    this.sendAction('pathDidChange');
+    fromPath.setPosition(point);
+    editor.sendAction('pathDidChange');
   },
 
   startMoveLine(point, line) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    set(this, 'toolState.lineBeingMoved', {
+    set(this, 'lineBeingMoved', {
       line,
       initialMousePos: point,
-      initialLinePos: Ember.assign({}, get(line, 'points'))
+      initialLinePos: assign({}, get(line, 'points'))
     });
   },
 
   startNewPath(point, snapToGrid) {
-    if (guard.apply(this, arguments)) {
-      return;
+    const editor = get(this, 'editor');
+
+    if (snapToGrid) {
+      point = editor.snapPointToGrid(point);
     }
 
-    const snapped = snapToGrid ? this.snapPointToGrid(point) : point;
-
-    set(this, 'toolState.newLineStartingPoint', snapped);
+    set(this, 'newLineStartingPoint', point);
   },
 
-  adjustNewPath(point, snapToGrid) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
+  startNewLineSegment(point, snapToGrid) {
+    const editor = get(this, 'editor');
+    const path = get(editor, 'path');
 
-    const point0 = get(this, 'toolState.newLineStartingPoint');
-    const point1 = snapToGrid ? this.snapPointToGrid(point) : point;
-
-    // The line would still have zero length, don't do anything yet
-    if (get(point0, 'x') === get(point1, 'x') && get(point0, 'y') === get(point1, 'y')) {
-      return;
-    }
-
-    this.sendAction('addPoint', point0);
-    this.sendAction('addPoint', point1);
-
-    run.next(() => {
-      this.sendAction('selectPoint', get(this, 'path.points.lastObject.id'));
-
-      set(this, 'toolState.handleBeingMoved', get(this, 'path.points.1'));
-      set(this, 'toolState.newLineStartingPoint', null);
-      set(this, 'toolState.mouseAction', 'moveHandle');
-
-      this.doMoveHandle(point, snapToGrid);
-    });
-  },
-
-  startNewLineSegment(path, point, snapToGrid) {
-    if (guard.apply(this, arguments)) {
-      return;
+    if (!path || !get(path, 'points.length')) {
+      return this.startNewPath(point, snapToGrid);
     }
 
     const points = get(path, 'points');
@@ -255,29 +223,54 @@ export default Ember.Mixin.create({
       y: get(lastPoint, 'y')
     };
     
-    this.sendAction('addPoint', newPos);
+    editor.sendAction('addPoint', newPos);
     
     run.next(() => {
-      const newPoint = get(this, 'path.points.lastObject');
+      const newPoint = get(editor, 'path.points.lastObject');
 
-      this.sendAction('selectPoint', get(newPoint, 'id'));
-      set(this, 'toolState.handleBeingMoved', newPoint);
+      editor.sendAction('selectPoint', get(newPoint, 'id'));
+      set(this, 'handleBeingMoved', newPoint);
 
-      this.doMoveHandle(point, snapToGrid);
+      this.moveHandle(point, snapToGrid);
+    });
+  },
+
+  adjustNewSegment(point, snapToGrid) {
+    const editor = get(this, 'editor');
+    const point0 = get(this, 'newLineStartingPoint');
+    let point1 = point;
+
+    if (snapToGrid) {
+      point1 = editor.snapPointToGrid(point);
+    }
+
+    // The line would still have zero length, don't do anything yet
+    
+    if (get(point0, 'x') === get(point1, 'x') && get(point0, 'y') === get(point1, 'y')) {
+      return;
+    }
+
+    editor.sendAction('addPoint', point0);
+    editor.sendAction('addPoint', point1);
+
+    run.next(() => {
+      editor.sendAction('selectPoint', get(editor, 'path.points.lastObject.id'));
+
+      set(this, 'handleBeingMoved', get(editor, 'path.points.1'));
+      set(this, 'newLineStartingPoint', null);
+
+      this.moveHandle(point, snapToGrid);
     });
   },
 
   moveSelectedHandlesOnGrid(dx, dy) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    const path = get(this, 'path');
+    const editor = get(this, 'editor');
+    const path = get(editor, 'path');
 
     if (path) {
-      const selectedEventIds = get(this, 'selectedEventIds');
+      const selectedEventIds = get(editor, 'selectedEventIds');
       const handles = get(path, 'points').filter(point => selectedEventIds.includes(get(point, 'id')));
-      const gridSize = get(this, 'gridSize');
+      const gridSize = get(editor, 'gridSize');
 
       handles.forEach(handle => handle.move({
         dx: gridSize * dx,
@@ -285,36 +278,31 @@ export default Ember.Mixin.create({
       }));
 
       if (handles.length) {
-        this.sendAction('pathDidChange');
+        editor.sendAction('pathDidChange');
       }
     }
   },
 
   deleteSelectedHandles() {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    const selectedEventIds = get(this, 'selectedEventIds');
-    const path = get(this, 'path');
+    const editor = get(this, 'editor');
+    const selectedEventIds = get(editor, 'selectedEventIds');
+    const path = get(editor, 'path');
 
     if (path) {
       const points = get(path, 'points').filter(point => selectedEventIds.includes(get(point, 'id')));
+
       path.removePoints(points);
-      this.sendAction('selectPoint', null);
-      this.sendAction('pathDidChange');
+      editor.sendAction('selectPoint', null);
+      editor.sendAction('pathDidChange');
     }
   },
 
   highlightHandle(point) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
+    const editor = get(this, 'editor');
     const handle = this.getPathHandlesAtPoint(point)[0];
     const handleId = handle ? get(handle, 'id') : null;
     
-    this.sendAction('highlightEvent', handleId);
+    editor.sendAction('highlightEvent', handleId);
   }
 });
 

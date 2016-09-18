@@ -4,8 +4,6 @@ import min from 'niarc-map-editor/utils/computed/min';
 import absoluteDifference from 'niarc-map-editor/utils/computed/absolute-difference';
 import * as geometry from 'niarc-map-editor/utils/geometry';
 
-console.log(geometry)
-
 const {
   get,
   set,
@@ -16,8 +14,6 @@ const {
 export default EmberObject.extend({
   startSelection(point) {
     const editor = get(this, 'editor');
-
-    set(this, 'mouseDidDrag', false);
 
     set(editor, 'selection', EmberObject.extend({
       x1: get(point, 'x'),
@@ -30,8 +26,6 @@ export default EmberObject.extend({
       h: absoluteDifference('y1', 'y2'),
       show: false
     }).create());
-
-    console.log('started selection');
   },
 
   adjustSelection(point) {
@@ -40,8 +34,6 @@ export default EmberObject.extend({
     set(editor, 'selection.x2', get(point, 'x'));
     set(editor, 'selection.y2', get(point, 'y'));
     set(editor, 'selection.show', true);
-
-    console.log('adjusted selection');
   },
 
   finishSelection() {
@@ -60,6 +52,13 @@ export default EmberObject.extend({
       return;
     }
 
+    // If the cursor didn't move
+    if (!get(selection, 'show')) {
+      editor.sendAction('deselectAll');
+      editor.sendAction('selectPoint', null);
+      return;
+    }
+
     lines
       .filter(line => geometry.lineIsInRect(selection, get(line, 'points')))
       .forEach(line => editor.sendAction('select', line));
@@ -67,7 +66,7 @@ export default EmberObject.extend({
     if (path && get(path, 'layer') === selectedLayerName) {
       const points = path.getPointsInRect(selection);
 
-      editor.sendAction('selectEvent', null);
+      editor.sendAction('selectPoint', null);
       editor.sendAction('addPointsToSelection', points.mapBy('id'));
 
       set(this, 'tool', 'path');

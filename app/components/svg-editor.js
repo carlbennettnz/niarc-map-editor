@@ -91,7 +91,14 @@ export default Ember.Component.extend(EKMixin, {
     };
   },
 
-  snapPointToGrid(point, gridSize = get(this, 'gridSize') / 4) {
+  snapPointToGrid(point, gridSize) {
+    if (!gridSize) {
+      const zoom = get(this, 'viewport.zoom');
+      const defaultGridSize = get(this, 'gridSize');
+
+      gridSize = zoom > 0.3 ? defaultGridSize / 10 : defaultGridSize;
+    }
+
     return {
       x: Math.round(point.x / gridSize) * gridSize,
       y: Math.round(point.y / gridSize) * gridSize

@@ -145,7 +145,11 @@ body.grabbing[data-tool=move] .map {
 }
 
 .map #grid-pattern line {
-  stroke: #565666;
+  stroke: rgba(255, 255, 255, 0.15);
+}
+
+.map #subgrid-pattern line {
+  stroke: rgba(255, 255, 255, 0.1);
 }
 
 .map line.axes {

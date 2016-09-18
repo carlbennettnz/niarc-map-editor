@@ -59,7 +59,6 @@ export default Ember.Service.extend({
     set(this, 'isConnecting', true);
     
     socket.onopen = function() {
-      console.log('connected');
       set(self, 'isConnected', true);
       set(self, 'isConnecting', false);
       set(self, 'socket', this);
@@ -92,10 +91,7 @@ export default Ember.Service.extend({
         // Message type is 1, message is robotData
         case 1:
           const robotData = RobotData.create().deserialize(message);
-          
           set(this, 'robotData', robotData);
-          
-          console.log(robotData.getProperties([ 'robotPose', 'lidarPoints' ]));
 
           break;
 

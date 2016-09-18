@@ -50,8 +50,6 @@ export default MapController.extend(EmberKeyboardMixin, {
     const selectedEvents = get(this, 'selectedEvents');
     const events = get(this, 'connection.events') || [];
 
-    console.log(events.length, selectedEvents.length)
-
     return selectedEvents.length === 1 && events.indexOf(selectedEvents[0]) > 0;
   }),
 

@@ -101,21 +101,7 @@
   </div>
 
   <div class="control">
-    <label>Sensor To Use</label>
-    {{#x-select value=event.sensorToUse as |xs|}}
-      {{#xs.option value=0}}Left{{/xs.option}}
-      {{#xs.option value=1}}Right{{/xs.option}}
-      {{#xs.option value=2}}Front{{/xs.option}}
-    {{/x-select}}
-  </div>
-  
-  <div class="control">
     <label>Go To Wall P Gain</label>
     {{input value=event.goToWallPGain type="number"}}
-  </div>
-
-  <div class="control">
-    <label>Stop at end</label>
-    {{input checked=event.stopAtEndOfLine type="checkbox"}}
   </div>
 </div>

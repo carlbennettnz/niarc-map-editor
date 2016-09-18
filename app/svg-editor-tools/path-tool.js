@@ -7,6 +7,7 @@ import PathPoint from 'niarc-map-editor/objects/path-point';
 const {
   get,
   set,
+  getProperties,
   assign,
   on,
   run,
@@ -15,11 +16,21 @@ const {
 
 export default EmberObject.extend({
   getPathHandlesAtPoint(point) {
+    const { x: x1, y: y1 } = getProperties(point, 'x', 'y');
     const editor = get(this, 'editor');
     const handles = get(editor, 'path.points') || [];
     const tolerance = get(editor, 'clickToSelectTolerance');
 
-    return handles.filter(handle => geometry.checkPointCollision(point, handle, tolerance));
+    return handles
+      .map(handle => {
+        const { x: x2, y: y2 } = getProperties(handle, 'x', 'y');
+        const distance = geometry.pythagoras({ x1, y1, x2, y2 });
+
+        return { handle, distance };
+      })
+      .filter(({ distance }) => distance <= tolerance)
+      .sortBy('distance')
+      .mapBy('handle');
   },
 
   startMoveHandle(point, handle) {

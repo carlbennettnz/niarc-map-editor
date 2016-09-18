@@ -24,7 +24,6 @@ export default SvgEditorComponent.extend({
   },
 
   mouseDown({ clientX, clientY, ctrlKey, metaKey, altKey, shiftKey, which }) {
-
     const pathTool = get(this, 'tools.path');
     const moveTool = get(this, 'tools.move');
     const selectionTool = get(this, 'tools.selection');

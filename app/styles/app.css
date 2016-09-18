@@ -201,6 +201,7 @@ body.grabbing[data-tool=move] .map {
   width: 260px;
   display: flex;
   flex-direction: column;
+  pointer-events: none;
 }
 
 .ui-modules.attributes {
@@ -211,6 +212,7 @@ body.grabbing[data-tool=move] .map {
 .ui-module {
   margin-bottom: 10px;
   flex: 0 0 auto;
+  pointer-events: auto;
 }
 
 .ui-module:last-of-type {

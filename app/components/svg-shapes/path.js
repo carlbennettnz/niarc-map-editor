@@ -28,7 +28,7 @@ export default Ember.Component.extend({
     return 'M' + parts.join(' L');
   }),
 
-  path: computed('line.points.@each.x', 'line.points.@each.y', 'viewport.zoom', function() {
+  path: computed('line.points.@each.x', 'line.points.@each.y', 'line.points.@each.radius', 'viewport.zoom', function() {
     const points = get(this, 'line.points') || [];
     const zoom = get(this, 'viewport.zoom');
     let str = '';

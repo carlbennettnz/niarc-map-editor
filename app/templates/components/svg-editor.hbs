@@ -19,10 +19,13 @@
   <line class="axes y" y1="0" x1={{viewport.scrollX}} y2="100%" x2={{viewport.scrollX}}></line>
 
   <g class="scroll-offset {{selectedLayerName}}-layer-selected" transform={{scrollTransform}}>
-    <circle cx={{robotData.robotPose.x}} cy={{robotData.robotPose.y}} r="10"/>
+    <circle class="robot-pose" cx={{scale robotData.robotPose.x viewport.zoom}} cy={{scale robotData.robotPose.y viewport.zoom}} r="10"/>
+
     {{log robotData.lidarPoints.x}}
-    {{#each robotData.lidarPoints as |points|}}
-      <circle cx={{points.x}} cy={{points.y}} r="2"/>
+    {{#each robotData.lidarPoints as |points index|}}
+      {{#if (mod index)}}
+        <circle class="lidar-pose" cx={{scale points.x viewport.zoom}} cy={{scale points.y viewport.zoom}} r="2"/>
+      {{/if}}
     {{/each}}
 
     {{#each layers as |layer|}}

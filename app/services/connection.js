@@ -27,8 +27,8 @@ export default Ember.Service.extend({
     },
 
     lidarPoints: [{
-      x: 50,
-      y: 50
+      x: 200,
+      y: 200
     }]
   }),
 

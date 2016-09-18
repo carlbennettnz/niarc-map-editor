@@ -36,17 +36,18 @@ export default Ember.Object.extend({
     const robotDataRotation = castData.splice(0, 2);
     const robotRotation = robotDataRotation[1] | robotDataRotation[0] << 16;
     
-    set(this, 'robotPose.x', robotX/1000);
-    set(this, 'robotPose.y', robotY/1000);
-    set(this, 'robotPose.rotation', robotRotation/1000);
+    set(this, 'robotPose.x', robotX / 1000);
+    set(this, 'robotPose.y', robotY / 1000);
+    set(this, 'robotPose.rotation', robotRotation / 1000);
+    set(this, 'lidarPoints', []);
 
-    while(castData.length > 0)  {
+    while (castData.length > 0)  {
       lidarPoints.pushObject({
         x: castData.shift(),
         y: castData.shift()
       });
     }
-    
+
     return this;
   }
 

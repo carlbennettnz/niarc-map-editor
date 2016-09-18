@@ -66,27 +66,41 @@ export default Ember.Service.extend({
     }
 
     socket.onmessage = ({ data }) => {
-      const castData = new Int16Array(data);
+      const typeData = new Uint16Array(data.slice(0, 2));
+      const type = typeData[0];
 
-      if (castData[0] === 0) { // Message is an event
-        const uint8array = new Uint8Array(data);
-        const str = String.fromCharCode(...uint8array);
-        const csv = str.trim().split('\n').map(line => line.split(','));
+      switch (type) {
+        // Message is an event
+        case 0:
+          const csvData = new Uint8Array(data.slice(2));
+          const csvStr = String.fromCharCode(...csvData);
+          const csvTable = csvStr.trim().split('\n').map(line => line.split(','));
+          const events = csvTable.map(row => Event.create().deserialize(row));
 
-        const events = csv.map(row => Event.create().deserialize(row));
+          const allowedTypes = [
+            'go-to-point',
+            'go-to-wall',
+            'drop-cube'
+          ];
 
-        const allowedTypes = [
-          'go-to-point',
-          'go-to-wall',
-          'drop-cube'
-        ];
+          // Only include events of allowedTypes
+          set(this, 'events', events.filter(({ type }) => allowedTypes.includes(type)));
 
-        // Only include events of allowedTypes
-        set(this, 'events', events.filter(({ type }) => allowedTypes.includes(type)));
-      } else { // Message type is 1, message is robotData
-        const robotData = RobotData.create().deserialize(castData);
-        set(this, 'robotData', robotData);
-        console.log(Ember.inspect(robotData));
+          break;
+        
+        // Message type is 1, message is robotData
+        case 1:
+          const data16 = Array.from(new Int16Array(data.slice(2)));
+          const robotData = RobotData.create().deserialize(data16);
+          
+          set(this, 'robotData', robotData);
+          
+          console.log(robotData.getProperties([ 'robotPose', 'lidarPoints' ]));
+
+          break;
+
+        default:
+          console.error('Unknown data type: ' + type);
       }
     };
     
@@ -97,16 +111,6 @@ export default Ember.Service.extend({
     };
 
     set(this, 'socket', socket);
-  },
-
-  readI32 : function (data, position) {
-      let out = position;
-      out = data[position];
-      out |= data[position + 1] << 8;
-      out |= data[position + 2] << 16;
-      out |= data[position + 3] << 24;
-      position += 4;
-      return out;
   },
 
   disconnect() {

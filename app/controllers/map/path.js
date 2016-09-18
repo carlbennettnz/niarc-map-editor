@@ -46,9 +46,11 @@ export default MapController.extend(EmberKeyboardMixin, {
 
   highlightedEvent: null,
 
-  hasPreviousEvent: computed('connection.events.[]', 'selectedEvent', function() {
+  hasPreviousEvent: computed('connection.events.[]', 'selectedEvents', function() {
     const selectedEvents = get(this, 'selectedEvents');
     const events = get(this, 'connection.events') || [];
+
+    console.log(events.length, selectedEvents.length)
 
     return selectedEvents.length === 1 && events.indexOf(selectedEvents[0]) > 0;
   }),
@@ -212,45 +214,41 @@ export default MapController.extend(EmberKeyboardMixin, {
       this.send('saveModel');
     },
 
-    selectEvent(eventId, { metaKey, ctrlKey } = {}) {
+    selectEvent(eventId) {
       const events = get(this, 'connection.events');
       const event = events.findBy('id', eventId);
 
-      if (metaKey || ctrlKey) {
-        const selectedEvents = get(this, 'selectedEvents');
+      set(this, 'selectedEvents', event ? [ event ] : []);
+    },
 
-        if (!selectedEvents.includes(event)) {
-          selectedEvents.pushObject(event);
-        }
+    toggleEventSelection(eventId) {
+      const event = get(this, 'connection.events').findBy('id', eventId);
+      const selectedEvents = get(this, 'selectedEvents');
+
+      if (selectedEvents.contains(event)) {
+        selectedEvents.removeObject(event);
       } else {
-        set(this, 'selectedEvents', event ? [ event ] : []);
+        selectedEvents.pushObject(event);
       }
     },
 
-    selectPreviousEvent() {
-      const selectedEvent = get(this, 'selectedEvent');
+    jumpEventSelection(step) {
+      const selectedEvents = get(this, 'selectedEvents');
 
-      if (!selectedEvent) {
+      console.log(step);
+
+      if (selectedEvents.length !== 1) {
         return;
       }
 
       const events = get(this, 'connection.events');
-      const index = events.indexOf(selectedEvent);
+      const index = events.indexOf(selectedEvents[0]);
 
-      set(this, 'selectedEvent', events.objectAt(index - 1) || get(events, 'firstObject') || null);
-    },
+      console.log(index, events.objectAt(index + step));
 
-    selectNextEvent() {
-      const selectedEvent = get(this, 'selectedEvent');
+      const newSelection = events.objectAt(index + step) || get(events, step < 0 ? 'firstObject' : 'lastObject');
 
-      if (!selectedEvent) {
-        return;
-      }
-
-      const events = get(this, 'connection.events');
-      const index = events.indexOf(selectedEvent);
-
-      set(this, 'selectedEvent', events.objectAt(index + 1) || get(events, 'lastObject') || null);
+      set(this, 'selectedEvents', newSelection ? [ newSelection ] : []);
     },
 
     addEventsToSelection(eventIds) {

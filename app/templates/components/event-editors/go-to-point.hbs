@@ -1,7 +1,7 @@
 <header>
-  <a {{action selectPreviousEvent}} class={{unless hasPreviousEvent 'disabled'}}>{{fa-icon 'caret-left'}}</a>
+  <a {{action jumpEventSelection -1}} class={{unless hasPreviousEvent 'disabled'}}>{{fa-icon 'caret-left'}}</a>
   <h2>Go To Point Event</h2>
-  <a {{action selectNextEvent}} class={{unless hasNextEvent 'disabled'}}>{{fa-icon 'caret-right'}}</a>
+  <a {{action jumpEventSelection 1}} class={{unless hasNextEvent 'disabled'}}>{{fa-icon 'caret-right'}}</a>
 </header>
 
 <div class="controls">

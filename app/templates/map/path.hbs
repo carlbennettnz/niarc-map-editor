@@ -9,6 +9,7 @@
   pathDidChange=(action 'updateEvents')
   addPoint=(action 'addPoint')
   selectPoint=(action 'selectEvent')
+  togglePointSelection=(action 'toggleEventSelection')
   addPointsToSelection=(action 'addEventsToSelection')
   highlightEvent=(action 'highlightEvent')
 }}
@@ -80,8 +81,7 @@
       event=compiledEvent
       hasNextEvent=hasNextEvent
       hasPreviousEvent=hasPreviousEvent
-      selectPreviousEvent=(action 'selectPreviousEvent')
-      selectNextEvent=(action 'selectNextEvent')
+      jumpEventSelection=(action 'jumpEventSelection')
     }}
   </aside>
 {{/if}}

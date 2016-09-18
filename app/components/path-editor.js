@@ -53,6 +53,12 @@ export default SvgEditorComponent.extend({
       return;
     }
 
+    // Toggling handle selection
+    if (handles.length && shiftKey) {
+      this.sendAction('togglePointSelection', get(handles[0], 'id'));
+      return;
+    }
+
     // Dragging on a handle
     if (handles.length) {
       pathTool.startMoveHandle(point, handles.findBy('shape.isSelected') || handles[0]);
@@ -61,7 +67,7 @@ export default SvgEditorComponent.extend({
     }
 
     // Selection
-    if (true) {
+    if (!shiftKey) {
       selectionTool.startSelection(point);
       set(this, 'action', 'select');
       return;

@@ -159,6 +159,24 @@ export default EmberObject.extend({
     }
   },
 
+  selectAllPoints() {
+    const editor = get(this, 'editor');
+    const points = get(editor, 'path.points');
+
+    // Deselect all
+    editor.sendAction('selectPoint', null);
+
+    points.forEach(point => {
+      editor.sendAction('togglePointSelection', get(point, 'id'));
+    });
+  },
+
+  deselectAllPoints() {
+    const editor = get(this, 'editor');
+
+    editor.sendAction('selectPoint', null);
+  },
+
   highlightHandle(point) {
     const editor = get(this, 'editor');
     const handle = this.getPathHandlesAtPoint(point)[0];

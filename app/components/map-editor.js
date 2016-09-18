@@ -154,5 +154,12 @@ export default SvgEditorComponent.extend({
     event.preventDefault();
   }),
 
+  escape: on(keyDown('Escape'), function(event) {
+    const lineTool = get(this, 'tools.line');
+
+    lineTool.deselectAllLines();
+    event.preventDefault();
+  }),
+
   shapes: computed.alias('lines')
 });

@@ -144,6 +144,20 @@ export default SvgEditorComponent.extend({
     event.preventDefault();
   }),
 
+  ctrlA: on(keyDown('meta+KeyA'), keyDown('ctrl+KeyA'), function(event) {
+    const pathTool = get(this, 'tools.path');
+
+    pathTool.selectAllPoints();
+    event.preventDefault();
+  }),
+
+  escape: on(keyDown('Escape'), function(event) {
+    const pathTool = get(this, 'tools.path');
+
+    pathTool.deselectAllPoints();
+    event.preventDefault();
+  }),
+
   shapes: computed('map.[]', 'path', function() {
     const map = get(this, 'map');
     const path = get(this, 'path');

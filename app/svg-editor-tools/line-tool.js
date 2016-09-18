@@ -257,5 +257,11 @@ export default EmberObject.extend({
     if (selected) {
       editor.sendAction('remove', selected);
     }
+  },
+
+  deselectAllLines(){
+    const editor = get(this, 'editor');
+
+    editor.sendAction('deselectAll');
   }
 });

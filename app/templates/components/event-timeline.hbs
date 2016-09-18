@@ -14,6 +14,12 @@
 </div>
 
 <div class="controls">
-  <button {{action addEvent 'drop-cube'}} title="Add event after the selected event">Add ‘Drop Cube’ Event</button>
-  <button {{action deleteEvent}} title="Delete the selected event">Delete Event</button>
+  <div>
+    <button {{action addEvent 'go-to-point'}} title="Add 'go to point' event after the selected event">{{fa-icon 'map-marker'}}</button>
+    <button {{action addEvent 'go-to-wall'}} title="Add 'go to wall' event after the selected event">{{fa-icon 'step-forward'}}</button>
+    <button {{action addEvent 'drop-cube'}} title="Add 'drop cube' event after the selected event">{{fa-icon 'cube'}}</button>
+  </div>
+  <div class="right">
+    <button {{action deleteEvent}} title="Delete the selected event">{{fa-icon 'trash'}}</button>
+  </div>
 </div>

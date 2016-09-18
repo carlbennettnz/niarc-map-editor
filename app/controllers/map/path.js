@@ -3,6 +3,7 @@ import MapController from 'niarc-map-editor/controllers/map';
 import Event, { parameters as eventParams } from 'niarc-map-editor/objects/event';
 import Path from 'niarc-map-editor/objects/path';
 import PathPoint from 'niarc-map-editor/objects/path-point';
+import { EKMixin as EmberKeyboardMixin } from 'ember-keyboard';
 
 const {
   get,
@@ -15,7 +16,7 @@ const {
   inject: { service }
 } = Ember;
 
-export default MapController.extend({
+export default MapController.extend(EmberKeyboardMixin, {
   connection: service(),
 
   tool: 'path',
@@ -144,20 +145,39 @@ export default MapController.extend({
       this.send('saveModel');
     },
 
-    addEvent(type = 'drop-cube') {
+    addEvent(type) {
       const newEvent = Event.create({ type });
       const events = get(this, 'connection.events');
       const selectedEvent = get(this, 'selectedEvents.lastObject');
       let index = events.length;
+      let prevPoint;
+      let nextPoint;
 
       if (selectedEvent) {
         index = events.indexOf(selectedEvent) + 1;
       }
 
+      pointEvents
+      set(newEvent, 'x', 0);
+      set(newEvent, 'y', 0);
+
       events.splice(index, 0, newEvent);
       events.arrayContentDidChange();
 
-      set(this, 'selectedEvent', newEvent)
+      const pointEvents = events.filterBy('type', 'go-to-point');
+      const newEventIndex = pointEvents.indexOf(newEvent);
+      const prevEvent = newEventIndex > 0 ? pointEvents.objectAt(newEventIndex - 1) : null;
+      const nextEvent = newEventIndex < pointEvents.length - 1 ? pointEvents.objectAt(newEventIndex + 1) : null;
+
+      if (prevEvent && nextEvent) {
+        set(newEvent, 'x', (get(prevEvent, 'x') + get(nextEvent, 'x')) / 2);
+        set(newEvent, 'y', (get(prevEvent, 'y') + get(nextEvent, 'y')) / 2);
+      } else {
+        set(newEvent, 'x', 0);
+        set(newEvent, 'y', 0);
+      }
+
+      set(this, 'selectedEvents', [ newEvent ]);
 
       this.send('saveModel');
     },

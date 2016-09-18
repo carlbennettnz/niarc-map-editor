@@ -66,10 +66,12 @@ export default EmberObject.extend({
     if (path && get(path, 'layer') === selectedLayerName) {
       const points = path.getPointsInRect(selection);
 
+      // Clear selection
       editor.sendAction('selectPoint', null);
-      editor.sendAction('addPointsToSelection', points.mapBy('id'));
 
-      set(this, 'tool', 'path');
+      points.mapBy('id').forEach(pointId => {
+        editor.sendAction('togglePointSelection', pointId);
+      });
     }
   },
 });

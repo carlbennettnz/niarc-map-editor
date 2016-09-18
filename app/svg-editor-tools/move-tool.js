@@ -1,5 +1,4 @@
 import Ember from 'ember';
-import { keyDown, keyUp, getCode } from 'ember-keyboard';
 
 const {
   get,
@@ -37,8 +36,3 @@ export default EmberObject.extend({
     set(this, 'viewport.scrollY', get(this, 'viewport.scrollY') + get(this, 'arrowKeyScrollJump') * dy);
   }
 });
-
-function guard() {
-  this._super(...arguments);
-  return get(this, 'tool') !== 'move' || get(this, 'isDestroying');
-}

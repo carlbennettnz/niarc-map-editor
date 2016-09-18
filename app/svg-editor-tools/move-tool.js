@@ -12,55 +12,6 @@ const {
 export default EmberObject.extend({
   arrowKeyScrollJump: 40,
 
-  moveMouseMove: on('mouseMove', function() {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    if (!event.buttons) {
-      set(this, 'toolState.mouseAction', null);
-      return;
-    }
-
-    this.doMove({ x: event.clientX, y: event.clientY });
-  }),
-
-  moveMouseUp: on('mouseUp', function() {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    this.endMove()
-  }),
-
-  moveArrowKeys: on(keyDown('ArrowLeft'), keyDown('ArrowRight'), keyDown('ArrowUp'), keyDown('ArrowDown'), function(event) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    // If the user is focused on an input, don't hijack their key events
-    if (event.target.tagName.toLowerCase() === 'input') {
-      return;
-    }
-
-    const code = getCode(event);
-    const map = {
-      'ArrowLeft':  [ 1, 0 ],
-      'ArrowUp':    [ 0, -1 ],
-      'ArrowRight': [ -1, 0 ],
-      'ArrowDown':  [ 0, 1 ]
-    };
-
-    if (map[code]) {
-      this.moveViewport(...map[code]);
-      event.preventDefault();
-    }
-  }),
-
-  selectMoveTool: on(keyUp('KeyM'), function() {
-    set(this, 'tool', 'move');
-  }),
-
   startMove(point) {
     set(this, 'lastMousePos', point);
     $('body').addClass('grabbing');

@@ -40,7 +40,7 @@ export default SvgEditorComponent.extend({
     }
 
     // Pan
-    if ((which === 1 && (crtlKey || metaKey)) || which === 2) {
+    if ((which === 1 && (crtlKey || metaKey) && !handles.length) || which === 2) {
       moveTool.startMove({ x: clientX, y: clientY });
       set(this, 'action', 'pan');
       return;
@@ -54,7 +54,7 @@ export default SvgEditorComponent.extend({
     }
 
     // Toggling handle selection
-    if (handles.length && shiftKey) {
+    if (handles.length && (crtlKey || metaKey)) {
       this.sendAction('togglePointSelection', get(handles[0], 'id'));
       return;
     }

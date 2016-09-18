@@ -235,36 +235,15 @@ export default MapController.extend(EmberKeyboardMixin, {
     jumpEventSelection(step) {
       const selectedEvents = get(this, 'selectedEvents');
 
-      console.log(step);
-
       if (selectedEvents.length !== 1) {
         return;
       }
 
       const events = get(this, 'connection.events');
       const index = events.indexOf(selectedEvents[0]);
-
-      console.log(index, events.objectAt(index + step));
-
       const newSelection = events.objectAt(index + step) || get(events, step < 0 ? 'firstObject' : 'lastObject');
 
       set(this, 'selectedEvents', newSelection ? [ newSelection ] : []);
-    },
-
-    addEventsToSelection(eventIds) {
-      const events = get(this, 'connection.events');
-      const selectedEvents = get(this, 'selectedEvents');
-      const newEvents = [ ...selectedEvents ];
-
-      eventIds.forEach(id => {
-        const event = events.findBy('id', id);
-
-        if (!selectedEvents.includes(event)) {
-          newEvents.pushObject(event);
-        }
-      });
-
-      set(this, 'selectedEvents', newEvents);
     },
 
     highlightEvent(eventId) {

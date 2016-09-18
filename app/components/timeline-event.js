@@ -24,7 +24,7 @@ export default Ember.Component.extend({
     const selectedEvents = get(this, 'selectedEvents');
 
     if (metaKey || ctrlKey) {
-      this.sendAction('addEventsToSelection', [ get(this, 'event.id') ]);
+      this.sendAction('toggleEventSelection', get(this, 'event.id'));
     } else {
       this.sendAction('selectEvent', get(this, 'event.id'));
     }

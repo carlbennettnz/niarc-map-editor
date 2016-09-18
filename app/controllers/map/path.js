@@ -160,8 +160,8 @@ export default MapController.extend(EmberKeyboardMixin, {
       const nextEvent = newEventIndex < pointEvents.length - 1 ? pointEvents.objectAt(newEventIndex + 1) : null;
 
       if (prevEvent && nextEvent) {
-        set(newEvent, 'x', (get(prevEvent, 'x') + get(nextEvent, 'x')) / 2);
-        set(newEvent, 'y', (get(prevEvent, 'y') + get(nextEvent, 'y')) / 2);
+        set(newEvent, 'x', Math.round((get(prevEvent, 'x') + get(nextEvent, 'x')) / 2));
+        set(newEvent, 'y', Math.round((get(prevEvent, 'y') + get(nextEvent, 'y')) / 2));
       } else {
         set(newEvent, 'x', 0);
         set(newEvent, 'y', 0);

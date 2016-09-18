@@ -86,6 +86,7 @@ export default Ember.Service.extend({
       } else { // Message type is 1, message is robotData
         const robotData = RobotData.create().deserialize(castData);
         set(this, 'robotData', robotData);
+        console.log(Ember.inspect(robotData));
       }
     };
     

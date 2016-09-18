@@ -125,7 +125,7 @@ export default Ember.Object.extend({
     set(this, 'servoIndex',            data[22]);
     set(this, 'sensorToUse',           data[23]);
     set(this, 'goToWallPGain',         data[24]);
-    set(this, 'enableLocalisation',    data[25] === 1);
+    set(this, 'disableLocalisation',   data[25] === 1);
     set(this, 'timeToWait',            data[26]);
 
     return this;

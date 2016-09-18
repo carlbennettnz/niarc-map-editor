@@ -10,16 +10,6 @@ export default Ember.Component.extend({
   classNameBindings: [ 'isSelected:selected', 'isHighlighted:highlighted' ],
   attributeBindings: [ 'event.type:data-event-type' ],
 
-  unknownEventType: computed('event.type', function() {
-    const knownEventTypes = [
-      'go-to-point',
-      'drop-cube',
-      'go-to-wall'
-    ];
-
-    return !knownEventTypes.includes(get(this, 'event.type'));
-  }),
-
   click({ metaKey, ctrlKey }) {
     const selectedEvents = get(this, 'selectedEvents');
 

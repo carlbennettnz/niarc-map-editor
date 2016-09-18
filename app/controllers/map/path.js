@@ -74,16 +74,6 @@ export default MapController.extend(EmberKeyboardMixin, {
     return Path.create({ layer: 'path' }).fromEvents(goToPointEvents);
   }),
 
-  eventsForTimeline: computed('connection.events.[]', function() {
-    const allowedTypes = [
-      'go-to-point',
-      'drop-cube',
-      'go-to-wall'
-    ];
-
-    return get(this, 'connection.events').filter(({ type }) => allowedTypes.includes(type));
-  }),
-
   compiledEvent: computed(...eventParams.map(param => `selectedEvents.@each.${param}`), function() {
     const selectedEvents = get(this, 'selectedEvents');
 
@@ -198,12 +188,6 @@ export default MapController.extend(EmberKeyboardMixin, {
       }
 
       events.removeObjects(selectedEvents);
-
-      const remainingPointEvents = events.filterBy('type', 'go-to-point');
-
-      if (remainingPointEvents.length === 1) {
-        events.removeObjects(remainingPointEvents);
-      }
 
       if (indexToSelect == null || events.length === 0) {
         set(this, 'selectedEvents', []);

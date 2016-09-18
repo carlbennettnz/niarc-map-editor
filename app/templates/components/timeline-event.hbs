@@ -15,6 +15,12 @@
   <span>Go To Wall</span>
 {{/if}}
 
-{{#if unknownEventType}}
-  <span>Unknown Event Type</span>
+{{#if (eq event.type 'toggle-localisation')}}
+  <span>Toggle Localisation: {{if event.enableLocalisation 'Enable' 'Disable'}}</span>
+{{/if}}
+
+{{#if (eq event.type 'wait')}}
+  <span>
+    Wait: {{event.timeToWait}}ms
+  </span>
 {{/if}}

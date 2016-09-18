@@ -79,7 +79,9 @@ export default Ember.Service.extend({
           const allowedTypes = [
             'go-to-point',
             'go-to-wall',
-            'drop-cube'
+            'drop-cube',
+            'toggle-localisation',
+            'wait'
           ];
 
           // Only include events of allowedTypes

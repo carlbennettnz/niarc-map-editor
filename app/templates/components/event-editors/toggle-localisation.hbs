@@ -1,0 +1,12 @@
+<header>
+  <a {{action jumpEventSelection -1}} class={{unless hasPreviousEvent 'disabled'}}>{{fa-icon 'caret-left'}}</a>
+  <h2>Localisation Event</h2>
+  <a {{action jumpEventSelection 1}} class={{unless hasNextEvent 'disabled'}}>{{fa-icon 'caret-right'}}</a>
+</header>
+
+<div class="controls">
+  <div class="control">
+    <label>Disable Localisation</label>
+    {{input type='checkbox' checked=event.disableLocalisation}}
+  </div>
+</div>

@@ -8,15 +8,23 @@ const {
 
 let nextId = 0;
 
+export const eventTypes = [];
+
+eventTypes[0] = 'go-to-point';
+eventTypes[1] = 'go-to-point';
+eventTypes[2] = 'drop-cube';
+eventTypes[3] = 'face-angle';
+eventTypes[4] = 'go-to-wall';
+eventTypes[5] = 'go-to-point-relative';
+eventTypes[6] = 'toggle-localisation';
+eventTypes[7] = 'wait';
+
 export default Ember.Object.extend({
   init() {
     this._super(...arguments);
     set(this, 'id', nextId);
     nextId++;
   },
-
-  // ATTENTION: Don't add params without also adding them to the exported
-  // parameters array at the end of this file.
 
   id: null,
   type: 'go-to-point',
@@ -45,17 +53,14 @@ export default Ember.Object.extend({
   servoIndex: 0,
   sensorToUse: 0,
   goToWallPGain: 0,
+  enableLocalisation: true,
+  timeToWait: 0,
+
+  // ATTENTION: Don't add params without also adding them to the exported
+  // parameters array at the end of this file.
 
   serialize() {
-    const types = {
-      'go-to-point': 1,
-      'drop-cube': 2,
-      'face-angle': 3,
-      'go-to-wall': 4,
-      'go-to-point-relative': 5
-    };
-
-    const getType = (index, radius) => types[index] === 1 ? Number(radius > 0) : types[index];
+    const getType = (type, radius) => eventTypes.indexOf(type) === 0 ? Number(radius > 0) : eventTypes.indexOf(type);
 
     const serialized = [
       getType(get(this, 'type'), get(this, 'radius')),
@@ -82,7 +87,9 @@ export default Ember.Object.extend({
       Number(get(this, 'curveErrorCorrectionP')) || 0,
       Number(get(this, 'servoIndex')) || 0,
       Number(get(this, 'sensorToUse')) || 0,
-      Number(get(this, 'goToWallPGain')) || 0
+      Number(get(this, 'goToWallPGain')) || 0,
+      get(this, 'disableLocalisation') === true ? 1 : 0,
+      Number(get(this, 'timeToWait')) || 0
     ].join();
 
     return serialized;
@@ -93,16 +100,7 @@ export default Ember.Object.extend({
 
     data = data.map(Number);
 
-    const types = [
-      'go-to-point',
-      'go-to-point',
-      'drop-cube',
-      'face-angle',
-      'go-to-wall',
-      'go-to-point-relative'
-    ];
-
-    set(this, 'type',                  types[data[0]]);
+    set(this, 'type',                  eventTypes[data[0]]);
     set(this, 'x',                     data[1]);
     set(this, 'y',                     data[2]);
     set(this, 'relativePointX',        data[3]);
@@ -127,6 +125,8 @@ export default Ember.Object.extend({
     set(this, 'servoIndex',            data[22]);
     set(this, 'sensorToUse',           data[23]);
     set(this, 'goToWallPGain',         data[24]);
+    set(this, 'enableLocalisation',    data[25] === 1);
+    set(this, 'timeToWait',            data[26]);
 
     return this;
   }
@@ -156,5 +156,7 @@ export const parameters = [
   'curveErrorCorrectionP',
   'servoIndex',
   'sensorToUse',
-  'goToWallPGain'
+  'goToWallPGain',
+  'disableLocalisation',
+  'timeToWait'
 ];

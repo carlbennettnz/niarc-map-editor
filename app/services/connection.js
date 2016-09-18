@@ -1,5 +1,7 @@
 import Ember from 'ember';
 import Event from 'niarc-map-editor/objects/event';
+import RobotData from 'niarc-map-editor/objects/robot-data';
+
 
 const {
   get,
@@ -17,6 +19,7 @@ export default Ember.Service.extend({
   address: '192.168.1.5:4000',
   lastSendTime: null,
   events: [],
+  messageListeners: [],
 
   loadStoredAddress: on('init', function() {
     this._super(...arguments);
@@ -37,6 +40,11 @@ export default Ember.Service.extend({
     };
   }),
 
+  onMessage(func) {
+    const messageListeners = get(this, 'messageListeners');
+    messageListeners.pushObject(func);
+  },
+
   storeAddress: observer('address', function() {
     localStorage.address = get(this, 'address');
   }),
@@ -44,6 +52,9 @@ export default Ember.Service.extend({
   connect() {
     const socket = new WebSocket('ws://' + get(this, 'address'));
     const self = this;
+
+    // Binary socket
+    socket.binaryType = 'arraybuffer';
 
     set(this, 'isConnecting', true);
     
@@ -53,16 +64,44 @@ export default Ember.Service.extend({
       set(self, 'isConnecting', false);
       set(self, 'socket', this);
     }
-    
-    socket.onmessage = ({ data }) => {
-      const events = data.trim().split('\n').map(event => Event.create().deserialize(event.split(',')));
-      const allowedTypes = [
-        'go-to-point',
-        'go-to-wall',
-        'drop-cube'
-      ];
 
-      set(this, 'events', events.filter(({ type }) => allowedTypes.includes(type)));
+    socket.onmessage = ({ data }) => {
+      const typeData = new Uint16Array(data.slice(0, 2));
+      const type = typeData[0];
+
+      switch (type) {
+        // Message is an event
+        case 0:
+          const csvData = new Uint8Array(data.slice(2));
+          const csvStr = String.fromCharCode(...csvData);
+          const csvTable = csvStr.trim().split('\n').map(line => line.split(','));
+          const events = csvTable.map(row => Event.create().deserialize(row));
+
+          const allowedTypes = [
+            'go-to-point',
+            'go-to-wall',
+            'drop-cube'
+          ];
+
+          // Only include events of allowedTypes
+          set(this, 'events', events.filter(({ type }) => allowedTypes.includes(type)));
+
+          break;
+        
+        // Message type is 1, message is robotData
+        case 1:
+          const data16 = Array.from(new Int16Array(data.slice(2)));
+          const robotData = RobotData.create().deserialize(data16);
+          
+          set(this, 'robotData', robotData);
+          
+          console.log(robotData.getProperties([ 'robotPose', 'lidarPoints' ]));
+
+          break;
+
+        default:
+          console.error('Unknown data type: ' + type);
+      }
     };
     
     socket.onclose = () => {

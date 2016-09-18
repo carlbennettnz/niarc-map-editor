@@ -17,7 +17,8 @@ const {
 export default Ember.Component.extend(EKMixin, {
   // Model
   shapes: [],
-
+  robotData: null,
+  
   // Config
   tools: [],
   keyboardActivated: true,

@@ -19,7 +19,18 @@ export default Ember.Service.extend({
   address: '192.168.1.5:4000',
   lastSendTime: null,
   events: [],
-  messageListeners: [],
+  robotData: RobotData.create({
+    robotPose: {
+      x: 100,
+      y: 100,
+      rotation: 0
+    },
+
+    lidarPoints: [{
+      x: 50,
+      y: 50
+    }]
+  }),
 
   loadStoredAddress: on('init', function() {
     this._super(...arguments);

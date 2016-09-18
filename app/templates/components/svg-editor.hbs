@@ -35,12 +35,12 @@
       {{/if}}
     {{/each}}
 
-    {{#if (and (eq tool 'selection') toolState.selection.show)}}
+    {{#if selection.show}}
       <rect class="selection-marquee"
-        x={{scale toolState.selection.x viewport.zoom}}
-        y={{scale toolState.selection.y viewport.zoom}}
-        width={{scale toolState.selection.w viewport.zoom}}
-        height={{scale toolState.selection.h viewport.zoom}}></rect>
+        x={{scale selection.x viewport.zoom}}
+        y={{scale selection.y viewport.zoom}}
+        width={{scale selection.w viewport.zoom}}
+        height={{scale selection.h viewport.zoom}}></rect>
     {{/if}}
   </g>
 </svg>

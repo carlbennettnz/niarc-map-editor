@@ -15,14 +15,11 @@ const {
 } = Ember;
 
 export default Ember.Component.extend(EKMixin, {
-  // State
-  tool: null,
-  toolState: {},
-
   // Model
   shapes: [],
 
   // Config
+  tools: [],
   keyboardActivated: true,
   gridSize: 200,
   clickToSelectTolerance: 100, // how many pixels away can you click and still select the shape?
@@ -92,39 +89,6 @@ export default Ember.Component.extend(EKMixin, {
       x: Math.round((x - scrollX) / zoom),
       y: Math.round((viewportHeight - y - scrollY) / zoom)
     };
-  },
-
-  getLineAtPoint(point, options = {}) {
-    // Reverse because we want to select shape on top first and the last shapes render on top
-    const shapes = (get(this, 'shapes') || []).reverse();
-    const tolerance = get(this, 'clickToSelectTolerance');
-
-    for (let i = 0; i < shapes.length; i++) {
-      const shape = shapes.objectAt(i);
-      const selectedOnly = get(options, 'selectedOnly');
-      const layerName = get(options, 'layerName');
-
-      if (selectedOnly && !get(shape, 'isSelected')) {
-        continue;
-      }
-
-      if (layerName && layerName !== get(shape, 'layer')) {
-        continue;
-      }
-
-      // Yes, shape.points.x1 would work, but doing it this way ensures Ember observers are triggered
-      // and computed properties are refreshed, if we one day wanted to add some.
-      const shapePoints = {
-        x1: get(shape, 'points.x1'),
-        y1: get(shape, 'points.y1'),
-        x2: get(shape, 'points.x2'),
-        y2: get(shape, 'points.y2')
-      };
-
-      if (geometry.checkLineCollision(point, shapePoints, tolerance)) {
-        return shape;
-      }
-    }
   },
 
   snapPointToGrid(point, gridSize = get(this, 'gridSize') / 4) {

@@ -39,7 +39,6 @@ export default MapController.extend({
 
     deselectAll(shape) {
       const shapes = get(this, 'shapes') || [];
-      console.log(shapes)
       shapes.forEach(shape => set(shape, 'isSelected', false));
     },
 

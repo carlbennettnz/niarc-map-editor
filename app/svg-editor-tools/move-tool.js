@@ -5,19 +5,12 @@ const {
   get,
   set,
   on,
-  $
+  $,
+  Object: EmberObject
 } = Ember;
 
-export default Ember.Mixin.create({
+export default EmberObject.extend({
   arrowKeyScrollJump: 40,
-
-  moveMouseDown: on('mouseDown', function(event) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    this.startMove({ x: event.clientX, y: event.clientY });
-  }),
 
   moveMouseMove: on('mouseMove', function() {
     if (guard.apply(this, arguments)) {
@@ -69,33 +62,22 @@ export default Ember.Mixin.create({
   }),
 
   startMove(point) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    set(this, 'toolState.lastMousePos', point);
+    set(this, 'lastMousePos', point);
     $('body').addClass('grabbing');
   },
 
-  doMove(point) {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
+  move(point) {
+    const editor = get(this, 'editor');
+    const last = get(this, 'lastMousePos');
 
-    const last = get(this, 'toolState.lastMousePos');
+    set(editor, 'viewport.scrollX', get(editor, 'viewport.scrollX') + (get(point, 'x') - get(last, 'x')));
+    set(editor, 'viewport.scrollY', get(editor, 'viewport.scrollY') + (get(last, 'y') - get(point, 'y')));
 
-    set(this, 'viewport.scrollX', get(this, 'viewport.scrollX') + (get(point, 'x') - get(last, 'x')));
-    set(this, 'viewport.scrollY', get(this, 'viewport.scrollY') + (get(last, 'y') - get(point, 'y')));
-
-    set(this, 'toolState.lastMousePos', point);
+    set(this, 'lastMousePos', point);
   },
 
   endMove() {
-    if (guard.apply(this, arguments)) {
-      return;
-    }
-
-    set(this, 'toolState.lastMousePos', null);
+    set(this, 'lastMousePos', null);
     $('body').removeClass('grabbing');
   },
 

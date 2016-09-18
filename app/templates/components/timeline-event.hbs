@@ -12,7 +12,7 @@
 {{/if}}
 
 {{#if (eq event.type 'go-to-wall')}}
-  <span>Go To Wall</span>
+  <span>Go To Wall: {{if (eq event.sensorToUse 1) 'Right' (if (eq event.sensorToUse 2) 'Front' 'Left')}}</span>
 {{/if}}
 
 {{#if (eq event.type 'toggle-localisation')}}

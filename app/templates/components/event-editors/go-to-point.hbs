@@ -102,7 +102,11 @@
 
   <div class="control">
     <label>Sensor To Use</label>
-    {{input value=event.sensorToUse type="number"}}
+    {{#x-select value=event.sensorToUse as |xs|}}
+      {{#xs.option value=0}}Left{{/xs.option}}
+      {{#xs.option value=1}}Right{{/xs.option}}
+      {{#xs.option value=2}}Front{{/xs.option}}
+    {{/x-select}}
   </div>
   
   <div class="control">

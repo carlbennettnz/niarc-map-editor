@@ -66,14 +66,13 @@ export default Ember.Service.extend({
     }
 
     socket.onmessage = ({ data }) => {
-      const typeData = new Uint16Array(data.slice(0, 2));
-      const type = typeData[0];
+      const message = Array.from(new Uint8Array(data));
+      const type = message.shift();
 
       switch (type) {
         // Message is an event
         case 0:
-          const csvData = new Uint8Array(data.slice(2));
-          const csvStr = String.fromCharCode(...csvData);
+          const csvStr = String.fromCharCode(...message);
           const csvTable = csvStr.trim().split('\n').map(line => line.split(','));
           const events = csvTable.map(row => Event.create().deserialize(row));
 
@@ -90,8 +89,7 @@ export default Ember.Service.extend({
         
         // Message type is 1, message is robotData
         case 1:
-          const data16 = Array.from(new Int16Array(data.slice(2)));
-          const robotData = RobotData.create().deserialize(data16);
+          const robotData = RobotData.create().deserialize(message);
           
           set(this, 'robotData', robotData);
           

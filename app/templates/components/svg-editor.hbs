@@ -1,4 +1,4 @@
-<svg class="map" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
+<svg class="svg-editor" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <pattern
       id="grid-pattern"
@@ -39,6 +39,20 @@
         {{#each shapes as |shape|}}
           {{#if (and (eq shape.layer layer.name) (not shape.isHidden))}}
             {{component (concat 'svg-shapes/' shape.type)
+              line=shape
+              viewport=viewport
+              tagName=''
+            }}
+          {{/if}}
+        {{/each}}
+      {{/if}}
+    {{/each}}
+
+    {{#each layers as |layer|}}
+      {{#if layer.isSelected}}
+        {{#each shapes as |shape|}}
+          {{#if (and (eq shape.layer layer.name) (not shape.isHidden))}}
+            {{component (concat 'svg-shapes/' shape.type '-ui')
               line=shape
               viewport=viewport
               selectedEventIds=selectedEventIds

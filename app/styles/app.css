@@ -107,7 +107,7 @@ select {
 /* MAP                            */
 /**********************************/
 
-.map {
+.svg-editor {
   background-color: #445;
   position: absolute;
   top: 0;
@@ -116,74 +116,87 @@ select {
   height: 100%;
 }
 
-body[data-tool=selection] .map {
+body[data-tool=selection] .svg-editor {
   cursor: crosshair;
 }
 
-body[data-tool=move] .map {
+body[data-tool=move] .svg-editor {
   cursor: grab;
   cursor: -webkit-grab;
 }
 
-body.grabbing[data-tool=move] .map {
+body.grabbing[data-tool=move] .svg-editor {
   cursor: grabbing;
   cursor: -webkit-grabbing;
 }
 
-.map g.wall line {
-  stroke-width: 2px;
-  stroke-linecap: round;
-  stroke: rgb(166, 166, 174);
-}
+/* Grid and axes */
 
-.map .map-layer-selected g.wall line {
-  stroke: white;
-}
-
-.map g.wall .handle {
-  fill: white;
-}
-
-.map #grid-pattern line {
+.svg-editor #grid-pattern line {
   stroke: rgba(255, 255, 255, 0.15);
 }
 
-.map #subgrid-pattern line {
+.svg-editor #subgrid-pattern line {
   stroke: rgba(255, 255, 255, 0.1);
 }
 
-.map line.axes {
+.svg-editor line.axes {
   stroke: #70707c;
 }
 
-.map g.path-layer line {
-  stroke: #e90;
+/* Lines */
+
+.svg-editor g.line line {
+  stroke: #bbbbc4;
+  stroke-linecap: round;
+  stroke-width: 2px;
 }
 
-.map g.path-layer circle.handle {
+.svg-editor g.line.selected line {
+  stroke: white;
+}
+
+.svg-editor g.line-handles .handle {
   fill: none;
+  stroke: #bbbbc4;
+  stroke-location: inside;
+  r: 4;
 }
 
-.map g.path-layer circle.handle.highlighted {
-  fill: rgba(238, 153, 0, 0.4);
+.svg-editor g.line-handles.selected .handle {
+  fill: white;
+  stroke: none;
 }
 
-.map g.path-layer circle.handle.selected {
-  fill: #e90;
-}
+/* Paths */
 
-.map g.path path {
+.svg-editor g.path path {
   stroke: #e90;
   stroke-width: 2px;
   fill: none;
 }
 
-.map g.path path.contruction-path {
+.svg-editor g.path path.contruction-path {
   stroke-width: 1px;
   stroke-dasharray: 5, 5;
 }
 
-.map .selection-marquee {
+.svg-editor g.path-handles .handle {
+  fill: rgba(238, 153, 0, 0.4);
+  r: 4;
+}
+
+.svg-editor g.path-handles .handle.highlighted {
+  fill: #e90;
+}
+
+.svg-editor g.path-handles .handle.selected {
+  fill: #e90;
+}
+
+/* Selections */
+
+.svg-editor .selection-marquee {
   fill: none;
   stroke-dasharray: 5, 5;
   stroke: rgba(255, 255, 255, 0.6);

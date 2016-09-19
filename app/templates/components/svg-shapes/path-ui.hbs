@@ -1,0 +1,9 @@
+<g class="path-handles {{line.layer}}-layer">
+  {{#each line.points as |point|}}
+    <circle
+      class="handle {{if (contains selectedEventIds point.id) 'selected'}} {{if (eq highlightedEventId point.id) 'highlighted'}}"
+      cx={{scale point.x viewport.zoom}}
+      cy={{scale point.y viewport.zoom}}
+    ></circle>
+  {{/each}}
+</g>

@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import config from 'niarc-map-editor/config/environment';
 import csv from 'niarc-map-editor/utils/csv';
+import Line from 'niarc-map-editor/objects/line';
 import Event from 'niarc-map-editor/objects/event';
 
 const {
@@ -28,15 +29,17 @@ export default Ember.Service.extend({
 
   map: computed(function() {
     const prefix = get(this, 'prefix');
+    const table = csv.parse(localStorage[prefix + 'map'] || '');
+    const walls = table.map(row => Line.create().deserialize(row));
 
-    return JSON.parse(localStorage[prefix + 'map'] || '[]');
+    return walls;
   }),
 
   persistMap: observer('map.[]', function() {
     const prefix = get(this, 'prefix');
     const map = get(this, 'map');
 
-    localStorage[prefix + 'map'] = JSON.stringify(map || []);
+    localStorage[prefix + 'map'] = map.map(line => line.serialize()).join('\n');
   }),
 
   events: computed(function() {

@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import { keyDown, getCode } from 'ember-keyboard';
 import * as geometry from 'niarc-map-editor/utils/geometry';
+import Line from 'niarc-map-editor/objects/line';
 
 const {
   get,
@@ -182,7 +183,7 @@ export default EmberObject.extend({
 
     editor.sendAction('deselectAll');
 
-    set(this, 'newLine', {
+    set(this, 'newLine', Line.create({
       points: {
         x1: get(point, 'x'),
         y1: get(point, 'y'),
@@ -192,7 +193,7 @@ export default EmberObject.extend({
       isSelected: false,
       type: 'line',
       layer
-    });
+    }));
   },
 
   adjustNewLine(point, snapToGrid) {

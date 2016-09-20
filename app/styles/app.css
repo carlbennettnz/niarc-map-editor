@@ -157,15 +157,13 @@ body.grabbing[data-tool=move] .svg-editor {
 }
 
 .svg-editor g.line-handles .handle {
-  fill: none;
-  stroke: #bbbbc4;
-  stroke-location: inside;
-  r: 4;
+  fill: #bbbbc4;
+  r: 3;
 }
 
 .svg-editor g.line-handles.selected .handle {
   fill: white;
-  stroke: none;
+  r: 4;
 }
 
 /* Paths */

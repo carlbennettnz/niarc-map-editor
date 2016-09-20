@@ -62,17 +62,6 @@ export function lineIsInRect(rect, line) {
   const xAxis = rectX1 < lineX1 && lineX2 < rectX2;
   const yAxis = rectY1 < lineY1 && lineY2 < rectY2;
 
-  console.log(
-    rectX1,
-    rectY1,
-    rectX2,
-    rectY2,
-    lineX1,
-    lineY1,
-    lineX2,
-    lineY2
-  );
-
   return xAxis && yAxis;
 }
 

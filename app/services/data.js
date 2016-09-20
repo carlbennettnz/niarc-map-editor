@@ -42,7 +42,6 @@ export default Ember.Service.extend({
   events: computed(function() {
     const prefix = get(this, 'prefix');
     const table = csv.parse(localStorage[prefix + 'events'] || '');
-    console.log('table', table);
     const events = table.map(row => Event.create().deserialize(row));
 
     return events;

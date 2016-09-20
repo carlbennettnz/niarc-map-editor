@@ -127,10 +127,7 @@ export default Ember.Service.extend({
   },
 
   sendEvents(events = []) {
-    const serialized = events.map(event => {
-      console.log(event)
-      return event.serialize()
-    }).join('\n');
+    const serialized = events.map(event => event.serialize()).join('\n');
 
     this.send(serialized);
   }

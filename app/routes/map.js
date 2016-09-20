@@ -1,26 +1,32 @@
 import Ember from 'ember';
-import config from 'niarc-map-editor/config/environment';
 
 const {
-  get
+  get,
+  set,
+  inject: { service }
 } = Ember;
 
 export default Ember.Route.extend({
-  model() {
-    const key = config.environment === 'test' ? 'map-test' : 'map';
+  data: service(),
 
-    try {
-      return JSON.parse(localStorage[key] || '[]');
-    } catch (err) {
-      console.error(err);
-      return [];
-    }
+  model() {
+    return get(this, 'data.map') || [];
+  },
+
+  afterModel(model) {
+    this._super(...arguments);
+
+    model.forEach(line => {
+      set(line, 'isSelected', false);
+    });
   },
 
   actions: {
     saveModel() {
-      const key = config.environment === 'test' ? 'map-test' : 'map';
-      localStorage[key] = JSON.stringify(get(this, 'controller.shapes') || []);
+      const map = get(this, 'data.map');
+
+      map.arrayContentDidChange();
+      // send to robot
     }
   }
 });

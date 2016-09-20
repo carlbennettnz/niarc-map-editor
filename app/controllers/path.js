@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import MapController from 'niarc-map-editor/controllers/map';
+import ApplicationController from 'niarc-map-editor/controllers/application';
 import Event, { parameters as eventParams } from 'niarc-map-editor/objects/event';
 import Path from 'niarc-map-editor/objects/path';
 import PathPoint from 'niarc-map-editor/objects/path-point';
@@ -16,10 +16,9 @@ const {
   inject: { service }
 } = Ember;
 
-export default MapController.extend(EmberKeyboardMixin, {
+export default ApplicationController.extend(EmberKeyboardMixin, {
   connection: service(),
-
-  tool: 'path',
+  data: service(),
 
   layers: [{
     name: 'map',
@@ -46,23 +45,23 @@ export default MapController.extend(EmberKeyboardMixin, {
 
   highlightedEvent: null,
 
-  hasPreviousEvent: computed('connection.events.[]', 'selectedEvents', function() {
+  hasPreviousEvent: computed('data.events.[]', 'selectedEvents', function() {
     const selectedEvents = get(this, 'selectedEvents');
-    const events = get(this, 'connection.events') || [];
+    const events = get(this, 'data.events') || [];
 
     return selectedEvents.length === 1 && events.indexOf(selectedEvents[0]) > 0;
   }),
 
-  hasNextEvent: computed('connection.events.[]', 'selectedEvents', function() {
+  hasNextEvent: computed('data.events.[]', 'selectedEvents', function() {
     const selectedEvents = get(this, 'selectedEvents');
-    const events = get(this, 'connection.events') || [];
+    const events = get(this, 'data.events') || [];
     const index = events.indexOf(selectedEvents[0]);
 
     return selectedEvents.length === 1 && index > -1 && index < events.length - 1;
   }),
 
-  path: computed('connection.events.[]', function() {
-    const events = get(this, 'connection.events') || [];
+  path: computed('data.events.[]', function() {
+    const events = get(this, 'data.events') || [];
     const goToPointEvents = events.filterBy('type', 'go-to-point');
 
     if (!goToPointEvents.length) {
@@ -113,7 +112,7 @@ export default MapController.extend(EmberKeyboardMixin, {
       set(event, key, newValue);
     });
 
-    this.send('saveModel');
+    this.send('saveEvents');
   },
 
   actions: {
@@ -122,7 +121,7 @@ export default MapController.extend(EmberKeyboardMixin, {
     },
 
     addPoint(point) {
-      const events = get(this, 'connection.events');
+      const events = get(this, 'data.events');
 
       const event = Event.create({
         type: 'go-to-point',
@@ -132,12 +131,12 @@ export default MapController.extend(EmberKeyboardMixin, {
 
       events.pushObject(event);
 
-      this.send('saveModel');
+      this.send('saveEvents');
     },
 
     addEvent(type) {
       const newEvent = Event.create({ type });
-      const events = get(this, 'connection.events');
+      const events = get(this, 'data.events');
       const selectedEvent = get(this, 'selectedEvents.lastObject');
       let index = events.length;
       let prevPoint;
@@ -169,12 +168,12 @@ export default MapController.extend(EmberKeyboardMixin, {
 
       set(this, 'selectedEvents', [ newEvent ]);
 
-      this.send('saveModel');
+      this.send('saveEvents');
     },
 
     deleteEvent() {
       const selectedEvents = get(this, 'selectedEvents') || [];
-      const events = get(this, 'connection.events');
+      const events = get(this, 'data.events');
       let indexToSelect = null;
 
       if (!selectedEvents.length) {
@@ -193,18 +192,18 @@ export default MapController.extend(EmberKeyboardMixin, {
         set(this, 'selectedEvents', [ events.objectAt(indexToSelect) ]);
       }
 
-      this.send('saveModel');
+      this.send('saveEvents');
     },
 
     selectEvent(eventId) {
-      const events = get(this, 'connection.events');
+      const events = get(this, 'data.events');
       const event = events.findBy('id', eventId);
 
       set(this, 'selectedEvents', event ? [ event ] : []);
     },
 
     toggleEventSelection(eventId) {
-      const event = get(this, 'connection.events').findBy('id', eventId);
+      const event = get(this, 'data.events').findBy('id', eventId);
       const selectedEvents = get(this, 'selectedEvents');
 
       if (selectedEvents.contains(event)) {
@@ -221,7 +220,7 @@ export default MapController.extend(EmberKeyboardMixin, {
         return;
       }
 
-      const events = get(this, 'connection.events');
+      const events = get(this, 'data.events');
       const index = events.indexOf(selectedEvents[0]);
       const newSelection = events.objectAt(index + step) || get(events, step < 0 ? 'firstObject' : 'lastObject');
 
@@ -229,7 +228,7 @@ export default MapController.extend(EmberKeyboardMixin, {
     },
 
     highlightEvent(eventId) {
-      const events = get(this, 'connection.events') || [];
+      const events = get(this, 'data.events') || [];
       const event = events.findBy('id', eventId);
 
       set(this, 'highlightedEvent', event);
@@ -238,7 +237,7 @@ export default MapController.extend(EmberKeyboardMixin, {
     updateEvents() {
       const path = get(this, 'path') || {};
       const points = get(path, 'points') || [];
-      const events = get(this, 'connection.events');
+      const events = get(this, 'data.events');
       const eventsToRemove = [];
 
       const updatedEvents = events.map(event => {
@@ -259,7 +258,7 @@ export default MapController.extend(EmberKeyboardMixin, {
 
       events.removeObjects(eventsToRemove);
 
-      this.send('saveModel');
+      this.send('saveEvents');
     },
 
     connect() {

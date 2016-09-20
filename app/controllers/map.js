@@ -1,36 +1,57 @@
 import Ember from 'ember';
-import config from 'niarc-map-editor/config/environment';
-import { EKMixin as EmberKeyboardMixin, keyDown } from 'ember-keyboard';
+import ApplicationController from 'niarc-map-editor/controllers/application';
 
 const {
   get,
   set,
-  on,
-  assign,
   assert,
-  isArray,
-  computed
+  isArray
 } = Ember;
 
-export default Ember.Controller.extend(EmberKeyboardMixin, {
-  keyboardActivated: true,
+export default ApplicationController.extend({
+  layers: [{
+    name: 'map',
+    isVisible: true,
+    isSelected: true
+  }],
 
-  // Override this
-  layers: [],
+  actions: {
+    addShape(shape) {
+      assert('Line must be provided', shape != null);
+      assert('Line must have points', typeof get(shape, 'points') === 'object');
+      assert('Line must have a layer', typeof get(shape, 'layer') === 'string');
+      assert('Line must have an isSelected flag', typeof get(shape, 'isSelected') === 'boolean');
 
-  mapViewport: {
-    scrollX: 300,
-    scrollY: 50,
-    zoom: 0.1
-  },
+      let shapes = get(this, 'shapes');
 
-  shapes: computed.alias('model'),
+      if (!shapes) {
+        shapes = set(this, 'shapes', []);
+      }
 
-  goToMap: on(keyDown('Digit1'), function() {
-    this.transitionToRoute('map.edit');
-  }),
+      shapes.pushObject(shape);
+      this.send('saveModel');
+    },
 
-  goToPath: on(keyDown('Digit2'), function() {
-    this.transitionToRoute('map.path');
-  })
+    selectShape(shape) {
+      this.send('deselectAll');
+      set(shape, 'isSelected', true);
+    },
+
+    deselectAll(shape) {
+      const shapes = get(this, 'shapes') || [];
+      shapes.forEach(shape => set(shape, 'isSelected', false));
+    },
+
+    resizeShape(line, points) {
+      set(line, 'points', points);
+      this.send('saveModel');
+    },
+
+    removeShapes(shapes) {
+      const model = get(this, 'shapes') || [];
+      shapes = isArray(shapes) ? shapes : [ shapes ];
+      model.removeObjects(shapes);
+      this.send('saveModel');
+    }
+  }
 });

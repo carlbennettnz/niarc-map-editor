@@ -1,7 +1,7 @@
 {{path-editor
   viewport=mapViewport
   layers=layers
-  map=model.map
+  map=data.map
   path=path
   selectedEvents=selectedEvents
   highlightedEvent=highlightedEvent
@@ -16,7 +16,7 @@
   {{map-mode-navigator}}
 
   {{event-timeline
-    events=connection.events
+    events=data.events
     selectedEvents=selectedEvents
     highlightedEvent=highlightedEvent
     addEvent=(action 'addEvent')

@@ -17,9 +17,7 @@ export default Ember.Service.extend({
   isConnecting: false,
   socket: null,
   address: '192.168.1.5:4000',
-  lastSendTime: null,
   events: [],
-  messageListeners: [],
 
   loadStoredAddress: on('init', function() {
     this._super(...arguments);
@@ -44,10 +42,6 @@ export default Ember.Service.extend({
     const messageListeners = get(this, 'messageListeners');
     messageListeners.pushObject(func);
   },
-
-  storeAddress: observer('address', function() {
-    localStorage.address = get(this, 'address');
-  }),
 
   connect() {
     const socket = new WebSocket('ws://' + get(this, 'address'));
@@ -125,27 +119,19 @@ export default Ember.Service.extend({
   },
 
   send(payload) {
-    const socket = get(this, 'socket') || {};
-    const lastSendTime = get(this, 'lastSendTime');
-    const pending = get(this, 'throttledMessage');
+    const socket = get(this, 'socket');
 
-    if (socket.readyState > 0) {
-      if (!lastSendTime || lastSendTime + 1000 < Date.now()) {
-        socket.send(payload.toString());
-      } else {
-        if (pending) {
-          run.cancel(pending);
-        }
-
-        const scheduledSend = run.later(() => {
-          set(this, 'pending', null);
-          this.send(payload);
-        }, lastSendTime + 1000 - Date.now());
-
-        set(this, 'pending', scheduledSend);
-      }
-    } else {
-      // console.log('No connection');
+    if (socket && socket.readyState > 0) {
+      socket.send(payload.toString());
     }
+  },
+
+  sendEvents(events = []) {
+    const serialized = events.map(event => {
+      console.log(event)
+      return event.serialize()
+    }).join('\n');
+
+    this.send(serialized);
   }
 });

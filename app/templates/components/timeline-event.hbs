@@ -4,10 +4,13 @@
 
 {{#if (eq event.type 'drop-cube')}}
   <span>
-    Drop Cube
-    {{~#if event.servoIndex~}}
-      : {{event.servoIndex}}
-    {{/if}}
+    Drop Cube:
+    {{if (eq event.servoIndex 2) 'Left 1'}}
+    {{if (eq event.servoIndex 1) 'Left 2'}}
+    {{if (eq event.servoIndex 5) 'Right 1'}}
+    {{if (eq event.servoIndex 0) 'Right 2'}}
+    {{if (eq event.servoIndex 3) 'Front 1'}}
+    {{if (eq event.servoIndex 4) 'Front 1'}}
   </span>
 {{/if}}
 

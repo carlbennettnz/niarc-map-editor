@@ -1,8 +1,6 @@
 # NIARC Map Editor
 
-* Draw walls, on a fixed grid, snapping to X or Y axis.
-* Select walls and edit them.
-* Export to a text file.
+This is the tool used by the VUW NIARC robotics team to configure instruction sets.
 
 ## Prerequisites
 
@@ -37,7 +35,7 @@ Make use of the many generators for code. Try `ember help generate` for more det
 
 ### Deploying
 
-`ember deploy` but you’ll need Carl’s login details.
+`ember surge` but you’ll need Carl’s login details.
 
 ## Further Reading / Useful Links
 

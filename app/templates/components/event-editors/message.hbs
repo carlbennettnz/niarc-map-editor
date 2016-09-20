@@ -1,0 +1,12 @@
+<header>
+  <a {{action jumpEventSelection -1}} class={{unless hasPreviousEvent 'disabled'}}>{{fa-icon 'caret-left'}}</a>
+  <h2>Message Event</h2>
+  <a {{action jumpEventSelection 1}} class={{unless hasNextEvent 'disabled'}}>{{fa-icon 'caret-right'}}</a>
+</header>
+
+<div class="controls">
+  <div class="control">
+    <label>Message</label>
+    {{textarea value=event.message}}
+  </div>
+</div>

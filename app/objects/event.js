@@ -18,6 +18,7 @@ eventTypes[4] = 'go-to-wall';
 eventTypes[5] = 'go-to-point-relative';
 eventTypes[6] = 'toggle-localisation';
 eventTypes[7] = 'wait';
+eventTypes[8] = 'message';
 
 export default Ember.Object.extend({
   init() {
@@ -55,6 +56,7 @@ export default Ember.Object.extend({
   goToWallPGain: 0,
   enableLocalisation: true,
   timeToWait: 0,
+  message: '',
 
   // ATTENTION: Don't add params without also adding them to the exported
   // parameters array at the end of this file.
@@ -89,7 +91,8 @@ export default Ember.Object.extend({
       Number(get(this, 'sensorToUse')) || 0,
       Number(get(this, 'goToWallPGain')) || 0,
       get(this, 'disableLocalisation') === true ? 1 : 0,
-      Number(get(this, 'timeToWait')) || 0
+      Number(get(this, 'timeToWait')) || 0,
+      `"${btoa(String(get(this, 'message')))}"`
     ].join();
 
     return serialized;
@@ -97,36 +100,36 @@ export default Ember.Object.extend({
 
   deserialize(data) {
     const pointsToFace = [];
+    const numbers = data.slice(0, 27).map(Number);
 
-    data = data.map(Number);
-
-    set(this, 'type',                  eventTypes[data[0]]);
-    set(this, 'x',                     data[1]);
-    set(this, 'y',                     data[2]);
-    set(this, 'relativePointX',        data[3]);
-    set(this, 'relativePointY',        data[4]);
-    set(this, 'pointToFaceX',          data[5]);
-    set(this, 'pointToFaceY',          data[6]);
-    set(this, 'rampMinValue',          data[7]);
-    set(this, 'errorCorrectionP',      data[8]);
-    set(this, 'pSaturation',           data[9]);
-    set(this, 'facePointP',            data[10]);
-    set(this, 'facePointPSaturation',  data[11]);
-    set(this, 'maxSpeed',              data[12]);
-    set(this, 'rampDistance',          data[13]);
-    set(this, 'tolerance',             data[14]);
-    set(this, 'acceleration',          data[15]);
-    set(this, 'rampCurveExponent',     data[16]);
-    set(this, 'stopAtEndOfLine',       data[17] === 1);
-    set(this, 'face',                  data[18]);
-    set(this, 'angleToFace',           data[19] / Math.PI * 180);
-    set(this, 'radius',                data[20]);
-    set(this, 'curveErrorCorrectionP', data[21]);
-    set(this, 'servoIndex',            data[22]);
-    set(this, 'sensorToUse',           data[23]);
-    set(this, 'goToWallPGain',         data[24]);
-    set(this, 'disableLocalisation',   data[25] === 1);
-    set(this, 'timeToWait',            data[26]);
+    set(this, 'type',                  eventTypes[numbers[0]]);
+    set(this, 'x',                     numbers[1]);
+    set(this, 'y',                     numbers[2]);
+    set(this, 'relativePointX',        numbers[3]);
+    set(this, 'relativePointY',        numbers[4]);
+    set(this, 'pointToFaceX',          numbers[5]);
+    set(this, 'pointToFaceY',          numbers[6]);
+    set(this, 'rampMinValue',          numbers[7]);
+    set(this, 'errorCorrectionP',      numbers[8]);
+    set(this, 'pSaturation',           numbers[9]);
+    set(this, 'facePointP',            numbers[10]);
+    set(this, 'facePointPSaturation',  numbers[11]);
+    set(this, 'maxSpeed',              numbers[12]);
+    set(this, 'rampDistance',          numbers[13]);
+    set(this, 'tolerance',             numbers[14]);
+    set(this, 'acceleration',          numbers[15]);
+    set(this, 'rampCurveExponent',     numbers[16]);
+    set(this, 'stopAtEndOfLine',       numbers[17] === 1);
+    set(this, 'face',                  numbers[18]);
+    set(this, 'angleToFace',           numbers[19] / Math.PI * 180);
+    set(this, 'radius',                numbers[20]);
+    set(this, 'curveErrorCorrectionP', numbers[21]);
+    set(this, 'servoIndex',            numbers[22]);
+    set(this, 'sensorToUse',           numbers[23]);
+    set(this, 'goToWallPGain',         numbers[24]);
+    set(this, 'disableLocalisation',   numbers[25] === 1);
+    set(this, 'timeToWait',            numbers[26]);
+    set(this, 'message',               atob(data[27] == null ? '' : data[27].substring(1, data[27].length - 1)));
 
     return this;
   }
@@ -158,5 +161,6 @@ export const parameters = [
   'sensorToUse',
   'goToWallPGain',
   'disableLocalisation',
-  'timeToWait'
+  'timeToWait',
+  'message'
 ];

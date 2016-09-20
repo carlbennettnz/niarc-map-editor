@@ -363,11 +363,23 @@ body.grabbing[data-tool=move] .svg-editor {
 }
 
 .ui-module.event-timeline li[data-event-type=go-to-wall]::before {
-  background-color: #494;
+  background-color: teal;
 }
 
 .ui-module.event-timeline li[data-event-type=drop-cube]::before {
   background-color: #37c;
+}
+
+.ui-module.event-timeline li[data-event-type=toggle-localisation]::before {
+  background-color: #37c;
+}
+
+.ui-module.event-timeline li[data-event-type=wait]::before {
+  background-color: #b44;
+}
+
+.ui-module.event-timeline li[data-event-type=message]::before {
+  background-color: #5a7;
 }
 
 .ui-module.event-timeline .controls {

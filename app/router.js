@@ -10,6 +10,7 @@ Router.map(function() {
   this.route('map');
   this.route('path');
   this.route('config');
+  this.route('select');
 });
 
 export default Router;

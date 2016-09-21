@@ -1,0 +1,17 @@
+<article class="save-and-load">
+  <h1>Saved Paths</h1>
+  
+  <div class="paths">
+    {{#each paths as |path|}}
+      {{path-preview
+        viewport=path.viewport
+        path=path.path
+        click=(action 'showPath' path)
+      }}
+    {{/each}}
+
+    <div class="new-path">
+      {{fa-icon 'plus-circle'}}
+    </div>
+  </div>
+</article>

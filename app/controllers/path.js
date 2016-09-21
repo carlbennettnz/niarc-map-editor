@@ -18,7 +18,6 @@ const {
 
 export default ApplicationController.extend(EmberKeyboardMixin, {
   connection: service(),
-  data: service(),
 
   layers: [{
     name: 'map',
@@ -45,23 +44,23 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
 
   highlightedEvent: null,
 
-  hasPreviousEvent: computed('data.events.[]', 'selectedEvents', function() {
+  hasPreviousEvent: computed('model.events.[]', 'selectedEvents', function() {
     const selectedEvents = get(this, 'selectedEvents');
-    const events = get(this, 'data.events') || [];
+    const events = get(this, 'model.events') || [];
 
     return selectedEvents.length === 1 && events.indexOf(selectedEvents[0]) > 0;
   }),
 
-  hasNextEvent: computed('data.events.[]', 'selectedEvents', function() {
+  hasNextEvent: computed('model.events.[]', 'selectedEvents', function() {
     const selectedEvents = get(this, 'selectedEvents');
-    const events = get(this, 'data.events') || [];
+    const events = get(this, 'model.events') || [];
     const index = events.indexOf(selectedEvents[0]);
 
     return selectedEvents.length === 1 && index > -1 && index < events.length - 1;
   }),
 
-  path: computed('data.events.[]', function() {
-    const events = get(this, 'data.events') || [];
+  path: computed('model.events.[]', function() {
+    const events = get(this, 'model.events') || [];
     const goToPointEvents = events.filterBy('type', 'go-to-point');
 
     if (!goToPointEvents.length) {
@@ -121,7 +120,7 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
     },
 
     addPoint(point) {
-      const events = get(this, 'data.events');
+      const events = get(this, 'model.events');
 
       const event = Event.create({
         type: 'go-to-point',
@@ -136,7 +135,7 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
 
     addEvent(type) {
       const newEvent = Event.create({ type });
-      const events = get(this, 'data.events');
+      const events = get(this, 'model.events');
       const selectedEvent = get(this, 'selectedEvents.lastObject');
       let index = events.length;
       let prevPoint;
@@ -173,7 +172,7 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
 
     deleteEvent() {
       const selectedEvents = get(this, 'selectedEvents') || [];
-      const events = get(this, 'data.events');
+      const events = get(this, 'model.events');
       let indexToSelect = null;
 
       if (!selectedEvents.length) {
@@ -196,14 +195,14 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
     },
 
     selectEvent(eventId) {
-      const events = get(this, 'data.events');
+      const events = get(this, 'model.events');
       const event = events.findBy('id', eventId);
 
       set(this, 'selectedEvents', event ? [ event ] : []);
     },
 
     toggleEventSelection(eventId) {
-      const event = get(this, 'data.events').findBy('id', eventId);
+      const event = get(this, 'model.events').findBy('id', eventId);
       const selectedEvents = get(this, 'selectedEvents');
 
       if (selectedEvents.contains(event)) {
@@ -220,7 +219,7 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
         return;
       }
 
-      const events = get(this, 'data.events');
+      const events = get(this, 'model.events');
       const index = events.indexOf(selectedEvents[0]);
       const newSelection = events.objectAt(index + step) || get(events, step < 0 ? 'firstObject' : 'lastObject');
 
@@ -228,7 +227,7 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
     },
 
     highlightEvent(eventId) {
-      const events = get(this, 'data.events') || [];
+      const events = get(this, 'model.events') || [];
       const event = events.findBy('id', eventId);
 
       set(this, 'highlightedEvent', event);
@@ -237,7 +236,7 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
     updateEvents() {
       const path = get(this, 'path') || {};
       const points = get(path, 'points') || [];
-      const events = get(this, 'data.events');
+      const events = get(this, 'model.events');
       const eventsToRemove = [];
 
       const updatedEvents = events.map(event => {

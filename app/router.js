@@ -11,6 +11,7 @@ Router.map(function() {
   this.route('path');
   this.route('config');
   this.route('select');
+  this.route('not-found', { path: '*path' });
 });
 
 export default Router;

@@ -17,6 +17,22 @@ body {
   -webkit-user-select: none;
 }
 
+article {
+  width: 960px;
+  margin: 8vh auto;
+}
+
+article h1 {
+  text-align: center;
+  font-size: 29px;
+  font-weight: 300;
+  font-family: "Helvetica Neue", sans-serif;
+  color: #e2e2e2;
+  border-bottom: 1px solid #4c4c4c;
+  padding-bottom: 4vh;
+  margin: 0 15% 6vh;
+}
+
 ::-webkit-scrollbar {
     width: 13px;
     height: 18px;
@@ -504,22 +520,6 @@ svg .selection-marquee {
 /**********************************/
 /* SAVE AND LOAD                  */
 /**********************************/
-
-article.save-and-load {
-  width: 960px;
-  margin: 8vh auto;
-}
-
-article.save-and-load h1 {
-  text-align: center;
-  font-size: 29px;
-  font-weight: 300;
-  font-family: "Helvetica Neue", sans-serif;
-  color: #e2e2e2;
-  border-bottom: 1px solid #4c4c4c;
-  padding-bottom: 4vh;
-  margin: 0 15% 6vh;
-}
 
 .paths {
   display: flex;

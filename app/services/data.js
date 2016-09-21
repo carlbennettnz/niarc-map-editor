@@ -9,7 +9,9 @@ const {
   set,
   on,
   computed,
-  observer
+  observer,
+  RSVP,
+  run
 } = Ember;
 
 export default Ember.Service.extend({
@@ -17,43 +19,102 @@ export default Ember.Service.extend({
   events: [],
   robotData: null,
 
-  setPrefix: on('init', function(key, value) {
-    set(this, 'prefix', config.environment === 'test' ? 'test-' : '');
+  openDbConnection: on('init', function() {
+    const openReq = indexedDB.open('niarc', 1);
+
+    openReq.onerror = console.error;
+    openReq.onupgradeneeded = this.setupDb.bind(this);
+    openReq.onsuccess = this.onDbOpen.bind(this);
   }),
 
-  persistAddress: observer('address', function() {
-    const prefix = get(this, 'prefix');
+  setupDb(event) {
+    const db = event.target.result;
+    const instructionsStore = db.createObjectStore('instructions', { keyPath: 'id', autoIncrement: true });
+    
+    if (localStorage.events) {
+      instructionsStore.add({
+        name: 'Instructions From LocalStorage',
+        events: localStorage.events,
+        modified: Date.now()
+      });
+    }
+  },
 
-    localStorage[prefix + address] = get(this, 'address');
+  onDbOpen(event) {
+    const db = event.target.result;
+
+    db.onerror = console.error;
+
+    set(this, 'db', db);
+  },
+
+  getDb() {
+    const db = get(this, 'db');
+
+    if (db) {
+      return RSVP.resolve(db);
+    }
+
+    return new RSVP.Promise(resolve => {
+      run.later(() => resolve(this.getDb()), 500);
+    });
+  },
+
+  find(storeName, id) {
+    return this.getDb().then(db => {
+      const transaction = db.transaction([ storeName ], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.get(id);
+
+      return new RSVP.Promise((resolve, reject) => {
+        request.onerror = reject;
+        request.onsuccess = event => resolve(request.result);
+      });
+    });
+  },
+
+  create(storeName, data) {
+    return this.getDb().then(db => {
+      const transaction = db.transaction([ storeName ], 'readwrite');
+      const store = transaction.objectStore(storeName);
+
+      return new RSVP.Promise((resolve, reject) => {
+        const request = store.add(data);
+        
+        request.onerror = reject;
+        request.oncomplete = resolve;
+      });
+    });
+  },
+
+  update(storeName, data) {
+    return this.getDb().then(db => {
+      const transaction = db.transaction([ storeName ], 'readwrite');
+      const store = transaction.objectStore(storeName);
+
+      return new RSVP.Promise((resolve, reject) => {
+        const request = store.put(data);
+        
+        request.onerror = reject;
+        request.oncomplete = resolve;
+      });
+    });
+  },
+
+  persistAddress: observer('address', function() {
+    localStorage.address = get(this, 'address');
   }),
 
   map: computed(function() {
-    const prefix = get(this, 'prefix');
-    const table = csv.parse(localStorage[prefix + 'map'] || '');
+    const table = csv.parse(localStorage.map || '');
     const walls = table.map(row => Line.create().deserialize(row));
 
     return walls;
   }),
 
   persistMap: observer('map.[]', function() {
-    const prefix = get(this, 'prefix');
     const map = get(this, 'map');
 
-    localStorage[prefix + 'map'] = map.map(line => line.serialize()).join('\n');
-  }),
-
-  events: computed(function() {
-    const prefix = get(this, 'prefix');
-    const table = csv.parse(localStorage[prefix + 'events'] || '');
-    const events = table.map(row => Event.create().deserialize(row));
-
-    return events;
-  }),
-
-  persistEvents: observer('events.[]', function() {
-    const prefix = get(this, 'prefix');
-    const events = get(this, 'events');
-
-    localStorage[prefix + 'events'] = events.map(event => event.serialize()).join('\n');
+    localStorage.map = map.map(line => line.serialize()).join('\n');
   })
 });

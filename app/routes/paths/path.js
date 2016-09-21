@@ -16,10 +16,10 @@ export default Ember.Route.extend({
   connection: service(),
   data: service(),
 
-  model({ id = 1 }) {
+  model({ id }) {
     const data = get(this, 'data');
 
-    return data.find('instructions', id).then(instructionSet => {
+    return data.find('instructions', Number(id)).then(instructionSet => {
       if (!instructionSet) {
         const error = new Error('Not found');
         error.status = 404;
@@ -51,6 +51,7 @@ export default Ember.Route.extend({
       const lastSave = get(this, 'save');
 
       set(instructionSet, 'events', events.map(event => event.serialize()).join('\n'));
+      set(instructionSet, 'modified', Date.now());
 
       if (lastSave) {
         run.cancel(lastSave);

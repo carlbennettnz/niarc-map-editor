@@ -82,7 +82,6 @@ export default Ember.Component.extend({
           y: get(pointsInQuestion[1], 'y') + distanceDownArms * Math.sin(getAngleOf(vectors[1]))
         };
 
-
         const final = [ mid, end ].map(p => this.getScaledPoint(p)).map(s => s.replace(',', ' '));
 
         str += ' L ' + this.getScaledPoint(start);

@@ -73,6 +73,19 @@ export default Ember.Service.extend({
     });
   },
 
+  findAll(storeName) {
+    return this.getDb().then(db => {
+      const transaction = db.transaction([ storeName ], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.getAll();
+
+      return new RSVP.Promise((resolve, reject) => {
+        request.onerror = reject;
+        request.onsuccess = event => resolve(request.result);
+      });
+    });
+  },
+
   create(storeName, data) {
     return this.getDb().then(db => {
       const transaction = db.transaction([ storeName ], 'readwrite');

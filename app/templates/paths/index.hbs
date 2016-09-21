@@ -2,11 +2,10 @@
   <h1>Saved Paths</h1>
   
   <div class="paths">
-    {{#each paths as |path|}}
+    {{#each model as |instructionSet|}}
       {{path-preview
-        viewport=path.viewport
-        path=path.path
-        click=(action 'showPath' path)
+        instructions=instructionSet
+        click=(action 'showInstructions' instructionSet)
       }}
     {{/each}}
 

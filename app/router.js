@@ -8,9 +8,10 @@ const Router = Ember.Router.extend({
 Router.map(function() {
   this.route('index', { path: '/' });
   this.route('map');
-  this.route('path');
+  this.route('paths', function() {
+    this.route('path', { path: ':id' });
+  });
   this.route('config');
-  this.route('select');
   this.route('not-found', { path: '*path' });
 });
 

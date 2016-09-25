@@ -56,6 +56,8 @@ export default Ember.Service.extend({
       set(self, 'isConnected', true);
       set(self, 'isConnecting', false);
       set(self, 'socket', this);
+
+      this.trigger('connected');
     }
 
     socket.onmessage = ({ data }) => {

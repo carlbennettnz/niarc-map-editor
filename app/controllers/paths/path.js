@@ -263,6 +263,10 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
     connect() {
       const connection = get(this, 'connection');
       connection.connect();
+
+      connection.one('connected', () => {
+        this.send('saveEvents');
+      });
     },
 
     disconnect() {

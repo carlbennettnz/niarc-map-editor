@@ -62,7 +62,6 @@ export default Ember.Component.extend({
 
     // Use the minimum
     if (xZoom < yZoom) {
-      console.log(-limits.bottom * xZoom, (limits.top - limits.bottom) * xZoom);
       return {
         scrollX: -limits.left * xZoom,
         scrollY: -limits.bottom * xZoom + (height - (limits.top - limits.bottom) * xZoom) / 2, // Center in available space

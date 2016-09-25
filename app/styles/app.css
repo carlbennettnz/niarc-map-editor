@@ -239,6 +239,16 @@ svg .selection-marquee {
   stroke: rgba(255, 255, 255, 0.6);
 }
 
+/* Mouse position indicator */
+
+.mouse-position {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  font-family: monospace, sans-serif;
+  pointer-events: none;
+}
+
 /**********************************/
 /* UI MODULES                     */
 /**********************************/

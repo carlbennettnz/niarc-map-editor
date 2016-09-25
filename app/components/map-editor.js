@@ -85,6 +85,8 @@ export default SvgEditorComponent.extend({
     const action = get(this, 'action');
     const point = this.getScaledAndOffsetPoint(clientX, clientY);
 
+    set(this, 'mousePosition', point);
+
     if (!buttons) {
       return;
     }

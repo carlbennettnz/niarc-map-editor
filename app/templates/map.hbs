@@ -9,5 +9,8 @@
   remove=(action 'removeShapes')}}
 
 <aside class="ui-modules">
-  {{map-mode-navigator}}
+  <div class="ui-module mode-switcher">
+    {{#link-to 'map'}}Map{{/link-to}}
+    {{#link-to 'paths'}}Paths{{/link-to}}
+  </div>
 </aside>

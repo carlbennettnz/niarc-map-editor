@@ -73,3 +73,9 @@
     {{/if}}
   </g>
 </svg>
+
+{{#if mousePosition}}
+  <div class="mouse-position">
+    { x: {{mousePosition.x}}, y: {{mousePosition.y}} }
+  </div>
+{{/if}}

@@ -69,7 +69,7 @@ export default Ember.Component.extend({
       };
     } else {
       return {
-        scrollX: (width - (limits.right - limits.left) * yZoom) / 2, // Center in available space
+        scrollX: -limits.left * yZoom + (width - (limits.right - limits.left) * yZoom) / 2, // Center in available space
         scrollY: -limits.bottom * yZoom,
         zoom: yZoom
       };

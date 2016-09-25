@@ -564,11 +564,16 @@ svg .selection-marquee {
 }
 
 .path-preview header button {
+  visibility: hidden;
   border: 0;
   background-color: transparent;
   box-shadow: none;
   color: rgba(255, 255, 255, 0.5);
   padding: 0 2em;
+}
+
+.path-preview:hover header button {
+  visibility: visible;
 }
 
 .path-preview header button:hover {

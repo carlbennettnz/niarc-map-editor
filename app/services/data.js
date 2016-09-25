@@ -114,6 +114,20 @@ export default Ember.Service.extend({
     });
   },
 
+  delete(storeName, id) {
+    return this.getDb().then(db => {
+      const transaction = db.transaction([ storeName ], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      
+      return new RSVP.Promise((resolve, reject) => {
+        const request = store.delete(id);
+
+        request.onerror = reject;
+        request.onsuccess = resolve;
+      });
+    });
+  },
+
   persistAddress: observer('address', function() {
     localStorage.address = get(this, 'address');
   }),

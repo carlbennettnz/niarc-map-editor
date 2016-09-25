@@ -76,7 +76,19 @@ export default Ember.Component.extend({
     }
   }),
 
-  click() {
-    this.sendAction('click');
+  didInsertElement() {
+    this.$('button.rename').on('click', event => {
+      run(() => this.sendAction('rename'));
+      return false;
+    });
+
+    this.$('button.delete').on('click', event => {
+      run(() => this.sendAction('delete'));
+      return false;
+    });
+
+    this.$().on('click', event => {
+      run(() => this.sendAction('show'));
+    });
   }
 });

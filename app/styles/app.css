@@ -559,6 +559,22 @@ svg .selection-marquee {
   flex-wrap: wrap;
 }
 
+.path-preview header {
+  display: flex;
+}
+
+.path-preview header button {
+  border: 0;
+  background-color: transparent;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0 2em;
+}
+
+.path-preview header button:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .path-preview, .new-path {
   width: 300px;
   height: 250px;

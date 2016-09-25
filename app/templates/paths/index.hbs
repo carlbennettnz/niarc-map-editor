@@ -5,7 +5,9 @@
     {{#each model as |instructionSet|}}
       {{path-preview
         instructions=instructionSet
-        click=(action 'showInstructions' instructionSet)
+        show=(action 'showInstructions' instructionSet)
+        rename=(action 'rename' instructionSet)
+        delete=(action 'delete' instructionSet)
       }}
     {{/each}}
 

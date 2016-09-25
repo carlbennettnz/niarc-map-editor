@@ -10,6 +10,7 @@ Router.map(function() {
   this.route('map');
   this.route('paths', function() {
     this.route('path', { path: ':id' });
+    this.route('new');
   });
   this.route('config');
   this.route('not-found', { path: '*path' });

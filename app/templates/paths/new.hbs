@@ -1,0 +1,8 @@
+<article>
+  <h1>New Path</h1>
+
+  <form class="new-path-form" {{action 'create' on="submit"}}>
+    <label>What should we call it?</label>
+    {{input value=name didRender=(action 'focus') placeholder="My New Path"}}
+  </form>
+</article>

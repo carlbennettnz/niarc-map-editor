@@ -4,6 +4,7 @@ const {
   get,
   set,
   on,
+  run,
   getProperties,
   computed
 } = Ember;
@@ -11,15 +12,8 @@ const {
 export default Ember.Component.extend({
   classNames: [ 'path-preview' ],
 
-  viewportHeight: 0,
-
-  updateViewportHeight: on('init', function() {
-    set(this, 'viewportHeight', $(window).height());
-
-    $(window).on('resize', function() {
-      run(() => set(this, 'viewportHeight', $(window).height()));
-    })
-  }),
+  width: 278,
+  height: 150,
 
   totalYOffset: computed('viewport.scrollY', 'viewportHeight', function() {
     return get(this, 'viewportHeight') - get(this, 'viewport.scrollY');
@@ -27,13 +21,23 @@ export default Ember.Component.extend({
 
   scrollTransform: computed('viewport.scrollX', 'viewport.scrollY', 'viewportHeight', function() {
     const x = get(this, 'viewport.scrollX');
-    const y = 150 - get(this, 'viewport.scrollY');
+    const y = get(this, 'height') - get(this, 'viewport.scrollY');
 
     return `translate(${x}, ${y}) scale(1, -1)`;
   }),
 
   viewport: computed('instructions.path.points.@each.{x,y}', function() {
-    const instructions = get(this, 'instructions');
+    const points = get(this, 'instructions.path.points');
+    const width = get(this, 'width');
+    const height = get(this, 'height');
+
+    if (!points.length) {
+      return {
+        scrollX: 0,
+        scrollY: 0,
+        zoom: 1
+      };
+    }
 
     const limits = {
       left: null,
@@ -43,30 +47,31 @@ export default Ember.Component.extend({
     };
 
     // Find extreme points
-    get(instructions, 'path.points').forEach(point => {
+    points.forEach(point => {
       const { x, y } = getProperties(point, 'x', 'y');
       
       if (!limits.left   || x < limits.left)   limits.left   = x;
       if (!limits.right  || x > limits.right)  limits.right  = x;
-      if (!limits.top    || y < limits.top)    limits.top    = y;
-      if (!limits.bottom || y > limits.bottom) limits.bottom = y;
+      if (!limits.bottom || y < limits.bottom) limits.bottom = y;
+      if (!limits.top    || y > limits.top)    limits.top    = y;
     });
 
     // The maximum possible zoom level while keeping all points in frame
-    const xZoom = 278 / (limits.right - limits.left);
-    const yZoom = 150 / (limits.bottom - limits.top);
+    const xZoom = width / (limits.right - limits.left);
+    const yZoom = height / (limits.top - limits.bottom);
 
     // Use the minimum
     if (xZoom < yZoom) {
+      console.log(-limits.bottom * xZoom, (limits.top - limits.bottom) * xZoom);
       return {
         scrollX: -limits.left * xZoom,
-        scrollY: (150 - (limits.bottom - limits.top) * xZoom) / 2, // Center in available space
+        scrollY: -limits.bottom * xZoom + (height - (limits.top - limits.bottom) * xZoom) / 2, // Center in available space
         zoom: xZoom
       };
     } else {
       return {
-        scrollX: (278 - (limits.right - limits.left) * yZoom) / 2, // Center in available space
-        scrollY: -limits.top * yZoom,
+        scrollX: (width - (limits.right - limits.left) * yZoom) / 2, // Center in available space
+        scrollY: -limits.bottom * yZoom,
         zoom: yZoom
       };
     }

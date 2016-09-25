@@ -12,6 +12,10 @@ export default Ember.Controller.extend({
   actions: {
     showInstructions(instructions) {
       this.transitionToRoute('paths.path', get(instructions, 'id'));
+    },
+
+    newInstructions() {
+      this.transitionToRoute('paths.new');
     }
   }
 });

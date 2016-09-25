@@ -95,7 +95,7 @@ export default Ember.Service.extend({
         const request = store.add(data);
         
         request.onerror = reject;
-        request.oncomplete = resolve;
+        request.onsuccess = event => resolve(event.target.result);
       });
     });
   },

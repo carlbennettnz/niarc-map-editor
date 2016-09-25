@@ -21,8 +21,20 @@ export default Ember.Controller.extend({
       this.transitionToRoute('paths.new');
     },
 
-    rename() {
-      alert('nah');
+    duplicate(instructions) {
+      const data = get(this, 'data');
+
+      const clone = {
+        name: get(instructions, 'name') + ' copy',
+        events: get(instructions, 'events'),
+        modified: Date.now()
+      };
+
+      data.create('instructions', clone).then(newId => {
+        set(clone, 'id', newId);
+        set(clone, 'path', get(instructions, 'path'));
+        get(this, 'model').pushObject(clone);
+      });
     },
 
     delete(instructions) {

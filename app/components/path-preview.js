@@ -31,7 +31,7 @@ export default Ember.Component.extend({
     const width = get(this, 'width');
     const height = get(this, 'height');
 
-    if (!points.length) {
+    if (!points || !points.length) {
       return {
         scrollX: 0,
         scrollY: 0,
@@ -77,8 +77,8 @@ export default Ember.Component.extend({
   }),
 
   didInsertElement() {
-    this.$('button.rename').on('click', event => {
-      run(() => this.sendAction('rename'));
+    this.$('button.duplicate').on('click', event => {
+      run(() => this.sendAction('duplicate'));
       return false;
     });
 

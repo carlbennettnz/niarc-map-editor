@@ -5,12 +5,15 @@ const {
   set,
   on,
   run,
+  observer,
   getProperties,
+  toggleProperty,
   computed
 } = Ember;
 
 export default Ember.Component.extend({
   classNames: [ 'path-preview' ],
+  classNameBindings: [ 'menuIsOpen:menu-open' ],
 
   width: 278,
   height: 150,
@@ -76,19 +79,17 @@ export default Ember.Component.extend({
     }
   }),
 
-  didInsertElement() {
-    this.$('button.duplicate').on('click', event => {
-      run(() => this.sendAction('duplicate'));
-      return false;
-    });
+  sendRenameAction: observer('instructions.name', function() {
+    this.sendAction('rename', get(this, 'instructions.name'));
+  }),
 
-    this.$('button.delete').on('click', event => {
-      run(() => this.sendAction('delete'));
-      return false;
-    });
+  actions: {
+    show() {
+      this.sendAction('show');
+    },
 
-    this.$().on('click', event => {
-      run(() => this.sendAction('show'));
-    });
+    toggleConfirmDelete() {
+      this.toggleProperty('confirmDelete');
+    }
   }
 });

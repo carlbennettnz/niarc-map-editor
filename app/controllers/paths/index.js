@@ -21,6 +21,19 @@ export default Ember.Controller.extend({
       this.transitionToRoute('paths.new');
     },
 
+    renameInstructions(instructions, name) {
+      const data = get(this, 'data');
+
+      const updatedInstructions = {
+        name,
+        id: get(instructions, 'id'),
+        events: get(instructions, 'events'),
+        modified: Date.now()
+      };
+
+      data.update('instructions', updatedInstructions);
+    },
+
     duplicate(instructions) {
       const data = get(this, 'data');
 

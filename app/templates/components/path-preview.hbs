@@ -1,10 +1,8 @@
 <header>
-  <button class="duplicate">{{fa-icon 'files-o'}}</button>
-  <h2>{{instructions.name}}</h2>
-  <button class="delete">{{fa-icon 'times'}}</button>
+  <h2>{{input value=instructions.name}}</h2>
 </header>
 
-<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="278" height="150">
+<svg {{action 'show'}} version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="278" height="150">
   <g class="scroll-offset {{selectedLayerName}}-layer-selected" transform={{scrollTransform}}>
     {{svg-shapes/path
       line=instructions.path
@@ -14,4 +12,18 @@
   </g>
 </svg>
 
-<div class="date-modified">Last modified {{moment-from-now instructions.modified}}</div>
+<footer>
+  <button {{action duplicate}}>{{fa-icon 'files-o'}}</button>
+  <div class="date-modified">Last modified {{moment-from-now instructions.modified}}</div>
+  <button {{action 'toggleConfirmDelete'}}>{{fa-icon 'trash'}}</button>
+</footer>
+
+{{#if confirmDelete}}
+  <div class="confirm-delete">
+    <p>Are you sure you want to delete these instructions?</p>
+    <div class="options">
+      <button class="cancel" {{action 'toggleConfirmDelete'}}>Cancel</button>
+      <button class="delete" {{action delete}}>Delete</button>
+    </div>
+  </div>
+{{/if}}

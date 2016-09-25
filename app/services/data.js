@@ -128,6 +128,12 @@ export default Ember.Service.extend({
     });
   },
 
+  initAddress: on('init', function() {
+    if (localStorage.address) {
+      set(this, 'address', localStorage.address);
+    }
+  }),
+
   persistAddress: observer('address', function() {
     localStorage.address = get(this, 'address');
   }),

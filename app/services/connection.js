@@ -8,24 +8,20 @@ const {
   set,
   run,
   on,
+  computed,
   observer,
-  assign
+  assign,
+  inject: { service }
 } = Ember;
 
 export default Ember.Service.extend({
+  data: service(),
+
   isConnected: false,
   isConnecting: false,
   socket: null,
-  address: '192.168.1.5:4000',
+  address: computed.alias('data.address'),
   events: [],
-
-  loadStoredAddress: on('init', function() {
-    this._super(...arguments);
-
-    if (localStorage.address) {
-      set(this, 'address', localStorage.address)
-    }
-  }),
 
   enableSaveAndLoad: on('init', function() {
     window.save = () => JSON.stringify(get(this, 'events'));

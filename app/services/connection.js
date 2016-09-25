@@ -97,7 +97,8 @@ export default Ember.Service.extend({
     socket.onclose = () => {
       console.log('closed, reconnecting in 10 seconds...');
       set(this, 'isConnected', false);
-      run.later(() => this.connect(), 10000);
+      const reconnectionTimer = run.later(() => this.connect(), 10000);
+      set(this, 'reconnectionTimer', reconnectionTimer);
     };
 
     set(this, 'socket', socket);
@@ -105,9 +106,14 @@ export default Ember.Service.extend({
 
   disconnect() {
     const socket = get(this, 'socket');
+    const reconnectionTimer = get(this, 'reconnectionTimer');
 
     if (!socket || !(socket instanceof WebSocket)) {
       return;
+    }
+
+    if (reconnectionTimer) {
+      run.cancel(reconnectionTimer);
     }
 
     socket.onclose = () => {};

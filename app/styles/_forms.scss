@@ -1,0 +1,81 @@
+button {
+  border: 1px solid black;
+  background-color: #55556f;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.45em 1em 0.6em;
+  line-height: 1;
+  outline: 0;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #62627f;
+}
+
+button i.fa {
+  font-size: 125%;
+  margin-top: 1px;
+}
+
+button:active {
+  background-color: #444459;
+}
+
+input[type=text],
+input[type=number] {
+  background: #444;
+  border: 1px solid black;
+  padding: 0.5em 0.8em;
+  color: white;
+  outline: 0;
+  width: 100px;
+}
+
+input[type=text]:focus,
+input[type=number]:focus {
+  border-color: #39c;
+}
+
+select {
+  margin-top: 3px;
+  width: 100px;
+}
+
+.control {
+  display: flex;
+  margin-bottom: 0.5em
+}
+
+.control label {
+  flex: 0 0 100px;
+  padding: 0.5em 0;
+}
+
+.control input {
+  flex: 1 1;
+  width: 0;
+}
+
+.new-path-form {
+  text-align: center;
+  margin: 80px 0;
+}
+
+.new-path-form label {
+  display: block;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 22px;
+  color: #999;
+  font-weight: 300;
+}
+
+.new-path-form input {
+  background-color: #262626;
+  margin-top: 0.5em;
+  /*border-color: #666;*/
+  /*border-width: 0 0 3px;*/
+  font-size: 32px;
+  text-align: center;
+  width: 12em;
+}

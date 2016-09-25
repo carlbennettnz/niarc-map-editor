@@ -304,12 +304,8 @@ svg .selection-marquee {
   color: white;
   text-decoration: none;
   padding: 0.8em 1em;
-  background-color: #2c2c2c;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.07), transparent);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 1px 0 0 rgba(255, 255, 255, 0.05),
-    inset -1px 0 0 rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   cursor: pointer;
 }
 
@@ -319,6 +315,10 @@ svg .selection-marquee {
 
 .ui-module.nav a:last-child {
   border-right: 0;
+}
+
+.ui-module.nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .ui-module.nav h1 {
@@ -457,6 +457,12 @@ svg .selection-marquee {
   padding-left: 0;
   padding-right: 0;
   text-align: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.075);
+}
+
+.ui-module.event-timeline .controls button:hover {
+  background-color: rgba(255, 255, 255, 0.125);
 }
 
 .ui-module.event-timeline .controls > div.right button {

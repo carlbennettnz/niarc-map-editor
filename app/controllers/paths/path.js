@@ -79,6 +79,7 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
 
     const type = get(selectedEvents[0], 'type');
     const compiledEvent = EmberObject.create({ type });
+    const blankEvent = Event.create(); // Just used to get field types
 
     if (selectedEvents.rejectBy('type', type).length) {
       return null;
@@ -87,31 +88,34 @@ export default ApplicationController.extend(EmberKeyboardMixin, {
     eventParams.forEach(key => {
       const firstValue = get(selectedEvents[0], key);
       const matchesFirst = selectedEvents.slice(1).map(event => get(event, key) !== firstValue);
+      const type = get(blankEvent, key);
 
       // If they're all the same, show the value in the compiled event
       if (!matchesFirst.includes(true)) {
         set(compiledEvent, key, firstValue);
       }
 
-      compiledEvent.addObserver(key, this, this.handleEventParamChange);
+      compiledEvent.addObserver(key, this, this.handleEventParamChange(type));
     });
 
     return compiledEvent;
   }),
 
-  handleEventParamChange(sender, key) {
-    let newValue = get(sender, key);
-    const selectedEvents = get(this, 'selectedEvents');
+  handleEventParamChange(type) {
+    return function(sender, key) {
+      let newValue = get(sender, key);
+      const selectedEvents = get(this, 'selectedEvents');
 
-    if (typeof newValue === 'string' && !isNaN(newValue)) {
-      newValue = Number(newValue);
-    }
+      if (type === 'number' && !isNaN(newValue)) {
+        newValue = Number(newValue);
+      }
 
-    selectedEvents.forEach(event => {
-      set(event, key, newValue);
-    });
+      selectedEvents.forEach(event => {
+        set(event, key, newValue);
+      });
 
-    this.send('saveEvents');
+      this.send('saveEvents');
+    };
   },
 
   actions: {

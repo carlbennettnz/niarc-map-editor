@@ -12,8 +12,13 @@
   highlightEvent=(action 'highlightEvent')
 }}
 
+
 <aside class="ui-modules">
-  {{map-mode-navigator}}
+  <div class="ui-module nav">
+    {{#link-to 'paths'}}{{fa-icon 'arrow-left'}}{{/link-to}}
+    <h1>{{model.instructionSet.name}}</h1>
+    {{#link-to 'map'}}{{fa-icon 'map-o'}}{{/link-to}}
+  </div>
 
   {{event-timeline
     events=model.events

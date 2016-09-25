@@ -75,6 +75,10 @@ button {
   cursor: pointer;
 }
 
+button:hover {
+  background-color: #62627f;
+}
+
 button i.fa {
   font-size: 125%;
   margin-top: 1px;

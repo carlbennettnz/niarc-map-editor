@@ -96,7 +96,7 @@ export default Ember.Component.extend(EKMixin, {
       const zoom = get(this, 'viewport.zoom');
       const defaultGridSize = get(this, 'gridSize');
 
-      gridSize = zoom > 0.3 ? defaultGridSize / 10 : defaultGridSize;
+      gridSize = zoom > 0.4 ? defaultGridSize / 20 : defaultGridSize;
     }
 
     return {
